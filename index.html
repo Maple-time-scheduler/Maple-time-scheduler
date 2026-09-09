@@ -158,21 +158,25 @@
 
   .board-tasks { list-style: none; padding: 0; margin: 0 0 10px; flex: 1; }
   .task-item {
-    display: flex; align-items: center; justify-content: space-between; padding: 7px 4px;
+    display: flex; align-items: flex-start; justify-content: space-between; padding: 7px 4px;
     border-bottom: 1px solid var(--border); gap: 6px; cursor: pointer; border-radius: 6px;
   }
   .task-item:hover { background: var(--accent-soft); }
   .task-item:last-child { border-bottom: none; }
   .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); }
-  .task-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-  .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; }
+  .task-left { display: flex; align-items: flex-start; gap: 8px; flex: 1 1 auto; min-width: 110px; padding-top: 2px; }
+  .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; margin-top: 2px; }
   .task-text { font-size: 13.5px; word-break: break-word; }
+  .task-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; }
   .task-char, .task-time {
     font-size: 11px; color: var(--muted); background: var(--track);
     padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
-  .task-reorder { display: flex; gap: 0px; opacity: 0; transition: opacity .15s ease; flex-shrink: 0; }
-  .task-item:hover .task-reorder { opacity: 1; }
+  .task-reorder {
+    display: flex; gap: 0px; opacity: 0; max-width: 0; overflow: hidden; flex-shrink: 0;
+    transition: opacity .15s ease, max-width .15s ease;
+  }
+  .task-item:hover .task-reorder { opacity: 1; max-width: 90px; }
   .task-reorder button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 10.5px; padding: 1px 2px; line-height: 1; }
   .task-reorder button:hover { color: var(--accent-strong); }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
@@ -545,8 +549,10 @@
             <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
             <span class="task-text">${escapeHtml(task.text)}</span>
           </div>
-          ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
-          ${!isMemo ? `<span class="task-time">${task.time}분</span>` : ''}
+          <div class="task-meta">
+            ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
+            ${!isMemo ? `<span class="task-time">${task.time}분</span>` : ''}
+          </div>
           <div class="task-reorder" onclick="event.stopPropagation()">
             <button onclick="reorderTask('${cat.id}',${task.id},'top')" title="맨 위로">⏫</button>
             <button onclick="reorderTask('${cat.id}',${task.id},'up')" title="위로">▲</button>
