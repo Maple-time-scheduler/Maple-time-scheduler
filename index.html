@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메린이의 하루 사냥일지</title>
+<style>
+  :root {
+    --bg: #FBEFD9;
+    --surface: #FFF8EA;
+    --ink: #4A3520;
+    --muted: #8B6F4E;
+    --border: #E3C68B;
+    --accent: #FF9F1C;
+    --accent-strong: #E67E00;
+    --accent-soft: rgba(255,159,28,0.16);
+    --success: #4C9F70;
+    --success-soft: rgba(76,159,112,0.16);
+    --danger: #D64545;
+    --track: #F0DFB8;
+    --shadow: 0 2px 0 var(--border), 0 10px 24px rgba(74,53,32,0.10);
+  }
+  [data-theme="dark"] {
+    --bg: #1B1730;
+    --surface: #241F3D;
+    --ink: #F3E7C9;
+    --muted: #B7A8D9;
+    --border: #3A3260;
+    --accent: #FFB443;
+    --accent-strong: #FFC968;
+    --accent-soft: rgba(255,180,67,0.18);
+    --success: #6FCB9F;
+    --success-soft: rgba(111,203,159,0.18);
+    --danger: #F08080;
+    --track: #2D2750;
+    --shadow: 0 2px 0 var(--border), 0 10px 26px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 28px 16px 60px;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 8% 12%, var(--accent-soft) 0%, transparent 34%),
+      radial-gradient(circle at 94% 88%, var(--success-soft) 0%, transparent 30%);
+    color: var(--ink);
+    font-family: '맑은 고딕', 'Malgun Gothic', -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    transition: background 0.25s ease, color 0.25s ease;
+    min-height: 100vh;
+  }
+  .app { width: 100%; max-width: 1080px; }
+
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 16px; }
+  .header-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .header-title .icon { flex-shrink: 0; }
+  .header-title h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; min-width: 60px; }
+  .header-title h1[contenteditable="true"] { outline: none; border-bottom: 1px dashed var(--accent); padding: 0 2px; }
+  .header-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .theme-toggle {
+    position: relative; width: 56px; height: 30px; border-radius: 999px;
+    background: var(--track); border: 2px solid var(--border); cursor: pointer; flex-shrink: 0;
+  }
+  .theme-toggle .knob {
+    position: absolute; top: 1px; left: 1px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; transition: transform 0.25s ease, background 0.25s ease;
+  }
+  [data-theme="dark"] .theme-toggle .knob { transform: translateX(26px); }
+
+  .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+
+  /* Character panel */
+  .char-card { padding: 14px 16px; margin-bottom: 16px; }
+  .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .char-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .char-chip {
+    display: flex; align-items: center; gap: 4px; background: var(--track); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 8px 4px 10px; font-size: 12.5px;
+  }
+  .char-chip button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; line-height: 1; }
+  .char-chip button:hover { color: var(--danger); }
+  .char-add-row { display: flex; gap: 6px; }
+  .char-add-row input {
+    flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--bg); color: var(--ink); font-size: 13px; font-family: inherit;
+  }
+  .char-add-row button {
+    padding: 8px 14px; background: var(--accent); color: #fff; border: none; border-radius: 7px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  [data-theme="dark"] .char-add-row button { color: #201404; }
+
+  /* EXP bar */
+  .exp-card { padding: 18px 20px; margin-bottom: 22px; }
+  .exp-top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .exp-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; outline: none; }
+  .exp-title[contenteditable="true"] { border-bottom: 1px dashed var(--accent); padding: 0 2px; }
+  .exp-figure { font-size: 20px; font-weight: 700; color: var(--accent-strong); }
+  .exp-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .exp-track {
+    width: 100%; height: 24px; border-radius: 999px; background: var(--track); border: 1px solid var(--border);
+    overflow: hidden; position: relative;
+    background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(0,0,0,0.05) 10%);
+  }
+  [data-theme="dark"] .exp-track { background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(255,255,255,0.06) 10%); }
+  .exp-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--success) 0%, var(--accent) 100%);
+    box-shadow: 0 0 10px var(--accent-soft) inset; transition: width 0.4s ease;
+  }
+  .exp-pct {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; font-weight: 700; color: var(--ink); text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+
+  .boards-heading { display: flex; align-items: center; gap: 8px; margin: 4px 0 16px; }
+  .boards-heading .icon { font-size: 18px; }
+  .boards-heading h2 { font-size: 17px; font-weight: 700; margin: 0; outline: none; }
+  .boards-heading h2[contenteditable="true"] { border-bottom: 1px dashed var(--accent); padding: 0 2px; }
+
+  /* Theme sections */
+  .theme-section { margin-bottom: 24px; }
+  .theme-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .theme-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .theme-section-header h3 { font-size: 15px; font-weight: 700; margin: 0; }
+  .theme-badge { font-size: 12px; color: var(--muted); margin-left: 2px; }
+
+  .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .board-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .board-grid { grid-template-columns: 1fr; } }
+
+  .board { display: flex; flex-direction: column; padding: 14px 14px 16px; cursor: grab; }
+  .board.dragging { opacity: 0.45; }
+  .board-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .drag-handle { color: var(--muted); font-size: 14px; flex-shrink: 0; cursor: grab; }
+  .board-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; flex: 1; }
+  .board-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .board-name {
+    font-size: 15px; font-weight: 700; outline: none; min-width: 20px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .board-name[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent); white-space: normal; }
+  .board-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .mark-all-btn {
+    font-size: 11px; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--success-soft); color: var(--success); cursor: pointer; font-weight: 700; white-space: nowrap;
+  }
+  .mark-all-btn:hover { background: var(--success); color: #fff; }
+  .board-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; flex-shrink: 0; opacity: 0.7; }
+  .board-delete:hover { color: var(--danger); opacity: 1; }
+
+  .board-progress-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin-bottom: 4px; }
+  .board-progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+  .board-progress-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; text-align: right; }
+
+  .board-tasks { list-style: none; padding: 0; margin: 0 0 10px; flex: 1; }
+  .task-item {
+    display: flex; align-items: center; justify-content: space-between; padding: 7px 4px;
+    border-bottom: 1px solid var(--border); gap: 6px; cursor: pointer; border-radius: 6px;
+  }
+  .task-item:hover { background: var(--accent-soft); }
+  .task-item:last-child { border-bottom: none; }
+  .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); }
+  .task-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; }
+  .task-text { font-size: 13.5px; word-break: break-word; }
+  .task-char, .task-time {
+    font-size: 11px; color: var(--muted); background: var(--track);
+    padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+  }
+  .task-reorder { display: flex; gap: 0px; opacity: 0; transition: opacity .15s ease; flex-shrink: 0; }
+  .task-item:hover .task-reorder { opacity: 1; }
+  .task-reorder button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 10.5px; padding: 1px 2px; line-height: 1; }
+  .task-reorder button:hover { color: var(--accent-strong); }
+  .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
+  .delete-btn:hover { opacity: 1; }
+  .empty-state { color: var(--muted); font-size: 12.5px; padding: 6px 0 10px; }
+
+  .board-add-row { display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap; }
+  .board-add-row input[type="text"] { flex: 1; min-width: 70px; }
+  .board-add-row input[type="number"] { width: 52px; }
+  .board-add-row select { max-width: 90px; }
+  .board-add-row input, .board-add-row select {
+    padding: 7px 6px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--bg); color: var(--ink); font-size: 12px; font-family: inherit;
+  }
+  .board-add-row button {
+    padding: 7px 11px; background: var(--accent); color: #fff; border: none; border-radius: 7px;
+    font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+  }
+  [data-theme="dark"] .board-add-row button { color: #201404; }
+  .board-add-row button:hover { background: var(--accent-strong); }
+
+  .add-board {
+    border: 2px dashed var(--border); border-radius: 14px; background: transparent; box-shadow: none;
+    display: flex; align-items: center; justify-content: center; min-height: 100px; cursor: pointer;
+    color: var(--muted); font-size: 13.5px; font-weight: 700; transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .add-board:hover { border-color: var(--accent); color: var(--accent-strong); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-title">
+      <span class="icon">
+        <svg width="30" height="30" viewBox="0 0 48 48">
+          <ellipse cx="24" cy="34" rx="8" ry="10" fill="#F4D9A5"/>
+          <path d="M6 22 C6 10 42 10 42 22 C42 26 38 28 24 28 C10 28 6 26 6 22 Z" fill="#FF7A1C"/>
+          <ellipse cx="16" cy="18" rx="3" ry="2.4" fill="#FFD9A0"/>
+          <ellipse cx="30" cy="16" rx="2.4" ry="2" fill="#FFD9A0"/>
+          <ellipse cx="24" cy="22" rx="2" ry="1.6" fill="#FFD9A0"/>
+        </svg>
+      </span>
+      <div>
+        <h1 id="listTitleEl" contenteditable="true" spellcheck="false"></h1>
+        <div class="header-sub">퀘스트에 시간을 붙이고, 오늘의 진행도를 채워보세요</div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
+      <span class="knob" id="themeKnob">☀️</span>
+    </button>
+  </div>
+
+  <div class="card char-card">
+    <div class="char-card-title">🎮 내 캐릭터</div>
+    <div class="char-chip-row" id="charChipRow"></div>
+    <div class="char-add-row">
+      <input type="text" id="charNameInput" placeholder="캐릭터 이름" onkeypress="if(event.key==='Enter')addCharacter()">
+      <button onclick="addCharacter()">추가</button>
+    </div>
+  </div>
+
+  <div class="card exp-card">
+    <div class="exp-top">
+      <div class="exp-title" id="expTitleEl" contenteditable="true" spellcheck="false"></div>
+      <div class="exp-figure" id="totalFigure">0분</div>
+    </div>
+    <div class="exp-sub" id="totalSub">완료 0분 / 전체 0분 (주간 컨텐츠 기준)</div>
+    <div class="exp-track">
+      <div class="exp-fill" id="totalFill"></div>
+      <span class="exp-pct" id="totalPct">0%</span>
+    </div>
+  </div>
+
+  <div class="boards-heading">
+    <span class="icon">🗂️</span>
+    <h2 id="boardsHeadingEl" contenteditable="true" spellcheck="false"></h2>
+  </div>
+
+  <div id="themeSections"></div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'scheduler-state-v2';
+  const THEME_META = {
+    daily:   { label: '일간', color: '#FF9F1C' },
+    weekly:  { label: '주간', color: '#4C9F70' },
+    monthly: { label: '월간', color: '#4C7FD6' },
+    memo:    { label: '메모', color: '#E6C33D' }
+  };
+  const THEME_ORDER = ['daily', 'weekly', 'monthly', 'memo'];
+
+  let state = {
+    darkMode: false,
+    listTitle: '메린이의 하루 사냥일지',
+    boardsHeading: '✅ 오늘의 목록',
+    expTitle: '⭐ 오늘의 진행도',
+    characters: [
+      { id: 'char_1', name: '섀도어' },
+      { id: 'char_2', name: '나이트로드' }
+    ],
+    categories: [
+      { id: 'd1', name: '일일 퀘스트', theme: 'daily' },
+      { id: 'w1', name: '보스 스케줄', theme: 'weekly' },
+      { id: 'w2', name: '사냥/파밍', theme: 'weekly' },
+      { id: 'm1', name: '제한 컨텐츠', theme: 'monthly' },
+      { id: 'memo1', name: '메모', theme: 'memo' }
+    ],
+    tasks: [
+      { id: 1, text: '무릉도장 20층', time: 25, completed: false, categoryId: 'd1', characterId: 'char_1' },
+      { id: 2, text: '자쿰 주간보스', time: 15, completed: true, categoryId: 'w1', characterId: 'char_2' },
+      { id: 3, text: '아케인리버 사냥', time: 60, completed: false, categoryId: 'w2', characterId: null },
+      { id: 4, text: '길드 상점 정비', time: 20, completed: false, categoryId: 'm1', characterId: null },
+      { id: 5, text: '이벤트 링 기억해두기', time: 0, completed: false, categoryId: 'memo1', characterId: null }
+    ]
+  };
+  let dragBoardId = null;
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatHM(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h > 0) return `${h}시간 ${m}분 (${mins}분)`;
+    return `${m}분 (${mins}분)`;
+  }
+
+  const persist = {
+    async get(key) {
+      if (window.storage) {
+        try { return await window.storage.get(key, false); }
+        catch (e) { console.error('window.storage.get 실패, localStorage로 대체:', e); }
+      }
+      try {
+        const v = localStorage.getItem(key);
+        return v !== null ? { value: v } : null;
+      } catch (e) { console.error('localStorage 읽기 실패:', e); return null; }
+    },
+    async set(key, value) {
+      if (window.storage) {
+        try { return await window.storage.set(key, value, false); }
+        catch (e) { console.error('window.storage.set 실패, localStorage로 대체:', e); }
+      }
+      try { localStorage.setItem(key, value); }
+      catch (e) { console.error('localStorage 저장 실패:', e); }
+    }
+  };
+
+  const LEGACY_STORAGE_KEYS = ['scheduler-state']; // 이전 버전에서 쓰던 저장 키 (데이터 복구용)
+
+  function waitForWindowStorage(timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      (function check() {
+        if (window.storage || Date.now() - start >= timeoutMs) { resolve(); return; }
+        setTimeout(check, 50);
+      })();
+    });
+  }
+
+  async function loadState() {
+    let migratedFromLegacy = false;
+    try {
+      await waitForWindowStorage(1000); // 저장소 연결이 늦게 준비되는 경우를 대비해 잠깐 대기
+      let result = await persist.get(STORAGE_KEY);
+      if (!result || !result.value) {
+        for (const legacyKey of LEGACY_STORAGE_KEYS) {
+          const legacyResult = await persist.get(legacyKey);
+          if (legacyResult && legacyResult.value) { result = legacyResult; migratedFromLegacy = true; break; }
+        }
+      }
+      if (result && result.value) {
+        const saved = JSON.parse(result.value);
+        state = { ...state, ...saved };
+        state.categories = (state.categories || []).map(c => ({ theme: 'weekly', ...c }));
+        state.characters = state.characters || [];
+        state.tasks = (state.tasks || []).map(t => ({ characterId: null, ...t }));
+      }
+    } catch (e) {
+      console.error('저장된 데이터를 불러오지 못했습니다:', e);
+    }
+    applyTheme();
+    document.getElementById('listTitleEl').textContent = state.listTitle;
+    document.getElementById('boardsHeadingEl').textContent = state.boardsHeading;
+    document.getElementById('expTitleEl').textContent = state.expTitle;
+    render();
+    if (migratedFromLegacy) saveState(); // 이전 키에서 옮겨온 경우에만 새 키로 재저장 (그 외엔 절대 자동 재저장하지 않음)
+  }
+
+  async function saveState() {
+    await persist.set(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function applyTheme() {
+    document.body.setAttribute('data-theme', state.darkMode ? 'dark' : 'light');
+    document.getElementById('themeKnob').textContent = state.darkMode ? '🌙' : '☀️';
+  }
+
+  function toggleTheme() { state.darkMode = !state.darkMode; applyTheme(); saveState(); }
+
+  function commitListTitle() {
+    const el = document.getElementById('listTitleEl');
+    const text = el.textContent.trim() || '나의 스케줄러';
+    el.textContent = text; state.listTitle = text; saveState();
+  }
+  function commitBoardsHeading() {
+    const el = document.getElementById('boardsHeadingEl');
+    const text = el.textContent.trim() || '할 일 목록';
+    el.textContent = text; state.boardsHeading = text; saveState();
+  }
+  function commitExpTitle() {
+    const el = document.getElementById('expTitleEl');
+    const text = el.textContent.trim() || '오늘의 진행도';
+    el.textContent = text; state.expTitle = text; saveState();
+  }
+
+  function addCharacter() {
+    const input = document.getElementById('charNameInput');
+    const name = input.value.trim();
+    if (!name) return;
+    state.characters.push({ id: 'char_' + Date.now(), name });
+    input.value = '';
+    render(); saveState();
+  }
+  function deleteCharacter(id) {
+    state.characters = state.characters.filter(c => c.id !== id);
+    state.tasks = state.tasks.map(t => t.characterId === id ? { ...t, characterId: null } : t);
+    render(); saveState();
+  }
+
+  function addBoard(themeKey) {
+    state.categories.push({ id: 'cat_' + Date.now(), name: '새 목록', theme: themeKey });
+    render(); saveState();
+  }
+  function commitBoardName(catId, el) {
+    const text = el.textContent.trim() || '이름 없는 목록';
+    el.textContent = text;
+    const cat = state.categories.find(c => c.id === catId);
+    if (cat) cat.name = text;
+    saveState();
+  }
+  function deleteBoard(catId) {
+    const hasTasks = state.tasks.some(t => t.categoryId === catId);
+    if (hasTasks && !confirm('이 목록의 할 일도 함께 삭제됩니다. 계속할까요?')) return;
+    state.categories = state.categories.filter(c => c.id !== catId);
+    state.tasks = state.tasks.filter(t => t.categoryId !== catId);
+    render(); saveState();
+  }
+  function markAllComplete(catId) {
+    state.tasks = state.tasks.map(t => t.categoryId === catId ? { ...t, completed: true } : t);
+    render(); saveState();
+  }
+
+  function addTask(catId) {
+    const cat = state.categories.find(c => c.id === catId);
+    const textInput = document.getElementById('taskInput_' + catId);
+    const timeInput = document.getElementById('timeInput_' + catId);
+    const charSelect = document.getElementById('charSelect_' + catId);
+    const text = textInput.value.trim();
+    if (!text) { alert(cat.theme === 'memo' ? '메모 내용을 입력해주세요!' : '할 일을 입력해주세요!'); return; }
+    let time = 0;
+    if (cat.theme !== 'memo') {
+      const rawTime = timeInput.value;
+      if (rawTime === '' || rawTime === null) { alert('시간을 입력해주세요! (0분도 가능해요)'); return; }
+      time = parseInt(rawTime);
+      if (isNaN(time) || time < 0) { alert('올바른 시간을 입력해주세요! (0 이상의 숫자)'); return; }
+    }
+    const characterId = charSelect.value || null;
+    state.tasks.push({ id: Date.now(), text, time, completed: false, categoryId: catId, characterId });
+    render(); saveState();
+  }
+
+  function toggleTask(id) {
+    state.tasks = state.tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+    render(); saveState();
+  }
+  function deleteTask(id) {
+    state.tasks = state.tasks.filter(t => t.id !== id);
+    render(); saveState();
+  }
+
+  function reorderTask(catId, taskId, action) {
+    const indices = state.tasks.map((t, i) => ({ t, i })).filter(o => o.t.categoryId === catId).map(o => o.i);
+    const list = indices.map(i => state.tasks[i]);
+    const pos = list.findIndex(t => t.id === taskId);
+    if (pos === -1) return;
+    let newPos = pos;
+    if (action === 'up') newPos = Math.max(0, pos - 1);
+    if (action === 'down') newPos = Math.min(list.length - 1, pos + 1);
+    if (action === 'top') newPos = 0;
+    if (action === 'bottom') newPos = list.length - 1;
+    if (newPos === pos) return;
+    const [item] = list.splice(pos, 1);
+    list.splice(newPos, 0, item);
+    indices.forEach((idx, i) => { state.tasks[idx] = list[i]; });
+    render(); saveState();
+  }
+
+  function boardDragStart(id, ev) { dragBoardId = id; if (ev && ev.target) ev.target.classList.add('dragging'); }
+  function boardDragEnd(ev) { if (ev && ev.target) ev.target.classList.remove('dragging'); dragBoardId = null; }
+  function boardDrop(themeKey, targetId) {
+    if (!dragBoardId || dragBoardId === targetId) return;
+    const indices = state.categories.map((c, i) => ({ c, i })).filter(o => o.c.theme === themeKey).map(o => o.i);
+    const list = indices.map(i => state.categories[i]);
+    const fromPos = list.findIndex(c => c.id === dragBoardId);
+    const toPos = list.findIndex(c => c.id === targetId);
+    if (fromPos === -1 || toPos === -1) return;
+    const [item] = list.splice(fromPos, 1);
+    list.splice(toPos, 0, item);
+    indices.forEach((idx, i) => { state.categories[idx] = list[i]; });
+    dragBoardId = null;
+    render(); saveState();
+  }
+
+  function themeTotals(themeKey) {
+    const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
+    const themeTasks = state.tasks.filter(t => boardIds.includes(t.categoryId));
+    const total = themeTasks.reduce((s, t) => s + t.time, 0);
+    const done = themeTasks.filter(t => t.completed).reduce((s, t) => s + t.time, 0);
+    return { total, done };
+  }
+
+  function charOptionsHtml() {
+    let html = `<option value="">캐릭터 없음</option>`;
+    state.characters.forEach(c => { html += `<option value="${c.id}">${escapeHtml(c.name)}</option>`; });
+    return html;
+  }
+
+  function renderCharacters() {
+    const row = document.getElementById('charChipRow');
+    if (state.characters.length === 0) {
+      row.innerHTML = '<span class="empty-state">등록된 캐릭터가 없어요. 아래에서 추가해보세요.</span>';
+      return;
+    }
+    row.innerHTML = state.characters.map(c => `
+      <span class="char-chip">🧙 ${escapeHtml(c.name)} <button onclick="deleteCharacter('${c.id}')" title="삭제">×</button></span>
+    `).join('');
+  }
+
+  function renderExp() {
+    const { total, done } = themeTotals('weekly');
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    document.getElementById('totalFigure').textContent = formatHM(total);
+    document.getElementById('totalSub').textContent = `완료 ${formatHM(done)} / 전체 ${formatHM(total)} (주간 컨텐츠 기준)`;
+    document.getElementById('totalFill').style.width = pct + '%';
+    document.getElementById('totalPct').textContent = pct + '%';
+  }
+
+  function boardCardHtml(cat) {
+    const catTasks = state.tasks.filter(t => t.categoryId === cat.id);
+    const isMemo = cat.theme === 'memo';
+    const catTotal = catTasks.reduce((s, t) => s + t.time, 0);
+    const catDone = catTasks.filter(t => t.completed).reduce((s, t) => s + t.time, 0);
+    const catPct = catTotal > 0 ? Math.round((catDone / catTotal) * 100) : 0;
+    const color = THEME_META[cat.theme].color;
+
+    let tasksHtml = '';
+    if (catTasks.length === 0) {
+      tasksHtml = `<div class="empty-state">${isMemo ? '아직 메모가 없어요.' : '아직 등록된 할 일이 없어요.'}</div>`;
+    } else {
+      tasksHtml = catTasks.map(task => {
+        const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
+        return `
+        <li class="task-item ${task.completed ? 'completed' : ''}" onclick="toggleTask(${task.id})">
+          <div class="task-left">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
+            <span class="task-text">${escapeHtml(task.text)}</span>
+          </div>
+          ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
+          ${!isMemo ? `<span class="task-time">${task.time}분</span>` : ''}
+          <div class="task-reorder" onclick="event.stopPropagation()">
+            <button onclick="reorderTask('${cat.id}',${task.id},'top')" title="맨 위로">⏫</button>
+            <button onclick="reorderTask('${cat.id}',${task.id},'up')" title="위로">▲</button>
+            <button onclick="reorderTask('${cat.id}',${task.id},'down')" title="아래로">▼</button>
+            <button onclick="reorderTask('${cat.id}',${task.id},'bottom')" title="맨 아래로">⏬</button>
+          </div>
+          <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
+        </li>`;
+      }).join('');
+    }
+
+    return `
+      <div class="card board" draggable="true"
+           ondragstart="boardDragStart('${cat.id}', event)"
+           ondragend="boardDragEnd(event)"
+           ondragover="event.preventDefault()"
+           ondrop="boardDrop('${cat.theme}','${cat.id}')">
+        <div class="board-header">
+          <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
+          <div class="board-name-wrap">
+            <span class="board-dot" style="background:${color}"></span>
+            <span class="board-name" contenteditable="true" spellcheck="false" id="boardName_${cat.id}">${escapeHtml(cat.name)}</span>
+          </div>
+          <div class="board-header-actions">
+            <button class="mark-all-btn" onclick="markAllComplete('${cat.id}')">모두 완료</button>
+            <button class="board-delete" title="목록 삭제" onclick="deleteBoard('${cat.id}')">🗑</button>
+          </div>
+        </div>
+        ${!isMemo ? `
+          <div class="board-progress-track"><div class="board-progress-fill" style="width:${catPct}%"></div></div>
+          <div class="board-progress-label">완료 ${catDone}분 / ${catTotal}분 (${catPct}%)</div>
+        ` : ''}
+        <ul class="board-tasks">${tasksHtml}</ul>
+        <div class="board-add-row">
+          <input type="text" id="taskInput_${cat.id}" placeholder="${isMemo ? '메모 입력' : '할 일 입력'}">
+          ${!isMemo ? `<input type="number" id="timeInput_${cat.id}" placeholder="분(0 가능)" min="0">` : ''}
+          <select id="charSelect_${cat.id}">${charOptionsHtml()}</select>
+          <button onclick="addTask('${cat.id}')">추가</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachBoardListeners(cat) {
+    const nameEl = document.getElementById('boardName_' + cat.id);
+    if (nameEl) {
+      nameEl.addEventListener('blur', () => commitBoardName(cat.id, nameEl));
+      nameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); nameEl.blur(); } });
+    }
+    const taskInputEl = document.getElementById('taskInput_' + cat.id);
+    if (taskInputEl) taskInputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(cat.id); });
+    const timeInputEl = document.getElementById('timeInput_' + cat.id);
+    if (timeInputEl) timeInputEl.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(cat.id); });
+  }
+
+  function renderThemeSections() {
+    const container = document.getElementById('themeSections');
+    container.innerHTML = '';
+
+    THEME_ORDER.forEach(themeKey => {
+      const meta = THEME_META[themeKey];
+      const boards = state.categories.filter(c => c.theme === themeKey);
+      let badgeHtml = '';
+      if (themeKey === 'daily' || themeKey === 'monthly') {
+        const { total, done } = themeTotals(themeKey);
+        badgeHtml = `<span class="theme-badge">완료 ${done}분 / ${total}분</span>`;
+      }
+
+      const section = document.createElement('div');
+      section.className = 'theme-section';
+      section.innerHTML = `
+        <div class="theme-section-header">
+          <span class="theme-dot" style="background:${meta.color}"></span>
+          <h3>${meta.label}</h3>
+          ${badgeHtml}
+        </div>
+        <div class="board-grid" id="grid_${themeKey}"></div>
+      `;
+      container.appendChild(section);
+
+      const grid = section.querySelector('#grid_' + themeKey);
+      boards.forEach(cat => {
+        grid.insertAdjacentHTML('beforeend', boardCardHtml(cat));
+        attachBoardListeners(cat);
+      });
+
+      const addCard = document.createElement('div');
+      addCard.className = 'add-board';
+      addCard.textContent = '+ 새 목록 추가';
+      addCard.onclick = () => addBoard(themeKey);
+      grid.appendChild(addCard);
+    });
+  }
+
+  function render() {
+    renderCharacters();
+    renderExp();
+    renderThemeSections();
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('listTitleEl').addEventListener('blur', commitListTitle);
+  document.getElementById('listTitleEl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+  document.getElementById('boardsHeadingEl').addEventListener('blur', commitBoardsHeading);
+  document.getElementById('boardsHeadingEl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+  document.getElementById('expTitleEl').addEventListener('blur', commitExpTitle);
+  document.getElementById('expTitleEl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
+
+  loadState();
+</script>
+
+</body>
+</html>
