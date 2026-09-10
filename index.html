@@ -167,6 +167,7 @@
   .task-left { display: flex; align-items: flex-start; gap: 8px; flex: 1 1 auto; min-width: 110px; padding-top: 2px; }
   .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; margin-top: 2px; }
   .task-text { font-size: 13.5px; word-break: break-word; }
+  .task-text[contenteditable="true"] { outline: none; border-bottom: 1px dashed var(--accent); cursor: text; background: var(--surface); }
   .task-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; }
   .task-char, .task-time {
     font-size: 11px; color: var(--muted); background: var(--track);
@@ -457,6 +458,44 @@
     render(); saveState();
   }
 
+  function startEditTask(ev, taskId) {
+    ev.stopPropagation();
+    const el = document.getElementById('taskText_' + taskId);
+    if (!el) return;
+    const original = el.textContent;
+    el.contentEditable = 'true';
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    let finished = false;
+    function finish(save) {
+      if (finished) return;
+      finished = true;
+      el.removeEventListener('blur', onBlur);
+      el.removeEventListener('keydown', onKeydown);
+      el.contentEditable = 'false';
+      if (save) {
+        const text = el.textContent.trim();
+        if (text) {
+          const task = state.tasks.find(t => t.id === taskId);
+          if (task) { task.text = text; saveState(); }
+        }
+      }
+      render();
+    }
+    function onBlur() { finish(true); }
+    function onKeydown(e) {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    }
+    el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKeydown);
+  }
+
   function taskDragStart(id, ev) {
     dragTaskId = id;
     if (ev) { ev.stopPropagation(); if (ev.target) ev.target.classList.add('dragging-task'); }
@@ -554,7 +593,7 @@
             ondrop="event.preventDefault(); taskDrop('${cat.id}', ${task.id}, event)">
           <div class="task-left">
             <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
-            <span class="task-text">${escapeHtml(task.text)}</span>
+            <span class="task-text" id="taskText_${task.id}" ondblclick="startEditTask(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(task.text)}</span>
           </div>
           <div class="task-meta">
             ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
