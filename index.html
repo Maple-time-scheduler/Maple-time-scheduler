@@ -316,8 +316,8 @@
   function formatHM(mins) {
     const h = Math.floor(mins / 60);
     const m = mins % 60;
-    if (h > 0) return `${h}시간 ${m}분 (${mins}분)`;
-    return `${m}분 (${mins}분)`;
+    if (h > 0) return m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
+    return `${m}분`;
   }
 
   const persist = {
@@ -694,7 +694,7 @@
           : `<span class="task-char chip-placeholder">-</span>`;
         const timeChipHtml = !isMemo
           ? (task.time > 0
-              ? `<span class="task-time" id="taskTime_${task.id}" ondblclick="startEditTaskTime(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${task.time}분</span>`
+              ? `<span class="task-time" id="taskTime_${task.id}" ondblclick="startEditTaskTime(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${formatHM(task.time)}</span>`
               : `<span class="task-time chip-placeholder">0분</span>`)
           : '';
         // 캐릭터가 없고 시간만 있는 경우, 실제 내용(시간)이 항상 위쪽에 오도록 순서를 바꿉니다.
@@ -777,7 +777,7 @@
       let badgeHtml = '';
       if (themeKey === 'daily' || themeKey === 'monthly') {
         const { total, done } = themeTotals(themeKey);
-        badgeHtml = `<span class="theme-badge">완료 ${done}분 / ${total}분</span>`;
+        badgeHtml = `<span class="theme-badge">완료 ${formatHM(done)} / ${formatHM(total)}</span>`;
       }
 
       const section = document.createElement('div');
