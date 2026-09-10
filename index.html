@@ -172,13 +172,7 @@
     font-size: 11px; color: var(--muted); background: var(--track);
     padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
-  .task-reorder {
-    display: flex; gap: 0px; opacity: 0; max-width: 0; overflow: hidden; flex-shrink: 0;
-    transition: opacity .15s ease, max-width .15s ease;
-  }
-  .task-item:hover .task-reorder { opacity: 1; max-width: 90px; }
-  .task-reorder button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 10.5px; padding: 1px 2px; line-height: 1; }
-  .task-reorder button:hover { color: var(--accent-strong); }
+  .task-item.dragging-task { opacity: 0.4; }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
   .delete-btn:hover { opacity: 1; }
   .empty-state { color: var(--muted); font-size: 12.5px; padding: 6px 0 10px; }
@@ -294,6 +288,7 @@
     ]
   };
   let dragBoardId = null;
+  let dragTaskId = null;
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -462,20 +457,26 @@
     render(); saveState();
   }
 
-  function reorderTask(catId, taskId, action) {
+  function taskDragStart(id, ev) {
+    dragTaskId = id;
+    if (ev) { ev.stopPropagation(); if (ev.target) ev.target.classList.add('dragging-task'); }
+  }
+  function taskDragEnd(ev) {
+    if (ev && ev.target) ev.target.classList.remove('dragging-task');
+    dragTaskId = null;
+  }
+  function taskDrop(catId, targetTaskId, ev) {
+    if (ev) ev.stopPropagation();
+    if (!dragTaskId || dragTaskId === targetTaskId) return;
     const indices = state.tasks.map((t, i) => ({ t, i })).filter(o => o.t.categoryId === catId).map(o => o.i);
     const list = indices.map(i => state.tasks[i]);
-    const pos = list.findIndex(t => t.id === taskId);
-    if (pos === -1) return;
-    let newPos = pos;
-    if (action === 'up') newPos = Math.max(0, pos - 1);
-    if (action === 'down') newPos = Math.min(list.length - 1, pos + 1);
-    if (action === 'top') newPos = 0;
-    if (action === 'bottom') newPos = list.length - 1;
-    if (newPos === pos) return;
-    const [item] = list.splice(pos, 1);
-    list.splice(newPos, 0, item);
+    const fromPos = list.findIndex(t => t.id === dragTaskId);
+    const toPos = list.findIndex(t => t.id === targetTaskId);
+    if (fromPos === -1 || toPos === -1) return;
+    const [item] = list.splice(fromPos, 1);
+    list.splice(toPos, 0, item);
     indices.forEach((idx, i) => { state.tasks[idx] = list[i]; });
+    dragTaskId = null;
     render(); saveState();
   }
 
@@ -544,7 +545,13 @@
       tasksHtml = catTasks.map(task => {
         const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
         return `
-        <li class="task-item ${task.completed ? 'completed' : ''}" onclick="toggleTask(${task.id})">
+        <li class="task-item ${task.completed ? 'completed' : ''}"
+            onclick="toggleTask(${task.id})"
+            draggable="true"
+            ondragstart="taskDragStart(${task.id}, event)"
+            ondragend="taskDragEnd(event)"
+            ondragover="event.preventDefault(); event.stopPropagation()"
+            ondrop="event.preventDefault(); taskDrop('${cat.id}', ${task.id}, event)">
           <div class="task-left">
             <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
             <span class="task-text">${escapeHtml(task.text)}</span>
@@ -552,12 +559,6 @@
           <div class="task-meta">
             ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
             ${!isMemo ? `<span class="task-time">${task.time}분</span>` : ''}
-          </div>
-          <div class="task-reorder" onclick="event.stopPropagation()">
-            <button onclick="reorderTask('${cat.id}',${task.id},'top')" title="맨 위로">⏫</button>
-            <button onclick="reorderTask('${cat.id}',${task.id},'up')" title="위로">▲</button>
-            <button onclick="reorderTask('${cat.id}',${task.id},'down')" title="아래로">▼</button>
-            <button onclick="reorderTask('${cat.id}',${task.id},'bottom')" title="맨 아래로">⏬</button>
           </div>
           <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
         </li>`;
