@@ -440,9 +440,10 @@
     let time = 0;
     if (cat.theme !== 'memo') {
       const rawTime = timeInput.value;
-      if (rawTime === '' || rawTime === null) { alert('시간을 입력해주세요! (0분도 가능해요)'); return; }
-      time = parseInt(rawTime);
-      if (isNaN(time) || time < 0) { alert('올바른 시간을 입력해주세요! (0 이상의 숫자)'); return; }
+      if (rawTime !== '' && rawTime !== null) {
+        time = parseInt(rawTime);
+        if (isNaN(time) || time < 0) { alert('올바른 시간을 입력해주세요! (0 이상의 숫자)'); return; }
+      }
     }
     const characterId = charSelect.value || null;
     state.tasks.push({ id: Date.now(), text, time, completed: false, categoryId: catId, characterId });
