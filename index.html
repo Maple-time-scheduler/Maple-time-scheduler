@@ -182,11 +182,18 @@
   .task-text[contenteditable="true"] { outline: none; cursor: text; background: var(--surface); }
   .task-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; width: 96px; }
   .task-char, .task-time {
-    font-size: 11px; color: var(--muted); background: var(--track);
-    padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
-    max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    font-size: 11px; color: var(--muted); padding: 2px 7px 2px 8px; border-radius: 20px;
+    white-space: nowrap; flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   }
-  .task-time { cursor: text; }
+  .task-char {
+    background: var(--track);
+    border-left: 3px solid var(--chip-accent, var(--accent));
+    border-radius: 4px 12px 12px 4px;
+  }
+  .task-time {
+    cursor: text; background: transparent; border: 1px dashed var(--border);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.2px; padding: 1px 8px;
+  }
   .task-char.chip-placeholder, .task-time.chip-placeholder { visibility: hidden; pointer-events: none; cursor: default; }
   .task-time[contenteditable="true"] { outline: none; background: var(--surface); border: 1px solid var(--accent); }
   .task-item.dragging-task { opacity: 0.4; }
@@ -696,6 +703,7 @@
           : charChipHtml + timeChipHtml;
         return `
         <li class="task-item ${task.completed ? 'completed' : ''}"
+            style="--chip-accent: ${color};"
             onclick="toggleTask(${task.id})"
             draggable="true"
             ondragstart="taskDragStart(${task.id}, event)"
