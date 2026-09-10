@@ -175,7 +175,7 @@
     gap: 6px; cursor: pointer; border-radius: 6px;
   }
   .task-item:hover { background: var(--accent-soft); }
-  .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); }
+  .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); opacity: 0.45; }
   .task-left { display: flex; align-items: flex-start; gap: 8px; flex: 1 1 auto; min-width: 110px; padding-top: 2px; }
   .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; margin-top: 2px; }
   .task-text { font-size: 13.5px; word-break: break-word; }
@@ -187,6 +187,7 @@
     max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   }
   .task-time { cursor: text; }
+  .task-char.chip-placeholder, .task-time.chip-placeholder { visibility: hidden; pointer-events: none; cursor: default; }
   .task-time[contenteditable="true"] { outline: none; background: var(--surface); border: 1px solid var(--accent); }
   .task-item.dragging-task { opacity: 0.4; }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
@@ -605,7 +606,7 @@
       return;
     }
     row.innerHTML = state.characters.map(c => `
-      <span class="char-chip">🧙 <span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span> <button onclick="deleteCharacter('${c.id}')" title="삭제">×</button></span>
+      <span class="char-chip"><span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span> <button onclick="deleteCharacter('${c.id}')" title="삭제">×</button></span>
     `).join('');
   }
 
@@ -681,6 +682,18 @@
         </li>`;
         }
         const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
+        const charChipHtml = character
+          ? `<span class="task-char">${escapeHtml(character.name)}</span>`
+          : `<span class="task-char chip-placeholder">-</span>`;
+        const timeChipHtml = !isMemo
+          ? (task.time > 0
+              ? `<span class="task-time" id="taskTime_${task.id}" ondblclick="startEditTaskTime(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${task.time}분</span>`
+              : `<span class="task-time chip-placeholder">0분</span>`)
+          : '';
+        // 캐릭터가 없고 시간만 있는 경우, 실제 내용(시간)이 항상 위쪽에 오도록 순서를 바꿉니다.
+        const metaHtml = (!character && !isMemo && task.time > 0)
+          ? timeChipHtml + charChipHtml
+          : charChipHtml + timeChipHtml;
         return `
         <li class="task-item ${task.completed ? 'completed' : ''}"
             onclick="toggleTask(${task.id})"
@@ -694,8 +707,7 @@
             <span class="task-text" id="taskText_${task.id}" ondblclick="startEditTask(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(task.text)}</span>
           </div>
           <div class="task-meta">
-            ${character ? `<span class="task-char">🧙 ${escapeHtml(character.name)}</span>` : ''}
-            ${(!isMemo && task.time > 0) ? `<span class="task-time" id="taskTime_${task.id}" ondblclick="startEditTaskTime(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${task.time}분</span>` : ''}
+            ${metaHtml}
           </div>
           <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
         </li>`;
