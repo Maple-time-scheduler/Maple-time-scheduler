@@ -19,21 +19,29 @@
     --danger: #D64545;
     --track: #F0DFB8;
     --shadow: 0 2px 0 var(--border), 0 10px 24px rgba(74,53,32,0.10);
+    --theme-daily: #FF9F1C;
+    --theme-weekly: #4C9F70;
+    --theme-monthly: #4C7FD6;
+    --theme-memo: #C99A2E;
   }
   [data-theme="dark"] {
-    --bg: #1B1730;
-    --surface: #241F3D;
-    --ink: #F3E7C9;
-    --muted: #B7A8D9;
-    --border: #3A3260;
+    --bg: #18171C;
+    --surface: #211F26;
+    --ink: #F0EAE0;
+    --muted: #9C9894;
+    --border: #35333A;
     --accent: #FFB443;
     --accent-strong: #FFC968;
-    --accent-soft: rgba(255,180,67,0.18);
+    --accent-soft: rgba(255,180,67,0.16);
     --success: #6FCB9F;
-    --success-soft: rgba(111,203,159,0.18);
-    --danger: #F08080;
-    --track: #2D2750;
-    --shadow: 0 2px 0 var(--border), 0 10px 26px rgba(0,0,0,0.4);
+    --success-soft: rgba(111,203,159,0.16);
+    --danger: #E8807A;
+    --track: #2A282E;
+    --shadow: 0 2px 0 var(--border), 0 10px 26px rgba(0,0,0,0.5);
+    --theme-daily: #FFB25C;
+    --theme-weekly: #7FD9A8;
+    --theme-monthly: #8FAEFF;
+    --theme-memo: #E8D07A;
   }
 
   * { box-sizing: border-box; }
@@ -41,9 +49,6 @@
     margin: 0;
     padding: 28px 16px 60px;
     background: var(--bg);
-    background-image:
-      radial-gradient(circle at 8% 12%, var(--accent-soft) 0%, transparent 34%),
-      radial-gradient(circle at 94% 88%, var(--success-soft) 0%, transparent 30%);
     color: var(--ink);
     font-family: '맑은 고딕', 'Malgun Gothic', -apple-system, sans-serif;
     display: flex;
@@ -53,7 +58,7 @@
   }
   .app { width: 100%; max-width: 1080px; }
 
-  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 16px; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; padding: 14px 4px 22px; gap: 16px; border-bottom: 1px solid var(--border); }
   .header-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .header-title .icon { flex-shrink: 0; }
   .header-title h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; min-width: 60px; }
@@ -218,8 +223,9 @@
 
   .add-board {
     border: 2px dashed var(--border); border-radius: 14px; background: transparent; box-shadow: none;
-    display: flex; align-items: center; justify-content: center; min-height: 100px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; min-height: 100px; height: 100px; cursor: pointer;
     color: var(--muted); font-size: 13.5px; font-weight: 700; transition: border-color 0.2s ease, color 0.2s ease;
+    align-self: start;
   }
   .add-board:hover { border-color: var(--accent); color: var(--accent-strong); }
 </style>
@@ -239,7 +245,7 @@
         </svg>
       </span>
       <div>
-        <h1 id="listTitleEl" contenteditable="true" spellcheck="false"></h1>
+        <h1 id="listTitleEl">메이플 타임 스케줄러</h1>
       </div>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
@@ -258,7 +264,7 @@
 
   <div class="card exp-card">
     <div class="exp-top">
-      <div class="exp-title" id="expTitleEl" contenteditable="true" spellcheck="false"></div>
+      <div class="exp-title" id="expTitleEl">⭐ 주간 진행도</div>
       <div class="exp-figure" id="totalFigure">0분</div>
     </div>
     <div class="exp-sub" id="totalSub">완료 0분 / 전체 0분 (주간 컨텐츠 기준)</div>
@@ -274,16 +280,17 @@
 <script>
   const STORAGE_KEY = 'scheduler-state-v2';
   const THEME_META = {
-    daily:   { label: '일간', color: '#FF9F1C' },
-    weekly:  { label: '주간', color: '#4C9F70' },
-    monthly: { label: '월간', color: '#4C7FD6' },
-    memo:    { label: '메모', color: '#E6C33D' }
+    daily:   { label: '일간', color: 'var(--theme-daily)' },
+    weekly:  { label: '주간', color: 'var(--theme-weekly)' },
+    monthly: { label: '월간', color: 'var(--theme-monthly)' },
+    memo:    { label: '메모', color: 'var(--theme-memo)' }
   };
   const THEME_ORDER = ['daily', 'weekly', 'monthly', 'memo'];
 
   let state = {
     darkMode: false,
     listTitle: '메이플 타임 스케줄러',
+    lastReset: { daily: 0, weekly: 0, monthly: 0 },
     expTitle: '⭐ 오늘의 진행도',
     characters: [
       { id: 'char_1', name: '섀도어' },
@@ -318,6 +325,57 @@
     const m = mins % 60;
     if (h > 0) return m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
     return `${m}분`;
+  }
+
+  // --- 한국 표준시(UTC+9) 기준 자동 초기화 ---
+  const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+  function kstNow() {
+    // UTC 게터로 읽으면 그대로 '한국 시간 기준 벽시계 값'이 되도록 오프셋을 더한 Date
+    return new Date(Date.now() + KST_OFFSET_MS);
+  }
+
+  function kstWallToEpoch(y, mo, d, h = 0, mi = 0, s = 0) {
+    // 한국 시간 기준 벽시계 값을 실제 UTC epoch(ms)로 환산
+    return Date.UTC(y, mo, d, h, mi, s) - KST_OFFSET_MS;
+  }
+
+  function getResetBoundaries() {
+    const kst = kstNow();
+    const y = kst.getUTCFullYear();
+    const mo = kst.getUTCMonth();
+    const d = kst.getUTCDate();
+    const dow = kst.getUTCDay(); // 0=일, 1=월, ..., 4=목
+
+    const daily = kstWallToEpoch(y, mo, d, 0, 0, 0);
+    const diffToThu = (dow - 4 + 7) % 7; // 이번 주(또는 오늘) 가장 최근 목요일까지 거슬러온 일수
+    const weekly = kstWallToEpoch(y, mo, d - diffToThu, 0, 0, 0);
+    const monthly = kstWallToEpoch(y, mo, 1, 0, 0, 0);
+
+    return { daily, weekly, monthly };
+  }
+
+  function checkAndApplyResets() {
+    if (!state.lastReset) state.lastReset = { daily: 0, weekly: 0, monthly: 0 };
+    const boundaries = getResetBoundaries();
+    let changed = false;
+
+    ['daily', 'weekly', 'monthly'].forEach(themeKey => {
+      if (!state.lastReset[themeKey]) {
+        // 최초 실행 시에는 기존 체크를 건드리지 않고 기준 시점만 맞춰둡니다.
+        state.lastReset[themeKey] = boundaries[themeKey];
+        changed = true;
+        return;
+      }
+      if (boundaries[themeKey] > state.lastReset[themeKey]) {
+        const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
+        state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
+        state.lastReset[themeKey] = boundaries[themeKey];
+        changed = true;
+      }
+    });
+
+    if (changed) { render(); saveState(); }
   }
 
   const persist = {
@@ -370,15 +428,16 @@
         state.categories = (state.categories || []).map(c => ({ theme: 'weekly', ...c }));
         state.characters = state.characters || [];
         state.tasks = (state.tasks || []).map(t => ({ characterId: null, ...t }));
+        state.lastReset = { daily: 0, weekly: 0, monthly: 0, ...(state.lastReset || {}) };
       }
     } catch (e) {
       console.error('저장된 데이터를 불러오지 못했습니다:', e);
     }
     applyTheme();
-    document.getElementById('listTitleEl').textContent = state.listTitle;
-    document.getElementById('expTitleEl').textContent = state.expTitle;
     render();
     if (migratedFromLegacy) saveState(); // 이전 키에서 옮겨온 경우에만 새 키로 재저장 (그 외엔 절대 자동 재저장하지 않음)
+    checkAndApplyResets();
+    setInterval(checkAndApplyResets, 60 * 1000); // 탭을 계속 열어두고 있어도 자정/목요일/1일을 넘기면 자동 초기화
   }
 
   async function saveState() {
@@ -391,17 +450,6 @@
   }
 
   function toggleTheme() { state.darkMode = !state.darkMode; applyTheme(); saveState(); }
-
-  function commitListTitle() {
-    const el = document.getElementById('listTitleEl');
-    const text = el.textContent.trim() || '나의 스케줄러';
-    el.textContent = text; state.listTitle = text; saveState();
-  }
-  function commitExpTitle() {
-    const el = document.getElementById('expTitleEl');
-    const text = el.textContent.trim() || '오늘의 진행도';
-    el.textContent = text; state.expTitle = text; saveState();
-  }
 
   function addCharacter() {
     const input = document.getElementById('charNameInput');
@@ -813,10 +861,6 @@
   }
 
   document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-  document.getElementById('listTitleEl').addEventListener('blur', commitListTitle);
-  document.getElementById('listTitleEl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
-  document.getElementById('expTitleEl').addEventListener('blur', commitExpTitle);
-  document.getElementById('expTitleEl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 
   loadState();
 </script>
