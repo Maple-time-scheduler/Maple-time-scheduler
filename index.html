@@ -861,6 +861,7 @@
     }
     updateModalCountHint();
     document.getElementById('bossModalOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 팝업이 열려있는 동안 바깥 페이지 스크롤 방지
   }
 
   function bossIconGridHtml(selectedName) {
@@ -955,6 +956,7 @@
 
   function closeBossModal() {
     document.getElementById('bossModalOverlay').style.display = 'none';
+    document.body.style.overflow = '';
     bossModalState = { catId: null, taskId: null };
   }
 
@@ -1088,6 +1090,13 @@
       .reduce((s, t) => s + t.price, 0);
   }
 
+  function characterBossPotential(characterId) {
+    const boardIds = state.categories.filter(c => c.theme === 'weekly').map(c => c.id);
+    return state.tasks
+      .filter(t => t.isBoss && t.characterId === characterId && boardIds.includes(t.categoryId))
+      .reduce((s, t) => s + t.price, 0);
+  }
+
   function charOptionsHtml() {
     let html = `<option value="">캐릭터 없음</option>`;
     state.characters.forEach(c => { html += `<option value="${c.id}">${escapeHtml(c.name)}</option>`; });
@@ -1107,11 +1116,12 @@
     }
     row.innerHTML = state.characters.map((c, idx) => {
       const earned = characterBossEarned(c.id);
+      const potential = characterBossPotential(c.id);
       return `
       <div class="char-row" data-id="${c.id}">
         <span class="char-number">${idx + 1}</span>
         <span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span>
-        ${earned > 0 ? `<span class="task-boss-total">💰 ${formatMeso(earned)}</span>` : ''}
+        ${potential > 0 ? `<span class="task-boss-total">💰 ${formatMeso(earned)} / ${formatMeso(potential)}</span>` : ''}
         <button class="row-add-btn" title="${escapeHtml(c.name)} 보스 추가/수정" onclick="openBossModalForCharacter('${c.id}')">+</button>
         <button class="char-delete-btn" onclick="deleteCharacter('${c.id}')" title="삭제">×</button>
       </div>
