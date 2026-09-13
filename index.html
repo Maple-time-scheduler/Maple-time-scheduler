@@ -44,7 +44,7 @@
     --theme-memo: #E8D07A;
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
     padding: 28px 16px 60px;
@@ -62,8 +62,6 @@
   .header-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .header-title .icon { flex-shrink: 0; }
   .header-title h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; min-width: 60px; }
-  .header-title h1[contenteditable="true"] { outline: none; }
-  .header-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
 
   .theme-toggle {
     position: relative; width: 56px; height: 30px; border-radius: 999px;
@@ -80,16 +78,27 @@
 
   /* Character panel */
   .char-card { padding: 14px 16px; margin-bottom: 16px; }
-  .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-  .char-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .char-chip {
-    display: flex; align-items: center; gap: 4px; background: var(--track); border: 1px solid var(--border);
-    border-radius: 999px; padding: 4px 8px 4px 10px; font-size: 12.5px;
+  .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: baseline; gap: 6px; }
+  .char-card-count { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  .char-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .char-row {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
   }
-  .char-chip-name { cursor: text; }
-  .char-chip-name[contenteditable="true"] { outline: none; background: var(--surface); border-bottom: 1px solid var(--accent); }
-  .char-chip button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; line-height: 1; }
-  .char-chip button:hover { color: var(--danger); }
+  .char-number {
+    font-size: 11px; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft);
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .char-chip-name { cursor: text; flex: 1; }
+  .char-chip-name[contenteditable="true"] {
+    outline: none; background: var(--surface);
+    border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 5px;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    display: inline-block; width: 110px; box-sizing: border-box;
+  }
+  .char-delete-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; flex-shrink: 0; }
+  .char-delete-btn:hover { color: var(--danger); }
   .char-add-row { display: flex; gap: 6px; }
   .char-add-row input {
     flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
@@ -101,13 +110,12 @@
   }
   [data-theme="dark"] .char-add-row button { color: #201404; }
 
-  /* EXP bar */
   .exp-card { padding: 18px 20px; margin-bottom: 22px; }
   .exp-top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .exp-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; outline: none; }
-  .exp-title[contenteditable="true"] { outline: none; }
+  .exp-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .exp-figure { font-size: 20px; font-weight: 700; color: var(--accent-strong); }
   .exp-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .exp-boss-sub { font-size: 12.5px; color: var(--accent-strong); font-weight: 700; margin-top: 8px; }
   .exp-track {
     width: 100%; height: 24px; border-radius: 999px; background: var(--track); border: 1px solid var(--border);
     overflow: hidden; position: relative;
@@ -123,12 +131,6 @@
     font-size: 12px; font-weight: 700; color: var(--ink); text-shadow: 0 1px 0 rgba(255,255,255,0.4);
   }
 
-  .boards-heading { display: flex; align-items: center; gap: 8px; margin: 4px 0 16px; }
-  .boards-heading .icon { font-size: 18px; }
-  .boards-heading h2 { font-size: 17px; font-weight: 700; margin: 0; outline: none; }
-  .boards-heading h2[contenteditable="true"] { border-bottom: 1px dashed var(--accent); padding: 0 2px; }
-
-  /* Theme sections */
   .theme-section { margin-bottom: 24px; }
   .theme-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .theme-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
@@ -139,10 +141,8 @@
   @media (max-width: 900px) { .board-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 600px) { .board-grid { grid-template-columns: 1fr; } }
 
-  .board { display: flex; flex-direction: column; padding: 14px 14px 16px; cursor: grab; }
-  .board.dragging { opacity: 0.45; }
+  .board { display: flex; flex-direction: column; padding: 14px 14px 16px; }
   .board-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-  .drag-handle { color: var(--muted); font-size: 14px; flex-shrink: 0; cursor: grab; }
   .board-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; flex: 1; }
   .board-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .board-name {
@@ -156,36 +156,37 @@
     background: var(--success-soft); color: var(--success); cursor: pointer; font-weight: 700; white-space: nowrap;
   }
   .mark-all-btn:hover { background: var(--success); color: #fff; }
+  .boss-settings-btn {
+    font-size: 12px; padding: 4px 7px; border-radius: 999px; border: 1px solid var(--border);
+    background: transparent; cursor: pointer; line-height: 1;
+  }
+  .boss-settings-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
   .board-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; flex-shrink: 0; opacity: 0.7; }
   .board-delete:hover { color: var(--danger); opacity: 1; }
 
   .board-progress-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin-bottom: 4px; }
   .board-progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
   .board-progress-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; text-align: right; }
+  .board-boss-summary { font-size: 11.5px; color: var(--accent-strong); font-weight: 700; margin-bottom: 10px; text-align: right; }
 
   .board-tasks { list-style: none; padding: 0; margin: 0 0 6px; flex: 1; }
-  .task-divider {
-    display: flex; align-items: center; gap: 6px; padding: 5px 4px; cursor: grab; border-radius: 6px;
-  }
-  .task-divider:hover { background: var(--accent-soft); }
-  .task-divider.dragging-task { opacity: 0.4; }
-  .divider-line { flex: 1; height: 0; border-top: 2px dashed var(--border); }
-  .add-divider-btn {
-    background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer;
-    padding: 2px 0 10px; text-align: left; width: 100%;
-  }
-  .add-divider-btn:hover { color: var(--accent-strong); }
   .task-item {
     display: flex; align-items: flex-start; justify-content: space-between; padding: 7px 4px;
-    gap: 6px; cursor: pointer; border-radius: 6px;
+    gap: 6px; cursor: pointer; border-radius: 6px; transition: opacity 0.12s ease;
   }
   .task-item:hover { background: var(--accent-soft); }
   .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); opacity: 0.45; }
+  .task-item.completed .task-text[contenteditable="true"] { text-decoration: none; color: var(--ink); opacity: 1; }
   .task-left { display: flex; align-items: flex-start; gap: 8px; flex: 1 1 auto; min-width: 110px; padding-top: 2px; }
   .task-left input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--success); flex-shrink: 0; cursor: pointer; margin-top: 2px; }
   .task-text { font-size: 13.5px; word-break: break-word; }
-  .task-text[contenteditable="true"] { outline: none; cursor: text; background: var(--surface); }
-  .task-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; width: 96px; }
+  .task-text[contenteditable="true"] {
+    outline: none; cursor: text; background: var(--surface);
+    border: 1.5px solid var(--accent); border-radius: 6px; padding: 1px 6px;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    display: block; width: 100%; box-sizing: border-box;
+  }
+  .task-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; width: 112px; }
   .task-char, .task-time {
     font-size: 11px; color: var(--muted); padding: 2px 7px 2px 8px; border-radius: 20px;
     white-space: nowrap; flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
@@ -199,11 +200,24 @@
     cursor: text; background: transparent; border: 1px dashed var(--border);
     font-variant-numeric: tabular-nums; letter-spacing: 0.2px; padding: 1px 8px;
   }
+  .task-time[contenteditable="true"] {
+    outline: none; background: var(--surface);
+    border: 1.5px solid var(--accent); border-radius: 20px;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    display: block; width: 100%; box-sizing: border-box; text-align: center;
+  }
   .task-char.chip-placeholder, .task-time.chip-placeholder { visibility: hidden; pointer-events: none; cursor: default; }
-  .task-time[contenteditable="true"] { outline: none; background: var(--surface); border: 1px solid var(--accent); }
-  .task-item.dragging-task { opacity: 0.4; }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
-  .delete-btn:hover { opacity: 1; }
+  .row-hover-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .task-item.editable .row-hover-actions,
+  .task-divider.editable .row-hover-actions { opacity: 0; transition: opacity 0.15s ease; }
+  .task-item.editable:hover .row-hover-actions,
+  .task-divider.editable:hover .row-hover-actions { opacity: 1; }
+  .row-add-btn {
+    background: none; border: none; color: var(--accent-strong); cursor: pointer; font-size: 17px;
+    font-weight: 700; padding: 0 4px; flex-shrink: 0; line-height: 1;
+  }
+  .row-add-btn:hover { color: var(--accent); }
   .empty-state { color: var(--muted); font-size: 12.5px; padding: 6px 0 10px; }
 
   .board-add-row { display: flex; gap: 6px; margin-top: auto; flex-wrap: wrap; }
@@ -220,6 +234,63 @@
   }
   [data-theme="dark"] .board-add-row button { color: #201404; }
   .board-add-row button:hover { background: var(--accent-strong); }
+
+  .boss-form-toggle {
+    background: var(--accent-soft); border: 1px solid var(--accent); color: var(--accent-strong); font-size: 11.5px; font-weight: 700;
+    cursor: pointer; padding: 5px 10px; border-radius: 999px;
+  }
+  .boss-form-toggle:hover { background: var(--accent); color: #fff; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-card {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
+    padding: 20px; width: 100%; max-width: 360px; box-shadow: var(--shadow);
+  }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--ink); }
+  .modal-field { margin-bottom: 10px; }
+  .modal-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+  .modal-field select {
+    width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--ink); font-size: 13px; font-family: inherit;
+  }
+  .modal-hint { font-size: 11.5px; color: var(--muted); margin: 4px 0 16px; }
+  .modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .modal-cancel-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 14px;
+    border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .modal-save-btn {
+    background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; font-weight: 700; font-size: 13px;
+  }
+  [data-theme="dark"] .modal-save-btn { color: #201404; }
+  .modal-delete-btn {
+    background: none; border: 1px solid var(--danger); color: var(--danger); padding: 8px 14px;
+    border-radius: 8px; cursor: pointer; font-size: 13px; margin-right: auto;
+  }
+  .difficulty-badge {
+    font-size: 10px; font-weight: 700; color: #fff; padding: 2px 6px; border-radius: 4px;
+    flex-shrink: 0; white-space: nowrap;
+  }
+  .boss-price {
+    font-size: 11px; font-weight: 700; color: var(--accent-strong); background: var(--accent-soft);
+    border: 1px solid var(--accent); padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+    flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
+  .boss-panel { margin-bottom: 10px; padding: 10px; border-radius: 8px; background: var(--accent-soft); border: 1px solid var(--border); }
+  .edit-hint { font-size: 11.5px; color: var(--muted); }
+
+  .task-divider { display: flex; align-items: center; gap: 6px; padding: 5px 4px; border-radius: 6px; }
+  .task-divider:hover { background: var(--accent-soft); }
+  .divider-line { flex: 1; height: 0; border-top: 2px dashed var(--border); }
+  .add-divider-btn {
+    background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer;
+    padding: 2px 0 10px; text-align: left; width: 100%;
+  }
+  .add-divider-btn:hover { color: var(--accent-strong); }
 
   .add-board {
     border: 2px dashed var(--border); border-radius: 14px; background: transparent; box-shadow: none;
@@ -254,8 +325,8 @@
   </div>
 
   <div class="card char-card">
-    <div class="char-card-title">🎮 내 캐릭터</div>
-    <div class="char-chip-row" id="charChipRow"></div>
+    <div class="char-card-title">🎮 내 캐릭터 <span class="char-card-count" id="charCount"></span></div>
+    <div class="char-list" id="charChipRow"></div>
     <div class="char-add-row">
       <input type="text" id="charNameInput" placeholder="캐릭터 이름" onkeypress="if(event.key==='Enter')addCharacter()">
       <button onclick="addCharacter()">추가</button>
@@ -272,13 +343,44 @@
       <div class="exp-fill" id="totalFill"></div>
       <span class="exp-pct" id="totalPct">0%</span>
     </div>
+    <div class="exp-boss-sub" id="bossSub"></div>
   </div>
 
   <div id="themeSections"></div>
 </div>
 
+<div class="modal-overlay" id="bossModalOverlay" style="display:none;" onclick="if(event.target===this) closeBossModal()">
+  <div class="modal-card">
+    <div class="modal-title" id="bossModalTitle">보스 등록</div>
+    <div class="modal-field">
+      <label>보스</label>
+      <select id="modalBossName" onchange="updateModalDifficultyOptions()"></select>
+    </div>
+    <div class="modal-field">
+      <label>난이도</label>
+      <select id="modalBossDifficulty"></select>
+    </div>
+    <div class="modal-field">
+      <label>인원</label>
+      <select id="modalBossParty"></select>
+    </div>
+    <div class="modal-field">
+      <label>캐릭터</label>
+      <select id="modalBossChar" onchange="updateModalCountHint()"></select>
+    </div>
+    <div class="modal-hint" id="modalBossHint"></div>
+    <div class="modal-actions">
+      <button class="modal-delete-btn" id="modalDeleteBtn" onclick="deleteModalBoss()" style="display:none;">삭제</button>
+      <button class="modal-cancel-btn" onclick="closeBossModal()">취소</button>
+      <button class="modal-save-btn" onclick="saveModalBoss()">저장</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const STORAGE_KEY = 'scheduler-state-v2';
+  const LEGACY_STORAGE_KEYS = ['scheduler-state'];
+
   const THEME_META = {
     daily:   { label: '일간', color: 'var(--theme-daily)' },
     weekly:  { label: '주간', color: 'var(--theme-weekly)' },
@@ -287,11 +389,83 @@
   };
   const THEME_ORDER = ['daily', 'weekly', 'monthly', 'memo'];
 
+  const DIFFICULTY_COLORS = {
+    '이지': '#868E96',
+    '노멀': '#339AF0',
+    '하드': '#F06595',
+    '카오스': '#343A40',
+    '익스트림': '#862E9C'
+  };
+
+  const BOSS_DATA = [
+    { difficulty: '카오스', boss: '자쿰', price: 4040000 },
+    { difficulty: '카오스', boss: '블러디퀸', price: 4070000 },
+    { difficulty: '카오스', boss: '반반', price: 4070000 },
+    { difficulty: '카오스', boss: '피에르', price: 4080000 },
+    { difficulty: '하드', boss: '매그너스', price: 4280000 },
+    { difficulty: '카오스', boss: '벨룸', price: 4640000 },
+    { difficulty: '카오스', boss: '파풀라투스', price: 6550000 },
+    { difficulty: '노멀', boss: '스우', price: 8350000 },
+    { difficulty: '노멀', boss: '데미안', price: 8750000 },
+    { difficulty: '노멀', boss: '가디언 엔젤 슬라임', price: 12700000 },
+    { difficulty: '이지', boss: '루시드', price: 14900000 },
+    { difficulty: '이지', boss: '윌', price: 16100000 },
+    { difficulty: '노멀', boss: '루시드', price: 17800000 },
+    { difficulty: '노멀', boss: '윌', price: 20500000 },
+    { difficulty: '노멀', boss: '더스크', price: 22000000 },
+    { difficulty: '노멀', boss: '듄켈', price: 23700000 },
+    { difficulty: '하드', boss: '데미안', price: 46400000 },
+    { difficulty: '하드', boss: '스우', price: 48900000 },
+    { difficulty: '하드', boss: '루시드', price: 59700000 },
+    { difficulty: '카오스', boss: '더스크', price: 66300000 },
+    { difficulty: '노멀', boss: '진 힐라', price: 67600000 },
+    { difficulty: '카오스', boss: '가디언 엔젤 슬라임', price: 71300000 },
+    { difficulty: '하드', boss: '윌', price: 73200000 },
+    { difficulty: '하드', boss: '듄켈', price: 89600000 },
+    { difficulty: '하드', boss: '진 힐라', price: 100000000 },
+    { difficulty: '노멀', boss: '선택받은 세렌', price: 167000000 },
+    { difficulty: '이지', boss: '감시자 칼로스', price: 238000000 },
+    { difficulty: '이지', boss: '최초의 대적자', price: 261000000 },
+    { difficulty: '하드', boss: '선택받은 세렌', price: 302000000 },
+    { difficulty: '이지', boss: '카링', price: 320000000 },
+    { difficulty: '이지', boss: '벨로나', price: 396000000 },
+    { difficulty: '노멀', boss: '감시자 칼로스', price: 479000000 },
+    { difficulty: '노멀', boss: '최초의 대적자', price: 532000000 },
+    { difficulty: '익스트림', boss: '스우', price: 545000000 },
+    { difficulty: '노멀', boss: '카링', price: 576000000 },
+    { difficulty: '노멀', boss: '찬란한 흉성', price: 593000000 },
+    { difficulty: '노멀', boss: '벨로나', price: 824000000 },
+    { difficulty: '노멀', boss: '림보', price: 995000000 },
+    { difficulty: '카오스', boss: '감시자 칼로스', price: 1230000000 },
+    { difficulty: '노멀', boss: '발드릭스', price: 1320000000 },
+    { difficulty: '하드', boss: '최초의 대적자', price: 1390000000 },
+    { difficulty: '노멀', boss: '유피테르', price: 1560000000 },
+    { difficulty: '하드', boss: '카링', price: 1560000000 },
+    { difficulty: '익스트림', boss: '선택받은 세렌', price: 1840000000 },
+    { difficulty: '하드', boss: '림보', price: 2385000000 },
+    { difficulty: '하드', boss: '찬란한 흉성', price: 2678000000 },
+    { difficulty: '하드', boss: '벨로나', price: 2950000000 },
+    { difficulty: '하드', boss: '발드릭스', price: 3078000000 },
+    { difficulty: '익스트림', boss: '감시자 칼로스', price: 4104000000 },
+    { difficulty: '익스트림', boss: '최초의 대적자', price: 4712000000 },
+    { difficulty: '하드', boss: '유피테르', price: 4845000000 },
+    { difficulty: '익스트림', boss: '카링', price: 5387000000 }
+  ];
+  const WEEKLY_BOSS_LIMIT = 12;
+  const MAX_CHARACTERS = 30;
+
+  const BOSS_GROUPS = {};
+  BOSS_DATA.forEach(b => {
+    if (!BOSS_GROUPS[b.boss]) BOSS_GROUPS[b.boss] = [];
+    BOSS_GROUPS[b.boss].push({ difficulty: b.difficulty, price: b.price });
+  });
+  const BOSS_NAMES = Object.keys(BOSS_GROUPS);
+
   let state = {
     darkMode: false,
     listTitle: '메이플 타임 스케줄러',
+    expTitle: '⭐ 주간 진행도',
     lastReset: { daily: 0, weekly: 0, monthly: 0 },
-    expTitle: '⭐ 오늘의 진행도',
     characters: [
       { id: 'char_1', name: '섀도어' },
       { id: 'char_2', name: '나이트로드' }
@@ -311,8 +485,14 @@
       { id: 5, text: '이벤트 링 기억해두기', time: 0, completed: false, categoryId: 'memo1', characterId: null }
     ]
   };
-  let dragBoardId = null;
-  let dragTaskId = null;
+
+  const openBossPanels = new Set();
+
+  function toggleBossPanel(catId) {
+    if (openBossPanels.has(catId)) openBossPanels.delete(catId);
+    else openBossPanels.add(catId);
+    render();
+  }
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -327,31 +507,31 @@
     return `${m}분`;
   }
 
-  // --- 한국 표준시(UTC+9) 기준 자동 초기화 ---
+  function formatMeso(amount) {
+    if (!amount || amount <= 0) return '0메소';
+    const eok = Math.floor(amount / 100000000);
+    const man = Math.floor((amount % 100000000) / 10000);
+    const rest = amount % 10000;
+    const parts = [];
+    if (eok > 0) parts.push(`${eok}억`);
+    if (man > 0) parts.push(`${man}만`);
+    if (eok === 0 && man === 0) parts.push(`${rest}`);
+    return parts.join(' ') + '메소';
+  }
+
   const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
-
-  function kstNow() {
-    // UTC 게터로 읽으면 그대로 '한국 시간 기준 벽시계 값'이 되도록 오프셋을 더한 Date
-    return new Date(Date.now() + KST_OFFSET_MS);
-  }
-
-  function kstWallToEpoch(y, mo, d, h = 0, mi = 0, s = 0) {
-    // 한국 시간 기준 벽시계 값을 실제 UTC epoch(ms)로 환산
-    return Date.UTC(y, mo, d, h, mi, s) - KST_OFFSET_MS;
-  }
-
+  function kstNow() { return new Date(Date.now() + KST_OFFSET_MS); }
+  function kstWallToEpoch(y, mo, d, h = 0, mi = 0, s = 0) { return Date.UTC(y, mo, d, h, mi, s) - KST_OFFSET_MS; }
   function getResetBoundaries() {
     const kst = kstNow();
     const y = kst.getUTCFullYear();
     const mo = kst.getUTCMonth();
     const d = kst.getUTCDate();
-    const dow = kst.getUTCDay(); // 0=일, 1=월, ..., 4=목
-
+    const dow = kst.getUTCDay();
     const daily = kstWallToEpoch(y, mo, d, 0, 0, 0);
-    const diffToThu = (dow - 4 + 7) % 7; // 이번 주(또는 오늘) 가장 최근 목요일까지 거슬러온 일수
+    const diffToThu = (dow - 4 + 7) % 7;
     const weekly = kstWallToEpoch(y, mo, d - diffToThu, 0, 0, 0);
     const monthly = kstWallToEpoch(y, mo, 1, 0, 0, 0);
-
     return { daily, weekly, monthly };
   }
 
@@ -362,20 +542,35 @@
 
     ['daily', 'weekly', 'monthly'].forEach(themeKey => {
       if (!state.lastReset[themeKey]) {
-        // 최초 실행 시에는 기존 체크를 건드리지 않고 기준 시점만 맞춰둡니다.
         state.lastReset[themeKey] = boundaries[themeKey];
         changed = true;
         return;
       }
       if (boundaries[themeKey] > state.lastReset[themeKey]) {
         const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
-        state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
+        if (themeKey === 'weekly') {
+          state.tasks = state.tasks
+            .filter(t => !(boardIds.includes(t.categoryId) && t.isBoss))
+            .map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
+        } else {
+          state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
+        }
         state.lastReset[themeKey] = boundaries[themeKey];
         changed = true;
       }
     });
 
     if (changed) { render(); saveState(); }
+  }
+
+  function waitForWindowStorage(timeoutMs) {
+    return new Promise(resolve => {
+      const start = Date.now();
+      (function check() {
+        if (window.storage || Date.now() - start >= timeoutMs) { resolve(); return; }
+        setTimeout(check, 50);
+      })();
+    });
   }
 
   const persist = {
@@ -399,22 +594,10 @@
     }
   };
 
-  const LEGACY_STORAGE_KEYS = ['scheduler-state']; // 이전 버전에서 쓰던 저장 키 (데이터 복구용)
-
-  function waitForWindowStorage(timeoutMs) {
-    return new Promise(resolve => {
-      const start = Date.now();
-      (function check() {
-        if (window.storage || Date.now() - start >= timeoutMs) { resolve(); return; }
-        setTimeout(check, 50);
-      })();
-    });
-  }
-
   async function loadState() {
     let migratedFromLegacy = false;
     try {
-      await waitForWindowStorage(1000); // 저장소 연결이 늦게 준비되는 경우를 대비해 잠깐 대기
+      await waitForWindowStorage(1000);
       let result = await persist.get(STORAGE_KEY);
       if (!result || !result.value) {
         for (const legacyKey of LEGACY_STORAGE_KEYS) {
@@ -435,9 +618,9 @@
     }
     applyTheme();
     render();
-    if (migratedFromLegacy) saveState(); // 이전 키에서 옮겨온 경우에만 새 키로 재저장 (그 외엔 절대 자동 재저장하지 않음)
+    if (migratedFromLegacy) saveState();
     checkAndApplyResets();
-    setInterval(checkAndApplyResets, 60 * 1000); // 탭을 계속 열어두고 있어도 자정/목요일/1일을 넘기면 자동 초기화
+    setInterval(checkAndApplyResets, 60 * 1000);
   }
 
   async function saveState() {
@@ -448,13 +631,16 @@
     document.body.setAttribute('data-theme', state.darkMode ? 'dark' : 'light');
     document.getElementById('themeKnob').textContent = state.darkMode ? '🌙' : '☀️';
   }
-
   function toggleTheme() { state.darkMode = !state.darkMode; applyTheme(); saveState(); }
 
   function addCharacter() {
     const input = document.getElementById('charNameInput');
     const name = input.value.trim();
     if (!name) return;
+    if (state.characters.length >= MAX_CHARACTERS) {
+      alert(`캐릭터는 최대 ${MAX_CHARACTERS}개까지 등록할 수 있어요!`);
+      return;
+    }
     state.characters.push({ id: 'char_' + Date.now(), name });
     input.value = '';
     render(); saveState();
@@ -487,10 +673,119 @@
     state.tasks = state.tasks.map(t => t.categoryId === catId ? { ...t, completed: true } : t);
     render(); saveState();
   }
-
   function addDivider(catId) {
     state.tasks.push({ id: Date.now(), isDivider: true, categoryId: catId });
     render(); saveState();
+  }
+
+  function isWeeklyBoardId(catId) {
+    const cat = state.categories.find(c => c.id === catId);
+    return !!cat && cat.theme === 'weekly';
+  }
+  let bossModalState = { catId: null, taskId: null };
+
+  function openBossModal(catId, taskId, prefilledCharacterId) {
+    bossModalState = { catId, taskId: taskId || null };
+    const nameSel = document.getElementById('modalBossName');
+    const diffSel = document.getElementById('modalBossDifficulty');
+    const partySel = document.getElementById('modalBossParty');
+    const charSel = document.getElementById('modalBossChar');
+
+    nameSel.innerHTML = BOSS_NAMES.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+    charSel.innerHTML = charOptionsHtmlRequired();
+    partySel.innerHTML = [1, 2, 3, 4, 5, 6].map(n => `<option value="${n}">${n}인</option>`).join('');
+
+    const task = taskId ? state.tasks.find(t => t.id === taskId) : null;
+    if (task) {
+      document.getElementById('bossModalTitle').textContent = '보스 수정';
+      nameSel.value = task.bossName;
+      updateModalDifficultyOptions();
+      diffSel.value = task.bossDifficulty;
+      partySel.value = String(task.partySize || 1);
+      charSel.value = task.characterId || '';
+      document.getElementById('modalDeleteBtn').style.display = 'inline-block';
+    } else {
+      document.getElementById('bossModalTitle').textContent = '보스 등록';
+      updateModalDifficultyOptions();
+      partySel.value = '1';
+      charSel.value = prefilledCharacterId || (state.characters[0] ? state.characters[0].id : '');
+      document.getElementById('modalDeleteBtn').style.display = 'none';
+    }
+    updateModalCountHint();
+    document.getElementById('bossModalOverlay').style.display = 'flex';
+  }
+
+  function updateModalDifficultyOptions() {
+    const nameSel = document.getElementById('modalBossName');
+    const diffSel = document.getElementById('modalBossDifficulty');
+    const options = BOSS_GROUPS[nameSel.value] || [];
+    diffSel.innerHTML = options.map(o => `<option value="${o.difficulty}">${o.difficulty} · ${formatMeso(o.price)}</option>`).join('');
+  }
+
+  function updateModalCountHint() {
+    const charSel = document.getElementById('modalBossChar');
+    const hint = document.getElementById('modalBossHint');
+    const characterId = charSel.value;
+    if (!characterId) { hint.textContent = ''; return; }
+    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+    if (bossModalState.taskId) {
+      const editing = state.tasks.find(t => t.id === bossModalState.taskId);
+      if (editing && editing.characterId === characterId) count -= 1; // 수정 중인 자기 자신은 중복 카운트하지 않음
+    }
+    hint.textContent = `${state.characters.find(c => c.id === characterId)?.name || ''} · 이번 주 ${count}/${WEEKLY_BOSS_LIMIT}마리 등록됨`;
+  }
+
+  function closeBossModal() {
+    document.getElementById('bossModalOverlay').style.display = 'none';
+    bossModalState = { catId: null, taskId: null };
+  }
+
+  function saveModalBoss() {
+    const nameSel = document.getElementById('modalBossName');
+    const diffSel = document.getElementById('modalBossDifficulty');
+    const partySel = document.getElementById('modalBossParty');
+    const charSel = document.getElementById('modalBossChar');
+    const bossName = nameSel.value;
+    const difficulty = diffSel.value;
+    const entry = (BOSS_GROUPS[bossName] || []).find(o => o.difficulty === difficulty);
+    if (!entry) { alert('보스와 난이도를 선택해주세요!'); return; }
+    const characterId = charSel.value;
+    if (!characterId) { alert('캐릭터를 선택해주세요! (보스는 캐릭터당 주 12마리 제한이 있어요)'); return; }
+    const partySize = parseInt(partySel.value) || 1;
+
+    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+    if (bossModalState.taskId) {
+      const editing = state.tasks.find(t => t.id === bossModalState.taskId);
+      if (editing && editing.characterId === characterId) count -= 1;
+    }
+    if (count >= WEEKLY_BOSS_LIMIT) {
+      const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
+      alert(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+      return;
+    }
+
+    if (bossModalState.taskId) {
+      const task = state.tasks.find(t => t.id === bossModalState.taskId);
+      if (task) {
+        task.bossName = bossName; task.bossDifficulty = difficulty; task.partySize = partySize;
+        task.characterId = characterId; task.fullPrice = entry.price; task.price = Math.floor(entry.price / partySize);
+        task.text = `${difficulty} ${bossName}`;
+      }
+    } else {
+      state.tasks.push({
+        id: Date.now(), text: `${difficulty} ${bossName}`, time: 0, completed: false,
+        categoryId: bossModalState.catId, characterId,
+        isBoss: true, bossDifficulty: difficulty, bossName, partySize,
+        fullPrice: entry.price, price: Math.floor(entry.price / partySize)
+      });
+    }
+    closeBossModal();
+    render(); saveState();
+  }
+
+  function deleteModalBoss() {
+    if (bossModalState.taskId) deleteTask(bossModalState.taskId);
+    closeBossModal();
   }
 
   function addTask(catId) {
@@ -522,15 +817,93 @@
     render(); saveState();
   }
 
-  function startEditTask(ev, taskId) {
+  function themeTotals(themeKey) {
+    const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
+    const themeTasks = state.tasks.filter(t => boardIds.includes(t.categoryId) && !t.isDivider);
+    const total = themeTasks.reduce((s, t) => s + t.time, 0);
+    const done = themeTasks.filter(t => t.completed).reduce((s, t) => s + t.time, 0);
+    return { total, done };
+  }
+  function weeklyBossTotals() {
+    const boardIds = state.categories.filter(c => c.theme === 'weekly').map(c => c.id);
+    const bossTasks = state.tasks.filter(t => t.isBoss && boardIds.includes(t.categoryId));
+    const earned = bossTasks.filter(t => t.completed).reduce((s, t) => s + t.price, 0);
+    const potential = bossTasks.reduce((s, t) => s + t.price, 0);
+    return { earned, potential };
+  }
+
+  function charOptionsHtml() {
+    let html = `<option value="">캐릭터 없음</option>`;
+    state.characters.forEach(c => { html += `<option value="${c.id}">${escapeHtml(c.name)}</option>`; });
+    return html;
+  }
+  function charOptionsHtmlRequired() {
+    if (state.characters.length === 0) return `<option value="">등록된 캐릭터 없음</option>`;
+    return state.characters.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  }
+
+  function renderCharacters() {
+    const row = document.getElementById('charChipRow');
+    document.getElementById('charCount').textContent = `${state.characters.length}/${MAX_CHARACTERS}`;
+    if (state.characters.length === 0) {
+      row.innerHTML = '<span class="empty-state">등록된 캐릭터가 없어요. 아래에서 추가해보세요.</span>';
+      return;
+    }
+    row.innerHTML = state.characters.map((c, idx) => `
+      <div class="char-row" data-id="${c.id}">
+        <span class="char-number">${idx + 1}</span>
+        <span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span>
+        <button class="char-delete-btn" onclick="deleteCharacter('${c.id}')" title="삭제">×</button>
+      </div>
+    `).join('');
+  }
+
+  function startEditCharacterName(ev, charId) {
     ev.stopPropagation();
-    const el = document.getElementById('taskText_' + taskId);
+    const el = document.getElementById('charName_' + charId);
     if (!el) return;
-    const original = el.textContent;
+    const character = state.characters.find(c => c.id === charId);
+    if (!character) return;
     el.contentEditable = 'true';
     el.focus();
     const range = document.createRange();
     range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    let finished = false;
+    function finish(save) {
+      if (finished) return;
+      finished = true;
+      el.removeEventListener('blur', onBlur);
+      el.removeEventListener('keydown', onKeydown);
+      el.contentEditable = 'false';
+      if (save) {
+        const text = el.textContent.trim();
+        if (text) { character.name = text; saveState(); }
+      }
+      render();
+    }
+    function onBlur() { finish(true); }
+    function onKeydown(e) {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    }
+    el.addEventListener('blur', onBlur);
+    el.addEventListener('keydown', onKeydown);
+  }
+
+  function startEditTask(ev, taskId) {
+    ev.stopPropagation();
+    const el = document.getElementById('taskText_' + taskId);
+    if (!el) return;
+    el.contentEditable = 'true';
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
@@ -571,6 +944,7 @@
     el.focus();
     const range = document.createRange();
     range.selectNodeContents(el);
+    range.collapse(false);
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
@@ -601,106 +975,6 @@
     el.addEventListener('keydown', onKeydown);
   }
 
-  function taskDragStart(id, ev) {
-    dragTaskId = id;
-    if (ev) { ev.stopPropagation(); if (ev.target) ev.target.classList.add('dragging-task'); }
-  }
-  function taskDragEnd(ev) {
-    if (ev && ev.target) ev.target.classList.remove('dragging-task');
-    dragTaskId = null;
-  }
-  function taskDrop(catId, targetTaskId, ev) {
-    if (ev) ev.stopPropagation();
-    if (!dragTaskId || dragTaskId === targetTaskId) return;
-    const indices = state.tasks.map((t, i) => ({ t, i })).filter(o => o.t.categoryId === catId).map(o => o.i);
-    const list = indices.map(i => state.tasks[i]);
-    const fromPos = list.findIndex(t => t.id === dragTaskId);
-    const toPos = list.findIndex(t => t.id === targetTaskId);
-    if (fromPos === -1 || toPos === -1) return;
-    const [item] = list.splice(fromPos, 1);
-    list.splice(toPos, 0, item);
-    indices.forEach((idx, i) => { state.tasks[idx] = list[i]; });
-    dragTaskId = null;
-    render(); saveState();
-  }
-
-  function boardDragStart(id, ev) { dragBoardId = id; if (ev && ev.target) ev.target.classList.add('dragging'); }
-  function boardDragEnd(ev) { if (ev && ev.target) ev.target.classList.remove('dragging'); dragBoardId = null; }
-  function boardDrop(themeKey, targetId) {
-    if (!dragBoardId || dragBoardId === targetId) return;
-    const indices = state.categories.map((c, i) => ({ c, i })).filter(o => o.c.theme === themeKey).map(o => o.i);
-    const list = indices.map(i => state.categories[i]);
-    const fromPos = list.findIndex(c => c.id === dragBoardId);
-    const toPos = list.findIndex(c => c.id === targetId);
-    if (fromPos === -1 || toPos === -1) return;
-    const [item] = list.splice(fromPos, 1);
-    list.splice(toPos, 0, item);
-    indices.forEach((idx, i) => { state.categories[idx] = list[i]; });
-    dragBoardId = null;
-    render(); saveState();
-  }
-
-  function themeTotals(themeKey) {
-    const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
-    const themeTasks = state.tasks.filter(t => boardIds.includes(t.categoryId) && !t.isDivider);
-    const total = themeTasks.reduce((s, t) => s + t.time, 0);
-    const done = themeTasks.filter(t => t.completed).reduce((s, t) => s + t.time, 0);
-    return { total, done };
-  }
-
-  function charOptionsHtml() {
-    let html = `<option value="">캐릭터 없음</option>`;
-    state.characters.forEach(c => { html += `<option value="${c.id}">${escapeHtml(c.name)}</option>`; });
-    return html;
-  }
-
-  function renderCharacters() {
-    const row = document.getElementById('charChipRow');
-    if (state.characters.length === 0) {
-      row.innerHTML = '<span class="empty-state">등록된 캐릭터가 없어요. 아래에서 추가해보세요.</span>';
-      return;
-    }
-    row.innerHTML = state.characters.map(c => `
-      <span class="char-chip"><span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span> <button onclick="deleteCharacter('${c.id}')" title="삭제">×</button></span>
-    `).join('');
-  }
-
-  function startEditCharacterName(ev, charId) {
-    ev.stopPropagation();
-    const el = document.getElementById('charName_' + charId);
-    if (!el) return;
-    const character = state.characters.find(c => c.id === charId);
-    if (!character) return;
-    el.contentEditable = 'true';
-    el.focus();
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-
-    let finished = false;
-    function finish(save) {
-      if (finished) return;
-      finished = true;
-      el.removeEventListener('blur', onBlur);
-      el.removeEventListener('keydown', onKeydown);
-      el.contentEditable = 'false';
-      if (save) {
-        const text = el.textContent.trim();
-        if (text) { character.name = text; saveState(); }
-      }
-      render(); // 이름이 바뀌면 이 캐릭터를 참조하는 모든 항목에도 즉시 반영됩니다.
-    }
-    function onBlur() { finish(true); }
-    function onKeydown(e) {
-      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
-      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
-    }
-    el.addEventListener('blur', onBlur);
-    el.addEventListener('keydown', onKeydown);
-  }
-
   function renderExp() {
     const { total, done } = themeTotals('weekly');
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -708,6 +982,10 @@
     document.getElementById('totalSub').textContent = `완료 ${formatHM(done)} / 전체 ${formatHM(total)} (주간 컨텐츠 기준)`;
     document.getElementById('totalFill').style.width = pct + '%';
     document.getElementById('totalPct').textContent = pct + '%';
+
+    const { earned, potential } = weeklyBossTotals();
+    const bossSub = document.getElementById('bossSub');
+    bossSub.textContent = potential > 0 ? `💰 이번 주 결정석 수익 ${formatMeso(earned)} / ${formatMeso(potential)}` : '';
   }
 
   function boardCardHtml(cat) {
@@ -718,6 +996,11 @@
     const catDone = realTasks.filter(t => t.completed).reduce((s, t) => s + t.time, 0);
     const catPct = catTotal > 0 ? Math.round((catDone / catTotal) * 100) : 0;
     const color = THEME_META[cat.theme].color;
+    const isWeekly = cat.theme === 'weekly';
+    const panelOpen = openBossPanels.has(cat.id);
+    const bossTasks = realTasks.filter(t => t.isBoss);
+    const bossEarned = bossTasks.filter(t => t.completed).reduce((s, t) => s + t.price, 0);
+    const bossPotential = bossTasks.reduce((s, t) => s + t.price, 0);
 
     let tasksHtml = '';
     if (catTasks.length === 0) {
@@ -726,64 +1009,85 @@
       tasksHtml = catTasks.map(task => {
         if (task.isDivider) {
           return `
-        <li class="task-divider"
-            draggable="true"
-            ondragstart="taskDragStart(${task.id}, event)"
-            ondragend="taskDragEnd(event)"
-            ondragover="event.preventDefault(); event.stopPropagation()"
-            ondrop="event.preventDefault(); taskDrop('${cat.id}', ${task.id}, event)">
+        <li class="task-divider ${panelOpen ? 'editable' : ''}" data-id="${task.id}">
           <span class="divider-line"></span>
-          <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})" title="구분선 삭제">&times;</button>
+          ${panelOpen ? `
+          <div class="row-hover-actions">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})" title="구분선 삭제">&times;</button>
+          </div>
+          ` : ''}
         </li>`;
         }
         const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
+
+        if (task.isBoss) {
+          const diffColor = DIFFICULTY_COLORS[task.bossDifficulty] || 'var(--accent)';
+          return `
+        <li class="task-item boss-item ${task.completed ? 'completed' : ''} ${panelOpen ? 'editable' : ''}"
+            style="--chip-accent: ${color};"
+            onclick="toggleTask(${task.id})"
+            data-id="${task.id}">
+          <div class="task-left">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
+            <span class="difficulty-badge" style="background:${diffColor}">${task.bossDifficulty}</span>
+            <span class="task-text">${escapeHtml(task.bossName)}</span>
+          </div>
+          <div class="task-meta">
+            <span class="task-char">${character ? escapeHtml(character.name) : '-'}</span>
+            <span class="boss-price">${formatMeso(task.price)}${task.partySize > 1 ? ` (${task.partySize}인)` : ''}</span>
+          </div>
+          ${panelOpen ? `
+          <div class="row-hover-actions">
+            <button class="row-add-btn" title="보스 수정" onclick="event.stopPropagation(); openBossModal('${cat.id}', ${task.id})">✎</button>
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
+          </div>
+          ` : ''}
+        </li>`;
+        }
+
         const charChipHtml = character
           ? `<span class="task-char">${escapeHtml(character.name)}</span>`
           : `<span class="task-char chip-placeholder">-</span>`;
         const timeChipHtml = !isMemo
           ? (task.time > 0
-              ? `<span class="task-time" id="taskTime_${task.id}" ondblclick="startEditTaskTime(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${formatHM(task.time)}</span>`
+              ? `<span class="task-time" id="taskTime_${task.id}" onclick="if(this.isContentEditable){event.stopPropagation();}else if(${panelOpen}){startEditTaskTime(event, ${task.id});}">${formatHM(task.time)}</span>`
               : `<span class="task-time chip-placeholder">0분</span>`)
           : '';
-        // 캐릭터가 없고 시간만 있는 경우, 실제 내용(시간)이 항상 위쪽에 오도록 순서를 바꿉니다.
         const metaHtml = (!character && !isMemo && task.time > 0)
           ? timeChipHtml + charChipHtml
           : charChipHtml + timeChipHtml;
         return `
-        <li class="task-item ${task.completed ? 'completed' : ''}"
+        <li class="task-item ${task.completed ? 'completed' : ''} ${panelOpen ? 'editable' : ''}"
             style="--chip-accent: ${color};"
             onclick="toggleTask(${task.id})"
-            draggable="true"
-            ondragstart="taskDragStart(${task.id}, event)"
-            ondragend="taskDragEnd(event)"
-            ondragover="event.preventDefault(); event.stopPropagation()"
-            ondrop="event.preventDefault(); taskDrop('${cat.id}', ${task.id}, event)">
+            data-id="${task.id}">
           <div class="task-left">
             <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
-            <span class="task-text" id="taskText_${task.id}" ondblclick="startEditTask(event, ${task.id})" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(task.text)}</span>
+            <span class="task-text" id="taskText_${task.id}" onclick="if(this.isContentEditable){event.stopPropagation();}else if(${panelOpen}){startEditTask(event, ${task.id});}">${escapeHtml(task.text)}</span>
           </div>
           <div class="task-meta">
             ${metaHtml}
           </div>
-          <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
+          ${panelOpen ? `
+          <div class="row-hover-actions">
+            ${(isWeekly && character) ? `<button class="row-add-btn" title="${escapeHtml(character.name)} 보스 추가" onclick="event.stopPropagation(); openBossModal('${cat.id}', null, '${character.id}')">+</button>` : ''}
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
+          </div>
+          ` : ''}
         </li>`;
       }).join('');
     }
 
     return `
-      <div class="card board" draggable="true"
-           ondragstart="boardDragStart('${cat.id}', event)"
-           ondragend="boardDragEnd(event)"
-           ondragover="event.preventDefault()"
-           ondrop="boardDrop('${cat.theme}','${cat.id}')">
+      <div class="card board" data-id="${cat.id}">
         <div class="board-header">
-          <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
           <div class="board-name-wrap">
             <span class="board-dot" style="background:${color}"></span>
             <span class="board-name" contenteditable="true" spellcheck="false" id="boardName_${cat.id}">${escapeHtml(cat.name)}</span>
           </div>
           <div class="board-header-actions">
             <button class="mark-all-btn" onclick="markAllComplete('${cat.id}')">모두 완료</button>
+            <button class="boss-settings-btn" title="편집" onclick="toggleBossPanel('${cat.id}')">🛠️</button>
             <button class="board-delete" title="목록 삭제" onclick="deleteBoard('${cat.id}')">🗑</button>
           </div>
         </div>
@@ -791,8 +1095,18 @@
           <div class="board-progress-track"><div class="board-progress-fill" style="width:${catPct}%"></div></div>
           <div class="board-progress-label">완료 ${formatHM(catDone)} / ${formatHM(catTotal)} (${catPct}%)</div>
         ` : ''}
+        ${(isWeekly && bossTasks.length > 0) ? `
+          <div class="board-boss-summary">💰 결정석 수익 ${formatMeso(bossEarned)} / ${formatMeso(bossPotential)}</div>
+        ` : ''}
         <ul class="board-tasks">${tasksHtml}</ul>
         <button class="add-divider-btn" onclick="addDivider('${cat.id}')" title="구분선 추가">— 구분선 추가 —</button>
+        <div class="boss-panel" id="bossPanel_${cat.id}" style="display:${openBossPanels.has(cat.id) ? 'block' : 'none'};">
+          ${isWeekly ? `
+          <button class="boss-form-toggle" onclick="openBossModal('${cat.id}', null)">+ 보스 등록</button>
+          ` : `
+          <div class="edit-hint">✏️ 편집 모드예요. 이름이나 시간을 클릭하면 바로 수정할 수 있어요.</div>
+          `}
+        </div>
         <div class="board-add-row">
           <input type="text" id="taskInput_${cat.id}" placeholder="${isMemo ? '메모 입력' : '할 일 입력'}">
           ${!isMemo ? `<input type="number" id="timeInput_${cat.id}" placeholder="분(0 가능)" min="0">` : ''}
