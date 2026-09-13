@@ -25,8 +25,10 @@
     --theme-memo: #C99A2E;
     --time-grad-1: #3B6FD1;
     --time-grad-2: #7FB2FF;
+    --time-grad-pale: #A7BEEA;
     --money-grad-1: #D9A400;
     --money-grad-2: #4C9F70;
+    --money-grad-pale: #EED68C;
   }
   [data-theme="dark"] {
     --bg: #18171C;
@@ -48,11 +50,15 @@
     --theme-memo: #E8D07A;
     --time-grad-1: #5B8FE8;
     --time-grad-2: #A9CBFF;
+    --time-grad-pale: #A5C1F2;
     --money-grad-1: #FFC94D;
     --money-grad-2: #6FCB9F;
+    --money-grad-pale: #FFE19D;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  .coin-icon { vertical-align: -0.15em; margin-right: 1px; }
+  .clock-icon { vertical-align: -0.15em; margin-right: 1px; }
   body {
     margin: 0;
     padding: 28px 16px 60px;
@@ -130,8 +136,8 @@
   }
   [data-theme="dark"] .exp-track { background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(255,255,255,0.06) 10%); }
   .exp-fill {
-    height: 100%; width: 0%; background: linear-gradient(90deg, var(--time-grad-1) 0%, var(--time-grad-2) 100%);
-    box-shadow: 0 0 10px rgba(79,130,220,0.35) inset; transition: width 0.4s ease;
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%);
+    transition: width 0.4s ease;
   }
   .exp-pct {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -150,8 +156,8 @@
   }
   [data-theme="dark"] .money-track { background-image: repeating-linear-gradient(135deg, transparent, transparent 8px, rgba(255,255,255,0.05) 8px, rgba(255,255,255,0.05) 10px); }
   .money-fill {
-    height: 100%; width: 0%; background: linear-gradient(90deg, var(--money-grad-1) 0%, var(--money-grad-2) 100%);
-    box-shadow: 0 0 10px rgba(217,164,0,0.35) inset; transition: width 0.4s ease;
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--money-grad-pale) 30%, var(--money-grad-1) 100%);
+    transition: width 0.4s ease;
   }
   .money-pct {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -192,9 +198,11 @@
   .board-delete:hover { color: var(--danger); opacity: 1; }
 
   .board-progress-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin-bottom: 4px; }
-  .board-progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+  .board-progress-fill { height: 100%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%); width: 0%; transition: width 0.3s ease; }
   .board-progress-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; text-align: right; }
-  .board-boss-summary { font-size: 11.5px; color: var(--accent-strong); font-weight: 700; margin-bottom: 10px; text-align: right; }
+  .board-money-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin-bottom: 4px; }
+  .board-money-fill { height: 100%; background: linear-gradient(90deg, var(--money-grad-pale) 30%, var(--money-grad-1) 100%); width: 0%; transition: width 0.3s ease; }
+  .board-money-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; text-align: right; }
 
   .board-tasks { list-style: none; padding: 0; margin: 0 0 6px; flex: 1; }
   .task-item {
@@ -278,6 +286,10 @@
     padding: 20px; width: 100%; max-width: 400px; box-shadow: var(--shadow);
   }
   .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--ink); }
+  .modal-warning {
+    background: var(--danger); color: #fff; font-size: 12.5px; font-weight: 600;
+    padding: 9px 11px; border-radius: 8px; margin-bottom: 12px; line-height: 1.4;
+  }
   .modal-field { margin-bottom: 10px; }
   .modal-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
   .modal-field select {
@@ -299,8 +311,6 @@
   .boss-icon-btn:hover { background: var(--accent-soft); }
   .boss-icon-btn.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); font-weight: 700; }
   .modal-boss-row-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
-  .modal-boss-row.completed { opacity: 0.55; }
-  .modal-boss-row.completed .modal-boss-row-left span:not(.modal-boss-icon) { text-decoration: line-through; }
   .modal-boss-icon { width: 20px; height: 20px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
   .modal-hint { font-size: 11.5px; color: var(--muted); margin: 4px 0 12px; }
   .modal-boss-status { margin-bottom: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
@@ -402,7 +412,7 @@
 
   <div class="card exp-card">
     <div class="exp-top">
-      <div class="exp-title" id="expTitleEl">⭐ 주간 진행도</div>
+      <div class="exp-title" id="expTitleEl"><svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="12" y="1" width="8" height="3" rx="1.5" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="none" stroke-opacity="0.25" stroke="#000" stroke-width="1"/><line x1="16" y1="18" x2="16" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="20" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="18" r="1.5" fill="#fff"/></svg> 주간 진행도</div>
       <div class="exp-figure" id="totalFigure">0분</div>
     </div>
     <div class="exp-sub" id="totalSub">완료 0분 / 전체 0분 (주간 컨텐츠 기준)</div>
@@ -412,8 +422,8 @@
     </div>
     <div class="money-block" id="moneyBlock" style="display:none;">
       <div class="money-top">
-        <div class="money-title">💰 결정석 수익</div>
-        <div class="money-figure" id="moneyFigure">0메소</div>
+        <div class="money-title"><svg class="coin-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg> 결정석 수익</div>
+        <div class="money-figure" id="moneyFigure">0 메소</div>
       </div>
       <div class="money-sub" id="moneySub"></div>
       <div class="money-track">
@@ -426,9 +436,10 @@
   <div id="themeSections"></div>
 </div>
 
-<div class="modal-overlay" id="bossModalOverlay" style="display:none;" onclick="if(event.target===this) closeBossModal()">
+<div class="modal-overlay" id="bossModalOverlay" style="display:none;" onclick="if(event.target===this) cancelBossModal()">
   <div class="modal-card">
     <div class="modal-title" id="bossModalTitle">보스 등록</div>
+    <div class="modal-warning" id="modalWarning" style="display:none;"></div>
     <div class="modal-field">
       <label>보스</label>
       <div class="boss-icon-grid" id="modalBossIconGrid"></div>
@@ -453,9 +464,9 @@
     </div>
     <div class="modal-actions">
       <button class="modal-delete-btn" id="modalDeleteBtn" onclick="deleteModalBoss()" style="display:none;">삭제</button>
-      <button class="modal-cancel-btn" onclick="closeBossModal()">취소</button>
+      <button class="modal-cancel-btn" onclick="cancelBossModal()">취소</button>
       <button class="modal-add-btn" id="modalAddBtn" onclick="addAnotherModalBoss()">추가</button>
-      <button class="modal-save-btn" onclick="saveModalBoss()">저장</button>
+      <button class="modal-save-btn" onclick="finishBossModal()">저장</button>
     </div>
   </div>
 </div>
@@ -544,6 +555,8 @@
   });
   const BOSS_NAMES = Object.keys(BOSS_GROUPS);
 
+  const COIN_ICON = '<svg class="coin-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg>';
+
   const BOSS_ICONS = {
     "자쿰": "data:image/png;base64,UklGRmQdAABXRUJQVlA4IFgdAADwYgCdASqgAJkAPmkokEWkIqGZm58YQAaEsQBgafuWD8qPjednfG6hG/tl+lXcCeZjzkvRx/ld8v9ADpX/7t/47YN41fs/Cfy+fFfc/2LcefZzqQd0/8z1y/1ffH8ef9H1Avbu8Q219AX3U+0fsR65/1nmb/Cf672APMb/u+DR+M/4PsEfzj/Af+D/H/kZ8sH/n5d/rD2Df6D/e/TY9jH7Y//n3Sv2W//61L+IAR9NmSOgNd9NfX954awo55mbqcKVR2pjRVDszOABCB60qtzKBNUijvT3+ix7l1hcFYyxQvtKKfdqsY7Ngcpnd37aDH/LO8aluPywA3EE/DL/+bxTx5lcWxE+mVaeL640qfG4kSlWs8UHd25atLHR/DHlrme2uQlgDEEtUivhOHIM2yS8LubB8hrCxQVSdrX2Tx26JvXf1mctEyUO/jwd3bw520QxIfpZ4plKRcoJ05zVkX+2oLD0yiAUPk8tgD8uZ4CL3Z3Zs6qODEDMdYBU14YcerR91bSkgInl++H3jsHioOTalPnMWbSEoZqml5lYfbf6znQraVONjbEjmIxvf9+gDCWUA9u9DOf4sxhy+SizrPmkb9Xni/92pvIUzZTAd6tO2qCen2so6YPNfjCV6W+NuT8W3FVbxpT8/A0R3p50UyPVhrhwnXqA76284IFCmNEmZjw1BFb475r4otZclrrX5IOH9hBtHwxfIRnXfa8mMDkT3y3G3s2SiGy7Kv/TUouJTK5KTH4Yhtv++AEBbFqPOpKZ7VgpZgglu7QALbyJGZofGJPdpfMDesJJvdvaphbpjXK59hg12jlD0WxZIUyFsLUA/stL2vl4lD7n/RPqwh/0d9mutY7lubvytj29TCDXD22/VGlbR8rdhwSYM84sE/E7o36kf6Tdb4F1ZWARWyEYfPxnBS64RnZL5mhX886tE6myaqI/PGxZ5RQNaH8OGN7dGK+NGj0xN2k7caheKT3e92P4Df9VCXWsVUlc4yNwyUfAPnv8oQc0VMGPbgMuMZcVjFcd1t5ay97AbbJamqgDL/DDMF91YsyazTbw1rtoAAD+/h3cBIiJVHno0c29IKU3jkWcwMRprLYx5INGi+/t2tO//+V5/fY7YPj18RUNbSGFk7pzlZdN1LxLtxoX4s/FPQ38etuUDvtVqlK/qal5IUAx+UPjOcU9ryIBZ/XkTHL3Rwbx7ioigcO14POqAkCuDX/mvfuQsn///T05152Cj6Zh89IXqgjdl9xy16l74iI0cSRaIAi/Av7GIsriOSIJ9BycAOPmyJ4N2tJ0tcOrmSp5D3OMMeQFYdbY/4lkTa5GLI9hoLdQOGGCGHZvQ985cAE7eQkz5kCcMCyXsyGa2JkcZgLjKYfzp7haDwgtQURcE2Kdcr3k3mQ1BNBLaKuh/wziRgSazKFHa7H+En9Gz2go0EG+I2dhMLDOec/aziklEQexX4XVkfK7eoKcXCSS1vOtEud4NXaeGdVXXq1c62aGjlg2UhRUYZDZCnDTyW1v3ZLOTyYy2h/P8PpxUccf6osga/1cvXX0VxAZiiwwhWXViD78yVDc2V8Eq/0Rw+NKRb/J7EQtQ7oWI1652+t2meqJKdpj7llE7spB2yVac1W1p897Xn84PGOh9x4ubE558AC4Rv2HTmIYJIu5qYyepAwVvUw8FTSxSVp6V3gRUaCsnAkgMuzNL12ZP6jQjlBJ361JvgyrDfZl/xgQXjP9b5Fs+eTEkI4LazKLSGFRqbnveIFhXjBiVe4GNF0nycsSVZbZh70AR9wDv16++4QQ9EofuH0wQYrwvZYXGXuHKHdAt19lZmMiIIFYvG/D/o/LfPFI7wWTbPFACDS6/pPme6e3ITp1ETkMlIsIZwu6O4BWIiK2+n0cPllBjovtgAzYsdPptOEeQeZlRUgjjroycyFYNfgQl3mzfKu5pvdCT6mIApIGNoA0aqrHgAOgoSKpuIH0KhxHIYjuKCeFL+ni0ze0I6NUs0Qx0lu130Ly3fCMGd4/zeJb84QT9AtfH3UQOSMZNX+E7CQQ7Lq9KRm1ox6B6fWZnNVHPcc3cOQZDaI7DBF/dB2wnXmdNTJ4F7ZZNnGUwb1vXXpG9ImoRUD7XTp35OD32petWqlFNQ/C166IqbY7GhK255AJMIz0phyO8B8spsUapzA5rQnoqH+pHH0gIA/Dh5mSzuVHNc3gRsYgq/fLrEd+TPB8vkYbBiXyY9yU+8iySPG0c26FCVPclVKm81Mih0TWfMxjjakzJCP24XkB6mVJw0U2ZV6xHtD45SbyJbm7E+iuJ1PxcsBpUlV/xyzP5kAR0UxpLBWxrePpV5JlXEOueOgDgtJ73xKLdV6e2Er6gp1qTIzZ5RZlKa7jqtc9pseiRokyxq0ebjyvAzwUwYhokgpkpjzUlXaHVnafIfavUbuwOXKupIjf3/fEcwvlIGeoyx7qB/H67Z6hDPtIM1weeXgPx80WnFppzkc89zxbxlhqiFBBXtyBiiyFEDcpaBMpPTQeHtrZ5dWRmxfYHeot2sKPdUdkskpUmE8gyzETxjHunByYBSbmDVsNMHJBG8cXZQdqIqy/xNzKvB5sH9WAQ/Oi1l0ogaBvG2s4gJcc5HO5cMjhWHzCmEOym1gTpTDBHvXwBqwF40nPWpVGvMwlF3LSg0ZXZoKxie9SAfWrhmUoT0Qkpx7O617sIl0fSpp5UEJM8HLPk3lkup9ikeAx8r7embsVFBezE+7UGLS+6ZGK69G9M6QGEzBNICVe+hVxNigP9maOkL7XY0FLiWR+FolGWlhvzKSo5Lv19x2ct0IzYeEsglJ1OHPMSyrP/G0hQ+USKA1wj9bDldd/6Y4p2x1l2QWhSCecYPJozI9zNCPRL7rM8gUT1cTc/sjMs6nKoORzFGQJAz/XPuUrIUHWN66oEX/Xm3sqQMfZOEJNHFbbZpM9dh1WHdTq6FyaTBWMcsY1ra8HLpPzcf02QKbLgZuTmEXBWix5RCdaeax0RDVrv0DePrrfRy3czHMtSQvFLcLIIusIH7bNW44A28IQ+z8iU9ZTdhnZ25/OYIgBb7f6LJY0Yo+KDpHI0UnCnPC9s8YLBBseayyDjP4QeqL9UkezQLIR4du83fQ6qk1vABLZ/qRQw6drpeGWoZqsmLJ9K4ut3OM6IkNPZAEO8BJFA8SQt0c5VXnepsbXCfROpLlD6ZISilt1gQfhnMax/K11a5lUdixJdr53Mj432mLj8Cxsk/wCcG+xhy11VYr+CB8xNFVqYu6w/RqpyMpqF5mmIrXrjW08I/6pG5y8bd+FEPnvZBPcRu1+Usqs/KnUWN51oaa0EBryaqI4bjEKwxpRwGGnBDHMjZahikTHjsf4KcbzOVYJiG1rh+kBsDI6JzYovTpXG7Kk35ZCiuAo0yNwkcVsuvfhl46Yf4G+IZCOk/3vauBVpj0OifbuAqtl4o6tZ6UAM6a6ad8SpYDBNtQDgBYt/j1ndXS2ZCYJomDCHccqFobjy7vFaq0oj7XDGKXFfwlsJsMcMXqz4ZhIOQbTOo5spw0cW93Su4WS546egBV8hg5WiKmgIBDi5uii55nBCw9jjqtEdzJRlBMG7jpOQiJCoRStPuIUcjlNdfy5taczY6cryr4vLRb4SfgH0FFEHSyfsoK5VkeluvHWS8oD9L9ZNIBWDMB75F5IRVJol3YfRcbe6U7Yy/fv4GHvLSCortd05E0m3OteukfeaaqkYjTOdUgErI1YKx8yWVA+GkrZIUX60jgwZTyQa8SOahQoiMtTUoKd6Xgw2VQM1YDr0YZ2c+w5m9btgfOeUknowvJ9yhBcxFiIyGQsKv+Jowsj9lcJxHvTyFhPkskWM7Ad5KOIAmXSgdnM8liiYeDwdAv4gJS0uM4Zbl4O/QUave6tZJXBtTp+mITGsNtQl4sugMzexVKQ+BJQt8FjEgPq84+kgokvnvSIRJy10rrPxy/6HyjgTkjICQiLYQ+Li/8ONMTtnhZbJME6htGaYu+yq85O6P2YDZa1WPrsmOeQqA31XsHqGr49NGpykOxjiogk/gAkAUxDvRc8cl/NSqOz7RWEhiEdLkuDVUs94ES5XO6GCcwZk56J1pp7S0ehymSzDawevewXra5hl0LSHpRc3FQ5Wcdr2kGGL42fsV0/rj6NHW2fhmAOlAjyEj3pN9pJeTp2dTwo+2BcIPfERS/Q3ZwrRgpXrtMP2hQMCNje7dxzZfjhlv0/Lp0wvYHmufosPEB02xz6IRySWYeMILj0KKh7yvq0y/lwkU74lekot3c8vnauT4vMDCbh6ebFBmTC12HQar51RiugxHBkIZFcMjHM2UCFicxTft8WzRhtaDgmAUFT6T65O7Kn3x95Vl1LJJcQZF38VHb+9gPT6/XzG5/9CnBOD4KPKFR0/V3pnnmn47CJz0/xIHxUN4/k8xg1tA1Rm9sT/quD1qUNZuGfZ9iqLaDctBt0m2tvfOB0vI5fACu5nJIgf/l1BNezBwXX35n+zLGc1GDpNIDQteUfiXl0Yr8Jf0DycpPlz5qRnvGg3W5mey3qw5eyrEEZ2nubgR10Dvq/ZfIkujRtqayZyWAezczDbFe6gEJTo2bcpXLRzXUQl8hZ4fBSjvu2oIc1/PR15UC2JJpPNbf5ASg9W6xa/G0E+tKOUA0fyMhg2mCZLDtgEpG4WiujX7f4OvdEfdAMQCk8B2u9iAEEpVR000O2/HUj0lZPZVzPGyHMLgJvvZpsj1TF7efVZSqvdUH9grezcnpnt7ZzqPiHa+9w8cQbQKxkpRD9rDsBxehiwjZ93Tp1wrJCi3UpzOIRz+8jAPoBWHrwUwu6w+DumdDWkttY3oZzhehVwCeMqp8VZHANA9312SDXpC9jVp7IwOqDfXhLOC9qfZKsw+NdUvhOPHyxyXfZUGp4HVKZ9El18uvDeRSaPF/FMG3XBwFxLmV8VzgFyTi6nBM54PqnF5IOL53E2tVhLWZBq3nIu9EwdTssaR9xL4hyGokL5pDxaKVNLYS6ISprFJxi2O0Sj5talkULp/poab4PVauh5p8IyYl/EZIcsHDlfE1mdxVxXjNAww1dlD2YdgAEfmauEsjagyfOX/ndjjz2nXy6dQDHXaoiJ3wrnHJi3aQwGewkXOExSMy7okgdCLC25ETPMMaSJkuCr2M2VidRH+GWhPymaw7GXDOxhm7MDPQnjcA3eUmyy8AKcyytQgHOrlx1nyDOMm0ipovlNX1WUmXfs/OnhzhriuvNo/nuJ591XFuGLtex1tisxyFbtoTFMpAatW1GQVYDvlYNAj8Bi6k8FsjMS0MNaYubIlTLh1RtQo0PSUvQPKiV/raK1P+7e+aYVZOOyYRElxram4mob6j/X4nBdTHhq8xbI+C8t3A65Do4+VjHw8tVTMcZVlMcfwg8hMYBMZ/wBJhu9D2wrScEO31ZCMo+TFIWztfpcPH2zhw47o2yxFSXQOHAbTLMrq0rwTEhRzudsZIwrq8H7hbYc9YNsG/0k1rbblCd6OGpitBEeOwKPgxpcXvAOg1DniOT6OBwxlCUgeeCibyhzQwbh8QeOy9I4YqzWSvKOdMs/DeHjZoFHF17k2c157Z5vqlOX9amjKnBzwMrvvfu+CvAP+KkutptOtfqTOsV3xb4GwXIQArrDtkO/vIo0ul3foQBCqx/McUky6kCG2lQh0CWL7NRbbQqSQdnbj3nGGefkwVPfaPrCnwQNaiYLD17rAGlUV8t9AVzm4YxhyVODgrpN7RcOAJcjU56S1MMPcqXNQu7DpeYhoOkgTFCR27qK+j2GPl9e2zoZ6kS9/+KNZhBjqFrQGh3yNtKbUDZ5JF9PkHYhNAGfAJ3H1habPQX/vxDYCyFgw80ATU4rQvo0qV7jQcn0s8Nhy+cFXMpgn0GK60Saa+iRap65owU+M7PglqF1HUpmCrcESvOlvZMbHJCjbAxjfIk2WXxYcP6F0kcK2dYLTEnVP6dMr+NcfZ+gkkxKxNXQmhGwiLB2z9lfejEOb26YZeQRltTF6JvmovhXHEI6jEffVI7cKW9bh5r4rOGrJzG+zymlpx2Ewkl3bn5KHtClL3eLtFeLmQXbbfty9GnIWxhjliQCzmZQdkMxZANDNZnPZeEbNdfCRTRjtMx8IIDNp9vRXds3N1LbhwgAmlwWQxbpSmctVnjIJ7D2f+c9u4emrX9hy48wIRVUANJE2MksY9aj+jq+lSblymkGHbNgoFpQDBL1qg5qZBmKGn5XrLdIrD+OpvVvzjgiFoK+s441qgq9j/Os6jgUok3IH9GVDMro25g15gDtG+k/41elVvw8OSuI2/aO4ma2FpvAIqn4Yixa3TuwyJdQTEqLrxcACpVARK/WaMUK1AFde8LhCOITzFxV7F8bm0U4jr2mV9tCIRKTnL3vdTEyzrjbpS/ml90KiCdUSsbvPl1Xb5LIMo3SGGXs1SEuaFZdZC8ZRst13Pn6zaylxQDilwlbiU8+6inkw3TSa8laIZQvSmdqTH1s/eao2LhcmAAImkw1tO9A7EHgSbYAP9KYjW8ZJsE8An6xSv0X1jEuggjAWREWzM/xbLNc9ZpZphl7vdsKmJ7dxq+jhIV2xRCgVMD1rgpuoaCO4+TgWnEtJZWzfVzW/SKmUxuiFstmDaBoUrVX1OuGN2pYGhbEMJ2OUgsV2vFIrbxr3Cy/kqy9xVvPyTUkDrDKTwJvnMPOk5gNCPpZfQips1YP+b7brHYmRr/6T2yW1jntZcliaKxjjpJoAVyolo3ZKG0cj9/ZCimpRVbLbklXdhvJgHJdyV9Uf1oeZylQ2gBsxcZ8MIgQ2u2cD6xNn14lLStGlFBRwFukcN4C2NA+pGQKFKYcGsHkYJMs8mxZJSno4Vx8fFUGqB2n6CXGmM1nkV8hH9AdFwagw3KYcY9fOPrqh64f98zY8QtFxo9KiwBSGpk8CbTiqvxc03XcC9x3AKDp3SrRIzKH7ntPXerHZBVEWajek+muG0M8mXlJfhWIBpJFQXlfzv/Voax7sHvbrZLiX/Cknx3cBVWcIYc6XjTseNzdYx/7lqnpPbYa4byPZ9ZD/OqfVkUpPfWFN6X0+uEolOVH/Jnq9ozkfGRa++Wn2phd+R/TD4L8YGNd2NuR/0AQb5KSwFh0tchQPYMEGrd2/2Ba7XbgODBiAi4nzxNd4O4eXROH8gYkhLi3CeQDqvPjnGRoUZc4N6IJuE/N9GEEXVV+OHektmIbOEX2DKMz4Tayj0/7+ReqDZKe7yr/JLZUDKF/PqOVX7YmzztmECpWTvoxjOIVdUrDJm1K6mQVrhM4rxz076l5OrcLz1IcM/TMpnNv4pXVvd+Bo3L4Z3JZhEbneS9N5kHTTDmDeTgZ0lTLXenXQ66lnEwzYin5yCBvkP7FU45TOzdYq+7qSCQVVzAUqIeTi7ZLym+rMiGsAsBTmT39jzz5v2i9ll7XRjroV26WVvoP2wc4B1E/n4xRXa2PGT+4y+ok2xfoqGtndvwPA5aXExRSGOIIgCkd6xQbHurEBbdHTdpvn0rAzp5ocHqqcJgCZ4UNPcvCfjQQqx5LPhNTyA8m2R+LuLBVQULiSTCFKD9PWU/XRrk4uI8EVLW8T2d/Tvtaw0EYZIXR0/PG8LuYPpudaiaOyuf4fjwWwep5wCNb48VhGD9746V/R+/p/Rtn0S3sXzLD44URnUJI1oINoRBjVaQmJ+g3RjEYxrulAdx0o3rUFBueonH3bLsQlEybRjC46ck0fE0zMXjdj4bNDXjq0/7avfht8COuIBXyImzqmp+uOKjp1o3mfs/P7SfNupg5UxilP8NaTPx4B4S8K8y8OCxoOxRcw4FJe3wh7mcfzM+44rl287RF/RsNONhVn2MG/OK8WxbsIl3164rt5ikyPIQduf9NeJacMEmtI/QPmbBTCnJ8gkC2t9QBjuctSOdGd15qsErxBLzkzNnwZUi0u/Yh0u7WmjD213Cp9+XUQe5lfDiQjR7oCURzFogjv2oJP1SsvdNAmJ2yH8NG9jsM8lF/ZOhGFHbjEhJi9GELFr1l3rpTWSJUzoOCR+1PQ3/Pwwy/1GhUHwmN4WF/+04c7NmT/PPzOd50o4CqbAiL2+x/rp2XPkC5iL7SQ/BSZ29s9wf3Asw+HtkDSk8EwimrYP1+ouVJsHrYRdp2AK3y5a1nGOrxpSUhkiNEf8C4Y5fgO/iCEmr9Np+scxF372jFK5sDp11f7rKU+tYFUApqViKi0FSNQM4kkVbQtwQhEWN9T3s4LZQzULaU/BdlmyCM5Gp5rZ/JC+0sA1SfVOinm7dppurqf605FXPm6qt0MZvcUYNw8qd9iH/azfPMIL+UAMEIN548d3AUTZdlhzrQ5xkY1vftpMf9uB1xCyniEyy490fdIcShdQw/B6HNWdOFa9tksD3/txN2JQcFmBbrCMkbziZ0OU7iOawHwN90N1n3ZuJ7ChzxJHY++UcENc6//N6HCZMh3HpW7j/3D8sqnGWcpE6LOT/wH5Uo0gt4elFM99tFFOrpMMoiDrm5HjLmCb6CDqQVaFPA3AIFhuFHKfByoo1RpRY/xHjRkhbnN8TGio2wv8JOHww7f4d6yu/DNFZJ26s4x2+vEYjM0GwGJn5NjYw3X+oar4w3zwGSCyd5Kv5pn/iaFPouryUoug8Jc0b35h9yPWGYlfNT2tvSqUo6aCyy46b6H+E7itzLxni1Y7E+Ipjy7TOT3F8hLUmbO2vKGzBFubj2GBFyKCz2bWn2A/Rt1we9Bg+oTVu+n+te74PBuIFPROcM0vcArbZJL4Niw4KRBrLezaX1DVi+gnzHhZ0I1c+0fd7T2cRzY03yjLp5NP4xcbePowdEY7ZHrmCwS5HPuB/3bV4cQ9pK+3BezOe9ScErkw2xoCv3te11XDem2fh745R8QJXwBeXU1qEbeFQ8DLXPiPYWwozBqGa9Hu5on0elcxwqJ7nWgLvPPGvVkLd364tneDmpYk5x6kjN9F59v9QsPTUTzKCacAxIUP6+48s1AzBknznru+YKXzZeQUEC/b8O42wv01LxI44LabDwKTY0JtezG5GdJnO0R4W7H1hx70qCL8bNOnsxVdruBXmOsl+ia12Ct3RNmKciGWDlTBKFsem8ecu3C+Bg5iaucVm1VHHQ3KAzEbVD1jA4bFmoYIqWyqAP7xwUzO6ZCQWXsvi+sJ87DtB0kAlxMADAtBPxJ9OSEZF9Nvo1Yf5wTOxeXNICRRVIotLxBDpKHYf3zMVF8kYhehFjMG2F/5zrVEOOY2/ENTRP7qUQ8kaA5puVEHijLuLv02OOSVjacFxaLuOuQ/JRmJkB8UrAMhepRVoEV1NWnrrVu3iXyK/3pbCgcds1pt3DFbzmbUtD+Q3KLsphJJLRkN+rGik4e/3qttr9PGVemcIGW5+I3hM7idTdtNYftS6rESYntwGLF/jDEaSAxd83GzQ/VZpsUN5isyLVOD/6CSGpDDv8aS/FnIi8pGsl6rD77hKCI/ySbNKHcLxxNNO2giy9KhdS0C9XCgwx8l3Vha2wyQWYMFsCXpWl8GCNeiPl8N4GsSIlAEy6t7dvnikDchwBVPdeKbi9TIechvDl7qaxWQcH/JCRj9b9hs17eeDb7dE1FlD8Dfri1tyxFCZ/AuHGHs5H/NzyMgZrDViqIJYMgIEc+J7k99ryq/w8X7pGs0zJmn2xxBbGanPll8UOAI0ff8Y2+Yy1BLP+pTeG2/li/M/kR2eHJDik2K902boqfHzZqxE/eaLdEytpEiB6b6Y9Pj2ao9HYoWwqL1dkz33GViQVb9fITLuTFpMHyWNwA04iYaR40kb19zWNsvx/2vElZkqbZzttSX8xpn1bTXMyj9eG8S6Gl0HPAiK7yBlb/ZpOoczdAHFrCcwXHLw/ijX6BBP2VkNSFIqMAD9HdPul5nF4yAcORCh1+YBaiR8R3fTU23CQ2K5d0zWBOewc2JbFGOEyt2bk1Nufth7yFQQn5XJ5mTrV9zgi6CwEEvm7ThElUN7c4M3f5S/oKs5S0n3jmdWgAA=",
     "블러디퀸": "data:image/png;base64,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",
@@ -581,7 +594,7 @@
   let state = {
     darkMode: false,
     listTitle: '메이플 타임 스케줄러',
-    expTitle: '⭐ 주간 진행도',
+    expTitle: '주간 진행도',
     lastReset: { daily: 0, weekly: 0, monthly: 0 },
     characters: [
       { id: 'char_1', name: '섀도어' },
@@ -637,7 +650,7 @@
   }
 
   function formatMeso(amount) {
-    if (!amount || amount <= 0) return '0메소';
+    if (!amount || amount <= 0) return '0 메소';
     const eok = Math.floor(amount / 100000000);
     const man = Math.floor((amount % 100000000) / 10000);
     const rest = amount % 10000;
@@ -645,7 +658,7 @@
     if (eok > 0) parts.push(`${eok}억`);
     if (man > 0) parts.push(`${man}만`);
     if (eok === 0 && man === 0) parts.push(`${rest}`);
-    return parts.join(' ') + '메소';
+    return parts.join(' ') + ' 메소';
   }
 
   const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
@@ -677,13 +690,7 @@
       }
       if (boundaries[themeKey] > state.lastReset[themeKey]) {
         const boardIds = state.categories.filter(c => c.theme === themeKey).map(c => c.id);
-        if (themeKey === 'weekly') {
-          state.tasks = state.tasks
-            .filter(t => !(boardIds.includes(t.categoryId) && t.isBoss))
-            .map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
-        } else {
-          state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
-        }
+        state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
         state.lastReset[themeKey] = boundaries[themeKey];
         changed = true;
       }
@@ -706,7 +713,7 @@
     async get(key) {
       if (window.storage) {
         try { return await window.storage.get(key, false); }
-        catch (e) { console.error('window.storage.get 실패, localStorage로 대체:', e); }
+        catch (e) { /* window.storage 오류는 예상된 상황 — localStorage로 조용히 대체 */ }
       }
       try {
         const v = localStorage.getItem(key);
@@ -716,7 +723,7 @@
     async set(key, value) {
       if (window.storage) {
         try { return await window.storage.set(key, value, false); }
-        catch (e) { console.error('window.storage.set 실패, localStorage로 대체:', e); }
+        catch (e) { /* window.storage 오류는 예상된 상황 — localStorage로 조용히 대체 */ }
       }
       try { localStorage.setItem(key, value); }
       catch (e) { console.error('localStorage 저장 실패:', e); }
@@ -826,8 +833,9 @@
   }
 
   function openBossModal(catId, taskId, prefilledCharacterId, linkTaskId) {
-    bossModalState = { catId, taskId: taskId || null, linkTaskId: linkTaskId || null };
+    bossModalState = { catId, taskId: taskId || null, linkTaskId: linkTaskId || null, addedIds: [] };
     bossModalScope = 'card';
+    hideModalWarning();
     const nameInput = document.getElementById('modalBossName');
     const diffSel = document.getElementById('modalBossDifficulty');
     const partySel = document.getElementById('modalBossParty');
@@ -839,7 +847,7 @@
     const task = taskId ? state.tasks.find(t => t.id === taskId) : null;
     const saveBtn = document.querySelector('.modal-save-btn');
     const addBtn = document.getElementById('modalAddBtn');
-    const initialBossName = task ? task.bossName : BOSS_NAMES[0];
+    const initialBossName = task ? task.bossName : ''; // 등록 모드에서는 기본 선택 없이 시작 (실수로 첫 보스가 저장되는 것 방지)
     nameInput.value = initialBossName;
     document.getElementById('modalBossIconGrid').innerHTML = bossIconGridHtml(initialBossName);
 
@@ -854,12 +862,12 @@
       saveBtn.textContent = '저장';
     } else {
       document.getElementById('bossModalTitle').textContent = '보스 등록';
-      updateModalDifficultyOptions();
+      diffSel.innerHTML = ''; // 보스를 고르기 전까지는 난이도 목록도 비워둠
       partySel.value = '1';
       charSel.value = prefilledCharacterId || (state.characters[0] ? state.characters[0].id : '');
       document.getElementById('modalDeleteBtn').style.display = 'none';
       addBtn.style.display = 'inline-block';
-      saveBtn.textContent = '저장 후 닫기';
+      saveBtn.textContent = '닫기';
     }
     updateModalCountHint();
     document.getElementById('bossModalOverlay').style.display = 'flex';
@@ -937,10 +945,10 @@
       return;
     }
     listEl.innerHTML = bosses.map(b => `
-      <div class="modal-boss-row ${bossModalState.taskId === b.id ? 'editing' : ''} ${b.completed ? 'completed' : ''}">
+      <div class="modal-boss-row ${bossModalState.taskId === b.id ? 'editing' : ''}">
         <span class="modal-boss-row-left">
           ${BOSS_ICONS[b.bossName] ? `<img class="modal-boss-icon" src="${BOSS_ICONS[b.bossName]}" alt="">` : ''}
-          <span>${b.bossDifficulty} ${escapeHtml(b.bossName)}${b.partySize > 1 ? ` (${b.partySize}인)` : ''}${b.completed ? ' ✓' : ''}</span>
+          <span>${b.bossDifficulty} ${escapeHtml(b.bossName)}${b.partySize > 1 ? ` (${b.partySize}인)` : ''}</span>
         </span>
         <span class="modal-boss-row-right">
           <span class="price">${formatMeso(b.price)}</span>
@@ -959,7 +967,33 @@
   function closeBossModal() {
     document.getElementById('bossModalOverlay').style.display = 'none';
     document.body.style.overflow = '';
-    bossModalState = { catId: null, taskId: null, linkTaskId: null };
+    bossModalState = { catId: null, taskId: null, linkTaskId: null, addedIds: [] };
+  }
+
+  function cancelBossModal() {
+    if (bossModalState.addedIds && bossModalState.addedIds.length > 0) {
+      const ids = new Set(bossModalState.addedIds);
+      state.tasks = state.tasks.filter(t => !ids.has(t.id)); // 이 팝업 세션에서 '추가'로 등록한 항목을 전부 되돌림
+      saveState();
+      render();
+    }
+    closeBossModal();
+  }
+
+  function showModalWarning(msg) {
+    const el = document.getElementById('modalWarning');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+  function hideModalWarning() {
+    document.getElementById('modalWarning').style.display = 'none';
+  }
+
+  function isDuplicateBossForCharacter(characterId, bossName, excludeTaskId) {
+    return state.tasks.some(t =>
+      t.isBoss && t.characterId === characterId && t.bossName === bossName &&
+      isWeeklyBoardId(t.categoryId) && t.id !== excludeTaskId
+    );
   }
 
   function readModalBossForm() {
@@ -970,43 +1004,43 @@
     const bossName = nameSel.value;
     const difficulty = diffSel.value;
     const entry = (BOSS_GROUPS[bossName] || []).find(o => o.difficulty === difficulty);
-    if (!entry) { alert('보스와 난이도를 선택해주세요!'); return null; }
+    if (!entry) { showModalWarning('보스와 난이도를 선택해주세요!'); return null; }
     const characterId = charSel.value;
-    if (!characterId) { alert('캐릭터를 선택해주세요! (보스는 캐릭터당 주 12마리 제한이 있어요)'); return null; }
+    if (!characterId) { showModalWarning('캐릭터를 선택해주세요! (보스는 캐릭터당 주 12마리 제한이 있어요)'); return null; }
     const partySize = parseInt(partySel.value) || 1;
     return { bossName, difficulty, entry, characterId, partySize };
   }
 
-  function saveModalBoss() {
+  function finishBossModal() {
+    if (!bossModalState.taskId) {
+      // 등록 모드: 이 버튼은 새로 만들지 않고, 그동안 '추가'로 등록해둔 것만 그대로 둔 채 닫습니다.
+      closeBossModal();
+      return;
+    }
+    // 수정 모드: 폼에 입력된 내용을 기존 보스에 반영합니다.
     const form = readModalBossForm();
     if (!form) return;
     const { bossName, difficulty, entry, characterId, partySize } = form;
 
-    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
-    if (bossModalState.taskId) {
-      const editing = state.tasks.find(t => t.id === bossModalState.taskId);
-      if (editing && editing.characterId === characterId) count -= 1;
-    }
-    if (count >= WEEKLY_BOSS_LIMIT) {
+    if (isDuplicateBossForCharacter(characterId, bossName, bossModalState.taskId)) {
       const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
-      alert(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+      showModalWarning(`${charName}은(는) 이미 ${bossName}을(를) 등록했어요! 같은 보스는 난이도와 상관없이 두 번 등록할 수 없어요.`);
       return;
     }
 
-    if (bossModalState.taskId) {
-      const task = state.tasks.find(t => t.id === bossModalState.taskId);
-      if (task) {
-        task.bossName = bossName; task.bossDifficulty = difficulty; task.partySize = partySize;
-        task.characterId = characterId; task.fullPrice = entry.price; task.price = Math.floor(entry.price / partySize);
-        task.text = `${difficulty} ${bossName}`;
-      }
-    } else {
-      state.tasks.push({
-        id: Date.now(), text: `${difficulty} ${bossName}`, time: 0, completed: false,
-        categoryId: bossModalState.catId, characterId, linkedTaskId: bossModalState.linkTaskId,
-        isBoss: true, bossDifficulty: difficulty, bossName, partySize,
-        fullPrice: entry.price, price: Math.floor(entry.price / partySize)
-      });
+    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+    const editing = state.tasks.find(t => t.id === bossModalState.taskId);
+    if (editing && editing.characterId === characterId) count -= 1;
+    if (count >= WEEKLY_BOSS_LIMIT) {
+      const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
+      showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+      return;
+    }
+
+    if (editing) {
+      editing.bossName = bossName; editing.bossDifficulty = difficulty; editing.partySize = partySize;
+      editing.characterId = characterId; editing.fullPrice = entry.price; editing.price = Math.floor(entry.price / partySize);
+      editing.text = `${difficulty} ${bossName}`;
     }
     closeBossModal();
     render(); saveState();
@@ -1018,20 +1052,35 @@
     if (!form) return;
     const { bossName, difficulty, entry, characterId, partySize } = form;
 
-    const count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
-    if (count >= WEEKLY_BOSS_LIMIT) {
+    if (isDuplicateBossForCharacter(characterId, bossName, null)) {
       const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
-      alert(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+      showModalWarning(`${charName}은(는) 이미 ${bossName}을(를) 등록했어요! 같은 보스는 난이도와 상관없이 두 번 등록할 수 없어요.`);
       return;
     }
 
+    const count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+    if (count >= WEEKLY_BOSS_LIMIT) {
+      const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
+      showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+      return;
+    }
+
+    const newId = Date.now();
     state.tasks.push({
-      id: Date.now(), text: `${difficulty} ${bossName}`, time: 0, completed: false,
+      id: newId, text: `${difficulty} ${bossName}`, time: 0, completed: false,
       categoryId: bossModalState.catId, characterId, linkedTaskId: bossModalState.linkTaskId,
       isBoss: true, bossDifficulty: difficulty, bossName, partySize,
       fullPrice: entry.price, price: Math.floor(entry.price / partySize)
     });
+    bossModalState.addedIds.push(newId);
     saveState();
+    hideModalWarning();
+
+    // 방금 추가한 내용을 폼에서 비워서, 이어서 '저장 후 닫기'를 눌러도 같은 보스가 중복 등록되지 않게 합니다.
+    document.getElementById('modalBossName').value = '';
+    document.getElementById('modalBossDifficulty').innerHTML = '';
+    document.querySelectorAll('#modalBossIconGrid .boss-icon-btn').forEach(btn => btn.classList.remove('selected'));
+
     updateModalCountHint(); // 팝업은 닫지 않고, 현황/한도만 새로고침
     render();
   }
@@ -1099,6 +1148,18 @@
       .reduce((s, t) => s + t.price, 0);
   }
 
+  function characterBossEarnedInCard(characterId, catId) {
+    return state.tasks
+      .filter(t => t.isBoss && t.completed && t.characterId === characterId && t.categoryId === catId)
+      .reduce((s, t) => s + t.price, 0);
+  }
+
+  function taskLinkedBossEarned(taskId) {
+    return state.tasks
+      .filter(t => t.isBoss && t.completed && t.linkedTaskId === taskId)
+      .reduce((s, t) => s + t.price, 0);
+  }
+
   function characterBossPotential(characterId) {
     const boardIds = state.categories.filter(c => c.theme === 'weekly').map(c => c.id);
     return state.tasks
@@ -1130,7 +1191,7 @@
       <div class="char-row" data-id="${c.id}">
         <span class="char-number">${idx + 1}</span>
         <span class="char-chip-name" id="charName_${c.id}" ondblclick="startEditCharacterName(event, '${c.id}')" onclick="if(this.isContentEditable) event.stopPropagation();">${escapeHtml(c.name)}</span>
-        ${potential > 0 ? `<span class="task-boss-total">💰 ${formatMeso(earned)} / ${formatMeso(potential)}</span>` : ''}
+        ${potential > 0 ? `<span class="task-boss-total">${COIN_ICON} ${formatMeso(earned)} / ${formatMeso(potential)}</span>` : ''}
         <button class="row-add-btn" title="${escapeHtml(c.name)} 보스 추가/수정" onclick="openBossModalForCharacter('${c.id}')">+</button>
         <button class="char-delete-btn" onclick="deleteCharacter('${c.id}')" title="삭제">×</button>
       </div>
@@ -1258,7 +1319,7 @@
   function renderExp() {
     const { total, done } = themeTotals('weekly');
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    document.getElementById('totalFigure').textContent = formatHM(total);
+    document.getElementById('totalFigure').textContent = formatHM(done);
     document.getElementById('totalSub').textContent = `완료 ${formatHM(done)} / 전체 ${formatHM(total)} (주간 컨텐츠 기준)`;
     document.getElementById('totalFill').style.width = pct + '%';
     document.getElementById('totalPct').textContent = pct + '%';
@@ -1268,7 +1329,7 @@
     if (potential > 0) {
       moneyBlock.style.display = 'block';
       const moneyPct = Math.round((earned / potential) * 100);
-      document.getElementById('moneyFigure').textContent = formatMeso(potential);
+      document.getElementById('moneyFigure').textContent = formatMeso(earned);
       document.getElementById('moneySub').textContent = `완료 ${formatMeso(earned)} / 전체 ${formatMeso(potential)}`;
       document.getElementById('moneyFill').style.width = moneyPct + '%';
       document.getElementById('moneyPct').textContent = moneyPct + '%';
@@ -1291,6 +1352,7 @@
     const bossTasks = realTasks.filter(t => t.isBoss);
     const bossEarned = bossTasks.filter(t => t.completed).reduce((s, t) => s + t.price, 0);
     const bossPotential = bossTasks.reduce((s, t) => s + t.price, 0);
+    const bossPct = bossPotential > 0 ? Math.round((bossEarned / bossPotential) * 100) : 0;
 
     let tasksHtml = '';
     const visibleTasks = catTasks.filter(t => !t.isBoss);
@@ -1319,11 +1381,11 @@
               ? `<span class="task-time" id="taskTime_${task.id}" onclick="if(this.isContentEditable){event.stopPropagation();}else if(${panelOpen}){startEditTaskTime(event, ${task.id});}">${formatHM(task.time)}</span>`
               : `<span class="task-time chip-placeholder">0분</span>`)
           : '';
-        const bossEarnedForChar = character ? characterBossEarned(character.id) : 0;
+        const bossEarnedForChar = taskLinkedBossEarned(task.id);
         const bossChipHtml = (isWeekly || isMonthly)
           ? (character && bossEarnedForChar > 0
-              ? `<span class="task-boss-total">💰 ${formatMeso(bossEarnedForChar)}</span>`
-              : `<span class="task-boss-total chip-placeholder">💰 0메소</span>`)
+              ? `<span class="task-boss-total">${COIN_ICON} ${formatMeso(bossEarnedForChar)}</span>`
+              : `<span class="task-boss-total chip-placeholder">${COIN_ICON} 0메소</span>`)
           : '';
         const metaHtml = (!character && !isMemo && task.time > 0)
           ? timeChipHtml + charChipHtml + bossChipHtml
@@ -1368,7 +1430,8 @@
           <div class="board-progress-label">완료 ${formatHM(catDone)} / ${formatHM(catTotal)} (${catPct}%)</div>
         ` : ''}
         ${(isWeekly && bossTasks.length > 0) ? `
-          <div class="board-boss-summary">💰 결정석 수익 ${formatMeso(bossEarned)} / ${formatMeso(bossPotential)}</div>
+          <div class="board-money-track"><div class="board-money-fill" style="width:${bossPct}%"></div></div>
+          <div class="board-money-label">${COIN_ICON} 결정석 수익 ${formatMeso(bossEarned)} / ${formatMeso(bossPotential)} (${bossPct}%)</div>
         ` : ''}
         <ul class="board-tasks">${tasksHtml}</ul>
         <button class="add-divider-btn" onclick="addDivider('${cat.id}')" title="구분선 추가">— 구분선 추가 —</button>
