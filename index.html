@@ -94,35 +94,37 @@
   .char-card { padding: 14px 16px; margin-bottom: 16px; }
   .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: baseline; gap: 6px; }
   .char-card-count { font-size: 11.5px; font-weight: 400; color: var(--muted); }
-  .char-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 10px; }
+  .char-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px; }
   @media (max-width: 900px) { .char-grid { grid-template-columns: repeat(4, 1fr); } }
   @media (max-width: 600px) { .char-grid { grid-template-columns: repeat(3, 1fr); } }
   .char-grid-item {
     position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 12px 6px 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    padding: 14px 3px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    min-width: 0; box-sizing: border-box;
   }
   .char-grid-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 0px; }
-  .char-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; line-height: 1; padding: 2px; flex-shrink: 0; }
+  .char-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 11px; line-height: 1; padding: 2px; flex-shrink: 0; }
   .char-icon-btn:hover { color: var(--accent-strong); }
   .char-icon-danger:hover { color: var(--danger); }
-  .char-avatar-wrap { position: relative; margin-top: 2px; }
+  .char-avatar-wrap { position: relative; margin-top: 4px; }
   .char-avatar {
-    width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
     background: var(--accent-soft); border: 1px solid var(--border);
   }
   .char-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .char-number-badge {
-    position: absolute; bottom: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%;
-    background: var(--accent-strong); color: #fff; font-size: 9px; font-weight: 700;
+    position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-radius: 50%;
+    background: var(--accent-strong); color: #fff; font-size: 8.5px; font-weight: 700;
     display: flex; align-items: center; justify-content: center; border: 1px solid var(--surface);
   }
   [data-theme="dark"] .char-number-badge { color: #201404; }
-  .char-grid-name { font-size: 11.5px; font-weight: 700; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .char-grid-bottom { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: 2px; width: 100%; }
+  .char-grid-name { font-size: 11px; font-weight: 700; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .char-grid-bottom { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 4px; width: 100%; min-width: 0; }
   .char-time-chip {
-    font-size: 10px; color: var(--muted); background: var(--track); padding: 1px 7px;
+    font-size: 9.5px; color: var(--muted); background: var(--track); padding: 1px 6px;
     border-radius: 20px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    box-sizing: border-box;
   }
   .char-add-row { display: flex; gap: 6px; }
   .char-add-row input {
@@ -261,7 +263,7 @@
   .task-boss-total {
     font-size: 10.5px; font-weight: 700; color: var(--money-grad-1); background: transparent;
     border: 1px dashed var(--money-grad-1); padding: 1px 7px; border-radius: 20px; white-space: nowrap;
-    flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
   }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
   .row-hover-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
@@ -332,6 +334,7 @@
   .modal-boss-status { margin-bottom: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
   .modal-boss-status-title { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
   .modal-boss-list { display: flex; flex-direction: column; gap: 4px; height: 140px; overflow-y: auto; }
+  .char-view-boss-list { height: auto; max-height: none; overflow-y: visible; }
   .modal-boss-row {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     font-size: 12px; padding: 5px 8px; border-radius: 6px; background: var(--bg);
@@ -498,7 +501,7 @@
       </div>
     </div>
     <div class="modal-boss-status-title">이 캐릭터의 보스 현황</div>
-    <div class="modal-boss-list" id="charViewBossList"></div>
+    <div class="modal-boss-list char-view-boss-list" id="charViewBossList"></div>
     <div class="modal-actions">
       <button class="modal-cancel-btn" onclick="closeCharViewModal()">닫기</button>
     </div>
@@ -708,16 +711,15 @@
     return `${m}분`;
   }
 
+  function formatMesoCompact(amount) {
+    if (!amount || amount <= 0) return '0억';
+    let str = (amount / 100000000).toFixed(2);
+    str = str.replace(/\.?0+$/, '');
+    return `${str}억`;
+  }
+
   function formatMeso(amount) {
-    if (!amount || amount <= 0) return '0 메소';
-    const eok = Math.floor(amount / 100000000);
-    const man = Math.floor((amount % 100000000) / 10000);
-    const rest = amount % 10000;
-    const parts = [];
-    if (eok > 0) parts.push(`${eok}억`);
-    if (man > 0) parts.push(`${man}만`);
-    if (eok === 0 && man === 0) parts.push(`${rest}`);
-    return parts.join(' ') + ' 메소';
+    return formatMesoCompact(amount) + ' 메소';
   }
 
   const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
@@ -1249,7 +1251,7 @@
         <div class="char-grid-name">${escapeHtml(c.name)}</div>
         <div class="char-grid-bottom">
           <span class="char-time-chip">⏱ ${formatHM(timeTotal)}</span>
-          ${potential > 0 ? `<span class="task-boss-total">${COIN_ICON} ${formatMeso(earned)} / ${formatMeso(potential)}</span>` : ''}
+          ${potential > 0 ? `<span class="task-boss-total">${COIN_ICON} ${formatMesoCompact(earned)} / ${formatMesoCompact(potential)}</span>` : ''}
         </div>
       </div>
     `;
@@ -1496,8 +1498,8 @@
         const bossEarnedForChar = taskLinkedBossEarned(task.id);
         const bossChipHtml = (isWeekly || isMonthly)
           ? (character && bossEarnedForChar > 0
-              ? `<span class="task-boss-total">${COIN_ICON} ${formatMeso(bossEarnedForChar)}</span>`
-              : `<span class="task-boss-total chip-placeholder">${COIN_ICON} 0메소</span>`)
+              ? `<span class="task-boss-total">${COIN_ICON} ${formatMesoCompact(bossEarnedForChar)}</span>`
+              : `<span class="task-boss-total chip-placeholder">${COIN_ICON} 0억</span>`)
           : '';
         const metaHtml = (!character && !isMemo && task.time > 0)
           ? timeChipHtml + charChipHtml + bossChipHtml
