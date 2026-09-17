@@ -77,6 +77,121 @@
   .header-title .icon { flex-shrink: 0; }
   .header-title h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; min-width: 60px; }
 
+  .main-nav {
+    display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px;
+  }
+  .main-nav .nav-btn {
+    border: none; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 700;
+    padding: 7px 16px; border-radius: 16px; cursor: pointer; font-family: inherit;
+  }
+  .main-nav .nav-btn.active { background: var(--accent); color: #fff; }
+  [data-theme="dark"] .main-nav .nav-btn.active { color: #201404; }
+
+  /* --- 캘린더 페이지 --- */
+  #calendarPage .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+  #calendarPage .calendar-h2 { font-size: 17px; margin: 0; display: flex; align-items: center; gap: 7px; }
+  #calendarPage .note {
+    font-size: 12px; color: var(--muted); background: var(--surface); border: 1px dashed var(--border);
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 16px;
+  }
+  #calendarPage .view-toggle {
+    display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px;
+  }
+  #calendarPage .view-toggle button {
+    border: none; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 700;
+    padding: 6px 14px; border-radius: 16px; cursor: pointer; font-family: inherit;
+  }
+  #calendarPage .view-toggle button.active { background: var(--accent); color: #fff; }
+  [data-theme="dark"] #calendarPage .view-toggle button.active { color: #201404; }
+
+  #calendarPage .summary-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  #calendarPage .summary-card {
+    flex: 1; min-width: 150px; background: var(--surface); border: 2px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow);
+  }
+  #calendarPage .summary-card .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  #calendarPage .summary-card .value { font-size: 20px; font-weight: 700; }
+  #calendarPage .summary-card.time .value { color: var(--time-grad-1); }
+  #calendarPage .summary-card.money .value { color: var(--money-grad-1); }
+
+  #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  #calendarPage .day-card {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
+    padding: 10px 8px; box-shadow: var(--shadow); min-height: 128px; display: flex; flex-direction: column;
+  }
+  #calendarPage .day-card.today { border-color: var(--accent); }
+  #calendarPage .day-card .dow { font-size: 11px; color: var(--muted); font-weight: 700; }
+  #calendarPage .day-card .date { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  #calendarPage .day-card .stat-row { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  #calendarPage .day-card .stat-row.time { color: var(--time-grad-1); }
+  #calendarPage .day-card .stat-row.money { color: var(--money-grad-1); }
+  #calendarPage .task-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; padding-top: 6px; }
+  #calendarPage .done-count { font-size: 10.5px; color: var(--muted); margin-top: auto; padding-top: 6px; }
+  #calendarPage .done-count.muted { opacity: 0.5; }
+  #calendarPage .day-card.future { opacity: 0.5; }
+  #calendarPage .empty-state { font-size: 12px; color: var(--muted); padding: 10px 4px; }
+  #calendarPage .cal-nav-row { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+  #calendarPage .cal-nav-btn {
+    background: var(--surface); border: 1px solid var(--border); color: var(--ink); font-size: 12px; font-weight: 700;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: inherit;
+  }
+  #calendarPage .cal-nav-btn:hover { border-color: var(--accent); }
+  #calendarPage .cal-nav-label { font-size: 13px; font-weight: 700; min-width: 140px; text-align: center; }
+
+  #calendarPage .month-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 4px; }
+  #calendarPage .month-dow { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; padding-bottom: 4px; }
+  #calendarPage .month-cells { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  #calendarPage .month-week-totals {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
+    padding: 4px 16px; margin-top: 14px; box-shadow: var(--shadow);
+  }
+  #calendarPage .week-total-row {
+    display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  #calendarPage .week-total-row:last-child { border-bottom: none; }
+  #calendarPage .week-total-row .wt-label { font-size: 13px; font-weight: 700; width: 84px; flex-shrink: 0; }
+  #calendarPage .week-total-row .stat { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; }
+  #calendarPage .week-total-row .stat.time { color: var(--time-grad-1); width: 130px; }
+  #calendarPage .week-total-row .stat.money { color: var(--money-grad-1); }
+  #calendarPage .month-cell {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 6px 6px 8px; min-height: 74px; display: flex; flex-direction: column;
+  }
+  #calendarPage .month-cell.other-month { opacity: 0.35; }
+  #calendarPage .month-cell.today { border-color: var(--accent); border-width: 2px; }
+  #calendarPage .month-cell.mw-top { border-top: 2px solid var(--accent); }
+  #calendarPage .month-cell.mw-bottom { border-bottom: 2px solid var(--accent); }
+  #calendarPage .month-cell.mw-left { border-left: 2px solid var(--accent); }
+  #calendarPage .month-cell.mw-right { border-right: 2px solid var(--accent); }
+  #calendarPage .mw-label { font-size: 9px; font-weight: 700; color: var(--accent); margin-bottom: 1px; }
+  #calendarPage .month-cell .date { font-size: 11.5px; font-weight: 700; margin-bottom: auto; }
+  #calendarPage .month-cell .mini-row { display: flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 700; }
+  #calendarPage .month-cell .mini-row.time { color: var(--time-grad-1); }
+  #calendarPage .month-cell .mini-row.money { color: var(--money-grad-1); }
+
+  #calendarPage .stat-section { margin-bottom: 22px; }
+  #calendarPage .stat-section h2 { font-size: 13.5px; margin: 0 0 10px; color: var(--muted); }
+  #calendarPage .trend-chart {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
+    padding: 16px; box-shadow: var(--shadow); display: flex; align-items: flex-end; gap: 6px; height: 140px;
+  }
+  #calendarPage .trend-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  #calendarPage .trend-bar { width: 60%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--money-grad-1), var(--money-grad-pale)); }
+  #calendarPage .trend-label { font-size: 9.5px; color: var(--muted); }
+  #calendarPage .rank-list { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 6px 16px; box-shadow: var(--shadow); }
+  #calendarPage .rank-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  #calendarPage .rank-row:last-child { border-bottom: none; }
+  #calendarPage .rank-num { font-size: 12px; font-weight: 700; color: var(--muted); width: 16px; }
+  #calendarPage .rank-name { flex: 1; font-size: 13px; font-weight: 700; }
+  #calendarPage .rank-bar-track { flex: 2; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
+  #calendarPage .rank-bar-fill { height: 100%; background: var(--money-grad-1); }
+  #calendarPage .rank-value { font-size: 12px; font-weight: 700; color: var(--money-grad-1); width: 60px; text-align: right; }
+  #calendarPage .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { #calendarPage .two-col { grid-template-columns: 1fr; } }
+  #calendarPage .hidden { display: none !important; }
+
   .theme-toggle {
     position: relative; width: 56px; height: 30px; border-radius: 999px;
     background: var(--track); border: 2px solid var(--border); cursor: pointer; flex-shrink: 0;
@@ -93,6 +208,10 @@
   /* Character panel */
   .char-card { padding: 14px 16px; margin-bottom: 16px; }
   .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: baseline; gap: 6px; }
+  .char-collapse-arrow { font-size: 11px; color: var(--muted); transition: transform 0.2s ease; }
+  .char-collapse-arrow.open { transform: rotate(180deg); }
+  .hidden { display: none !important; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
   .char-card-count { font-size: 11.5px; font-weight: 400; color: var(--muted); }
   .char-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px; }
   @media (max-width: 900px) { .char-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -103,6 +222,7 @@
     min-width: 0; box-sizing: border-box;
   }
   .char-grid-actions { position: absolute; top: 3px; right: 3px; display: flex; gap: 0px; }
+  .char-drag-handle { position: absolute; top: 4px; left: 4px; font-size: 10px; }
   .char-icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 11px; line-height: 1; padding: 2px; flex-shrink: 0; }
   .char-icon-btn:hover { color: var(--accent-strong); }
   .char-icon-danger:hover { color: var(--danger); }
@@ -195,6 +315,12 @@
   .board { display: flex; flex-direction: column; padding: 14px 14px 16px; }
   .board-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
   .board-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; flex: 1; }
+  .drag-handle { color: var(--muted); font-size: 14px; cursor: grab; flex-shrink: 0; touch-action: none; padding: 2px; }
+  .drag-handle:active { cursor: grabbing; }
+  .board.drag-live, .char-grid-item.drag-live, .task-item.drag-live, .task-divider.drag-live { opacity: 0.4; }
+  .board.drag-over-target, .char-grid-item.drag-over-target, .task-item.drag-over-target, .task-divider.drag-over-target {
+    opacity: 0.4; transition: opacity 0.15s ease;
+  }
   .board-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .board-name {
     font-size: 15px; font-weight: 700; outline: none; min-width: 20px;
@@ -228,6 +354,8 @@
     gap: 6px; cursor: pointer; border-radius: 6px; transition: opacity 0.12s ease;
   }
   .task-item:hover { background: var(--accent-soft); }
+  body.dragging-active .task-item:hover { background: transparent; }
+  body.dragging-active .task-item.drag-live { background: var(--accent-soft); }
   .task-item.completed .task-text { text-decoration: line-through; color: var(--muted); opacity: 0.45; }
   .task-item.completed .task-text[contenteditable="true"] { text-decoration: none; color: var(--ink); opacity: 1; }
   .task-left { display: flex; align-items: flex-start; gap: 8px; flex: 1 1 auto; min-width: 110px; padding-top: 2px; }
@@ -266,7 +394,11 @@
     flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
   }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
-  .row-hover-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .row-hover-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s ease; }
+  .task-item:hover .row-hover-actions,
+  .task-divider:hover .row-hover-actions,
+  .task-item.editable .row-hover-actions,
+  .task-divider.editable .row-hover-actions { opacity: 1; }
   .row-add-btn {
     background: none; border: none; color: var(--accent-strong); cursor: pointer; font-size: 17px;
     font-weight: 700; padding: 0 4px; flex-shrink: 0; line-height: 1;
@@ -381,6 +513,8 @@
 
   .task-divider { display: flex; align-items: center; gap: 6px; padding: 5px 4px; border-radius: 6px; }
   .task-divider:hover { background: var(--accent-soft); }
+  body.dragging-active .task-divider:hover { background: transparent; }
+  body.dragging-active .task-divider.drag-live { background: var(--accent-soft); }
   .divider-line { flex: 1; height: 0; border-top: 2px dashed var(--border); }
   .add-divider-btn {
     background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer;
@@ -415,17 +549,28 @@
         <h1 id="listTitleEl">메이플 타임 스케줄러</h1>
       </div>
     </div>
+    <nav class="main-nav">
+      <button class="nav-btn active" id="navBtn_scheduler" onclick="switchPage('scheduler')">스케줄러</button>
+      <button class="nav-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
+    </nav>
     <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
       <span class="knob" id="themeKnob">☀️</span>
     </button>
   </div>
 
+  <div id="schedulerPage">
+
   <div class="card char-card">
-    <div class="char-card-title">🎮 내 캐릭터 <span class="char-card-count" id="charCount"></span></div>
-    <div class="char-grid" id="charChipRow"></div>
-    <div class="char-add-row">
-      <input type="text" id="charNameInput" placeholder="캐릭터 이름" onkeypress="if(event.key==='Enter')addCharacter()">
-      <button onclick="addCharacter()">추가</button>
+    <div class="char-card-title" onclick="toggleCharCard()" style="cursor:pointer; justify-content:space-between; margin-bottom:0;">
+      <span>🎮 내 캐릭터 <span class="char-card-count" id="charCount"></span></span>
+      <span class="char-collapse-arrow" id="charCollapseArrow">▼</span>
+    </div>
+    <div id="charCardBody" class="hidden" style="margin-top:10px;">
+      <div class="char-grid" id="charChipRow" ondragover="onDragOverContainer(event)" ondrop="onDropOnContainer(event, 'char', null)"></div>
+      <div class="char-add-row">
+        <input type="text" id="charNameInput" placeholder="캐릭터 이름" onkeypress="if(event.key==='Enter')addCharacter()">
+        <button onclick="addCharacter()">추가</button>
+      </div>
     </div>
   </div>
 
@@ -452,7 +597,97 @@
     </div>
   </div>
 
+  <hr class="section-divider">
+
   <div id="themeSections"></div>
+  </div>
+
+  <div id="calendarPage" style="display:none;">
+    <div class="top-row">
+      <h2 class="calendar-h2">
+        <svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="12" y="1" width="8" height="3" rx="1.5" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="var(--time-grad-1)"/><line x1="16" y1="18" x2="16" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="20" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="18" r="1.5" fill="#fff"/></svg>
+        보상 캘린더
+      </h2>
+      <div class="view-toggle">
+        <button class="active" onclick="setCalView('week')" id="calBtnWeek">주간</button>
+        <button onclick="setCalView('month')" id="calBtnMonth">월간</button>
+        <button onclick="setCalView('stats')" id="calBtnStats">통계</button>
+      </div>
+    </div>
+
+    <div class="note">📌 카드 안 항목을 체크한 시점(KST 기준)부터 기록이 쌓여요. 지난 기록은 초기화돼도 사라지지 않아요.</div>
+
+    <div class="summary-bar" id="calTopSummaryBar">
+      <div class="summary-card time">
+        <div class="label" id="calSummaryTimeLabel">이번 주 완료 시간</div>
+        <div class="value" id="calWeekSummaryTime">00:00</div>
+      </div>
+      <div class="summary-card money">
+        <div class="label" id="calSummaryMoneyLabel">이번 주 결정석 수익</div>
+        <div class="value" id="calWeekSummaryMoney">0억</div>
+      </div>
+    </div>
+
+    <div id="calWeekView">
+      <div class="cal-nav-row">
+        <button class="cal-nav-btn" onclick="calShiftWeek(-1)">◀ 이전 주</button>
+        <span class="cal-nav-label" id="calWeekLabel"></span>
+        <button class="cal-nav-btn" onclick="calShiftWeek(1)">다음 주 ▶</button>
+      </div>
+      <div class="week-grid" id="calWeekGrid"></div>
+    </div>
+
+    <div id="calMonthView" class="hidden">
+      <div class="cal-nav-row">
+        <button class="cal-nav-btn" onclick="calShiftMonth(-1)">◀ 이전 달</button>
+        <span class="cal-nav-label" id="calMonthLabel"></span>
+        <button class="cal-nav-btn" onclick="calShiftMonth(1)">다음 달 ▶</button>
+      </div>
+      <div id="calMonthGrid"></div>
+    </div>
+
+    <div id="calStatsView" class="hidden">
+      <div class="summary-bar">
+        <div class="summary-card time">
+          <div class="label">누적 총 시간</div>
+          <div class="value" id="calStatsTotalTime">00:00</div>
+        </div>
+        <div class="summary-card money">
+          <div class="label">누적 총 결정석 수익</div>
+          <div class="value" id="calStatsTotalMoney">0억</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">주 평균 수익</div>
+          <div class="value" id="calStatsWeekAvg">기록 없음</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">최고 기록 주</div>
+          <div class="value" id="calStatsBestWeek">기록 없음</div>
+        </div>
+      </div>
+
+      <div class="stat-section">
+        <h2>최근 8주 결정석 수익 추이</h2>
+        <div class="trend-chart" id="calTrendChart"></div>
+      </div>
+
+      <div class="stat-section">
+        <h2>주차별 기록</h2>
+        <div class="month-week-totals" id="calStatsWeekList"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="stat-section">
+          <h2>보스별 수익 기여도 (누적)</h2>
+          <div class="rank-list" id="calBossRankList"></div>
+        </div>
+        <div class="stat-section">
+          <h2>캐릭터별 수익 기여도 (누적)</h2>
+          <div class="rank-list" id="calCharRankList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="bossModalOverlay" style="display:none;" onclick="if(event.target===this) cancelBossModal()">
@@ -617,7 +852,376 @@
   });
   const BOSS_NAMES = Object.keys(BOSS_GROUPS);
 
+  // 월간 컨텐츠 보스: 메이플에는 검은 마법사 하나뿐입니다 (하드 / 익스트림 두 난이도).
+  const MONTHLY_BOSS_GROUPS = {
+    '검은 마법사': [
+      { difficulty: '하드', price: 465000000 },
+      { difficulty: '익스트림', price: 5680000000 }
+    ]
+  };
+  const MONTHLY_BOSS_NAMES = Object.keys(MONTHLY_BOSS_GROUPS);
+
+  function currentBossNames() { return bossModalState.theme === 'monthly' ? MONTHLY_BOSS_NAMES : BOSS_NAMES; }
+  function currentBossGroups() { return bossModalState.theme === 'monthly' ? MONTHLY_BOSS_GROUPS : BOSS_GROUPS; }
+  function currentBossIconsMap() { return bossModalState.theme === 'monthly' ? MONTHLY_BOSS_ICONS : BOSS_ICONS; }
+  function iconForBossName(name) { return BOSS_ICONS[name] || MONTHLY_BOSS_ICONS[name] || ''; }
+  function isBoardOfTheme(catId, theme) {
+    const cat = state.categories.find(c => c.id === catId);
+    return !!cat && cat.theme === theme;
+  }
+
   const COIN_ICON = '<svg class="coin-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg>';
+  const CLOCK_ICON_SMALL = '<svg class="clock-icon" width="11" height="11" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="currentColor"/><circle cx="16" cy="16" r="13" fill="none" stroke="#000" stroke-opacity="0.15" stroke-width="1"/><line x1="16" y1="16" x2="16" y2="8.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><line x1="16" y1="16" x2="20.5" y2="18.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="16" r="1.6" fill="#fff"/></svg>';
+
+  // ===================== 캘린더 페이지 (현재는 샘플 데이터, 추후 실제 기록과 연결 예정) =====================
+  function toggleCharCard() {
+    const body = document.getElementById('charCardBody');
+    const arrow = document.getElementById('charCollapseArrow');
+    const willOpen = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !willOpen);
+    arrow.classList.toggle('open', willOpen);
+  }
+
+  function switchPage(page) {
+    document.getElementById('schedulerPage').style.display = page === 'scheduler' ? '' : 'none';
+    document.getElementById('calendarPage').style.display = page === 'calendar' ? '' : 'none';
+    document.getElementById('navBtn_scheduler').classList.toggle('active', page === 'scheduler');
+    document.getElementById('navBtn_calendar').classList.toggle('active', page === 'calendar');
+    if (page === 'calendar') {
+      calWeekOffset = 0;
+      calMonthOffset = 0;
+      setCalView(calCurrentView);
+      calRenderWeek(); calRenderMonth(); calRenderStats();
+    }
+  }
+
+  let calCurrentView = 'week';
+  function setCalView(v) {
+    calCurrentView = v;
+    document.getElementById('calWeekView').classList.toggle('hidden', v !== 'week');
+    document.getElementById('calMonthView').classList.toggle('hidden', v !== 'month');
+    document.getElementById('calStatsView').classList.toggle('hidden', v !== 'stats');
+    document.getElementById('calBtnWeek').classList.toggle('active', v === 'week');
+    document.getElementById('calBtnMonth').classList.toggle('active', v === 'month');
+    document.getElementById('calBtnStats').classList.toggle('active', v === 'stats');
+
+    // 상단 요약 카드: 통계 탭은 자체 요약이 있으니 숨기고, 주간/월간 탭은 그에 맞는 기준으로 보여줍니다.
+    document.getElementById('calTopSummaryBar').classList.toggle('hidden', v === 'stats');
+    if (v === 'week') calRenderCurrentWeekSummary();
+    else if (v === 'month') calRenderCurrentMonthSummary();
+  }
+
+  const calDowNames = ['목', '금', '토', '일', '월', '화', '수'];
+
+  function formatHMShort(min) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+  // 메이플은 매주 목요일 자정(KST)에 초기화되므로, 한 주를 목~수로 계산합니다.
+  function calThisWeekThursday(date) {
+    const diffToThu = (date.getDay() - 4 + 7) % 7;
+    const d = new Date(date);
+    d.setDate(date.getDate() - diffToThu);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  // 그 목요일이 속한 '달'을 기준으로 몇 째 주인지 계산해서 'n월 n주차' 형태로 돌려줍니다.
+  // (월간 탭에서 각 주차 칩에 쓰는 것과 동일한 기준입니다.)
+  function mapleWeekLabel(thuDateStr) {
+    const [y, mo, d] = thuDateStr.split('-').map(Number);
+    const firstDayUTC = new Date(Date.UTC(y, mo - 1, 1));
+    const diffToThu = (firstDayUTC.getUTCDay() - 4 + 7) % 7;
+    const week1StartUTC = new Date(firstDayUTC);
+    week1StartUTC.setUTCDate(firstDayUTC.getUTCDate() - diffToThu);
+    const thuDateUTC = new Date(Date.UTC(y, mo - 1, d));
+    const diffDays = Math.floor((thuDateUTC - week1StartUTC) / 86400000);
+    const weekIdx = Math.floor(diffDays / 7);
+    return `${mo}월 ${weekIdx + 1}주차`;
+  }
+
+  // --- 실제 완료 기록(state.completionLog)에서 날짜별 합계를 읽어옵니다 ---
+  function calDayTotals(dateStr, excludeMonthly) {
+    const day = state.completionLog && state.completionLog[dateStr];
+    if (!day) return { timeMin: 0, moneyRaw: 0, doneCount: 0 };
+    let timeMin = 0, moneyRaw = 0, doneCount = 0;
+    Object.values(day).forEach(e => {
+      if (excludeMonthly && e.theme === 'monthly') return;
+      timeMin += (e.time || 0); moneyRaw += (e.money || 0); doneCount++;
+    });
+    return { timeMin, moneyRaw, doneCount };
+  }
+
+  // --- 지난 기록 열람용: 몇 주/몇 달 전을 보고 있는지 (0 = 이번 주/이번 달) ---
+  let calWeekOffset = 0;
+  let calMonthOffset = 0;
+  function calShiftWeek(delta) { calWeekOffset += delta; calRenderWeek(); }
+  function calShiftMonth(delta) { calMonthOffset += delta; calRenderMonth(); }
+
+  function calRenderWeek() {
+    const today = new Date();
+    const grid = document.getElementById('calWeekGrid');
+    grid.innerHTML = '';
+    const thursday = calThisWeekThursday(today);
+    thursday.setDate(thursday.getDate() + calWeekOffset * 7);
+    let weekTimeMin = 0, weekMoneyRaw = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(thursday);
+      d.setDate(thursday.getDate() + i);
+      const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+      const data = calDayTotals(dateStr, true);
+      weekTimeMin += data.timeMin; weekMoneyRaw += data.moneyRaw;
+      const isToday = d.toDateString() === today.toDateString();
+      const isFuture = d > today && !isToday;
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="day-card ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''}">
+          <div class="dow">${calDowNames[i]}</div>
+          <div class="date">${d.getDate()}일</div>
+          ${data.doneCount > 0 ? `
+            <div class="stat-row time">${CLOCK_ICON_SMALL} ${formatHMShort(data.timeMin)}</div>
+            <div class="stat-row money">${COIN_ICON} ${formatMesoCompact(data.moneyRaw)}</div>
+            <div class="done-count">완료 ${data.doneCount}개</div>
+          ` : `<div class="done-count muted">${isFuture ? '-' : '기록 없음'}</div>`}
+        </div>
+      `);
+    }
+    const weekEnd = new Date(thursday);
+    weekEnd.setDate(thursday.getDate() + 6);
+    document.getElementById('calWeekLabel').textContent =
+      `${thursday.getMonth() + 1}/${thursday.getDate()} ~ ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+  }
+
+  // 상단 "이번 주" 요약 카드는 열람 중인 주와 무관하게 항상 실제 이번 주 기준으로 보여줍니다.
+  function calRenderCurrentWeekSummary() {
+    const today = new Date();
+    const thursday = calThisWeekThursday(today);
+    let timeMin = 0, moneyRaw = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(thursday);
+      d.setDate(thursday.getDate() + i);
+      const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+      const data = calDayTotals(dateStr, true);
+      timeMin += data.timeMin; moneyRaw += data.moneyRaw;
+    }
+    document.getElementById('calSummaryTimeLabel').textContent = '이번 주 완료 시간';
+    document.getElementById('calSummaryMoneyLabel').textContent = '이번 주 결정석 수익';
+    document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
+    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+  }
+
+  // 월간 뷰에서는 상단 요약을 '이번 달' 기준(모든 컨텐츠 포함, 월간 보스도 포함)으로 보여줍니다.
+  function calRenderCurrentMonthSummary() {
+    const today = new Date();
+    const year = today.getFullYear(), month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    let timeMin = 0, moneyRaw = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = kstDateString(new Date(Date.UTC(year, month, d)));
+      const data = calDayTotals(dateStr);
+      timeMin += data.timeMin; moneyRaw += data.moneyRaw;
+    }
+    document.getElementById('calSummaryTimeLabel').textContent = '이번 달 완료 시간';
+    document.getElementById('calSummaryMoneyLabel').textContent = '이번 달 결정석 수익';
+    document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
+    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+  }
+
+  function calRenderMonth() {
+    const today = new Date();
+    const grid = document.getElementById('calMonthGrid');
+    const viewDate = new Date(today.getFullYear(), today.getMonth() + calMonthOffset, 1);
+    const year = viewDate.getFullYear(), month = viewDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    document.getElementById('calMonthLabel').textContent = `${year}년 ${month + 1}월`;
+
+    const startOffset = firstDay.getDay();
+    const daysInMonth = lastDay.getDate();
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+    const gridStartDate = new Date(year, month, 1 - startOffset);
+
+    const days = [];
+    for (let i = 0; i < totalCells; i++) {
+      const d = new Date(gridStartDate);
+      d.setDate(gridStartDate.getDate() + i);
+      days.push(d);
+    }
+
+    const week1Start = calThisWeekThursday(firstDay);
+    function mapleWeekIndex(d) {
+      const diffDays = Math.floor((d - week1Start) / 86400000);
+      return Math.floor(diffDays / 7);
+    }
+    const cols = 7;
+    const rows = days.length / cols;
+    const weekIdxOf = days.map(mapleWeekIndex);
+    function sameGroup(idx) { return idx >= 0 && idx < days.length ? weekIdxOf[idx] : null; }
+
+    grid.innerHTML = '';
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="month-dow-row">
+        ${calDowNames.slice(3).concat(calDowNames.slice(0, 3)).map(n => `<div class="month-dow">${n}</div>`).join('')}
+      </div>
+    `);
+    const cellsWrap = document.createElement('div');
+    cellsWrap.className = 'month-cells';
+    grid.appendChild(cellsWrap);
+
+    days.forEach((d, i) => {
+      const other = d.getMonth() !== month;
+      const myGroup = weekIdxOf[i];
+      const row = Math.floor(i / cols), col = i % cols;
+      const up = row > 0 ? sameGroup(i - cols) : null;
+      const down = row < rows - 1 ? sameGroup(i + cols) : null;
+      // 좌우 바깥쪽 끝(일요일 왼쪽 / 토요일 오른쪽)은 실제 주 경계가 아니라 다음 줄로 이어지는 지점이라, 테두리를 닫지 않고 열어둡니다.
+      const left = col > 0 ? sameGroup(i - 1) : myGroup;
+      const right = col < cols - 1 ? sameGroup(i + 1) : myGroup;
+      const borderClasses = [
+        up !== myGroup ? 'mw-top' : '',
+        down !== myGroup ? 'mw-bottom' : '',
+        left !== myGroup ? 'mw-left' : '',
+        right !== myGroup ? 'mw-right' : '',
+      ].filter(Boolean).join(' ');
+      const isThuStart = d.getDay() === 4;
+      const label = isThuStart ? `<div class="mw-label">${myGroup + 1}주차</div>` : '';
+      const isToday = d.toDateString() === today.toDateString();
+      const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+      const data = calDayTotals(dateStr);
+
+      if (other) {
+        cellsWrap.insertAdjacentHTML('beforeend', `<div class="month-cell other-month ${borderClasses}">${label}<div class="date">${d.getDate()}</div></div>`);
+        return;
+      }
+      cellsWrap.insertAdjacentHTML('beforeend', `
+        <div class="month-cell ${isToday ? 'today' : ''} ${borderClasses}">
+          ${label}
+          <div class="date">${d.getDate()}</div>
+          ${data.doneCount > 0 ? `
+            <div class="mini-row time">${CLOCK_ICON_SMALL} ${formatHMShort(data.timeMin)}</div>
+            <div class="mini-row money">${COIN_ICON} ${formatMesoCompact(data.moneyRaw)}</div>
+          ` : ''}
+        </div>
+      `);
+    });
+
+  }
+
+  // --- 전체 기록을 순회하며 통계에 필요한 값들을 한 번에 집계합니다 ---
+  function calAggregateAll() {
+    const log = state.completionLog || {};
+    const dateStrs = Object.keys(log).sort();
+    let totalTime = 0, totalMoney = 0;
+    const bossTotals = {}; // bossName -> money
+    const charTotals = {}; // characterId -> money
+    const weekTotals = {}; // mapleWeekKey -> { time, money }
+
+    dateStrs.forEach(dateStr => {
+      const [y, mo, d] = dateStr.split('-').map(Number);
+      const dateObj = new Date(Date.UTC(y, mo - 1, d));
+      const diffToThu = (dateObj.getUTCDay() - 4 + 7) % 7;
+      const thuDate = new Date(dateObj);
+      thuDate.setUTCDate(dateObj.getUTCDate() - diffToThu);
+      const weekKey = kstDateString(thuDate); // 그 주의 목요일 날짜를 주차 키로 사용
+
+      Object.values(log[dateStr]).forEach(e => {
+        totalTime += (e.time || 0);
+        totalMoney += (e.money || 0);
+        if (e.theme !== 'monthly') {
+          if (!weekTotals[weekKey]) weekTotals[weekKey] = { time: 0, money: 0 };
+          weekTotals[weekKey].time += (e.time || 0);
+          weekTotals[weekKey].money += (e.money || 0);
+        }
+        if (e.isBoss && e.bossName) {
+          bossTotals[e.bossName] = (bossTotals[e.bossName] || 0) + (e.money || 0);
+        }
+        if (e.money > 0 && e.characterId) {
+          charTotals[e.characterId] = (charTotals[e.characterId] || 0) + (e.money || 0);
+        }
+      });
+    });
+
+    return { dateStrs, totalTime, totalMoney, bossTotals, charTotals, weekTotals };
+  }
+
+  function calRenderStats() {
+    const agg = calAggregateAll();
+
+    document.getElementById('calStatsTotalTime').textContent = formatHM(agg.totalTime);
+    document.getElementById('calStatsTotalMoney').textContent = formatMeso(agg.totalMoney);
+
+    const weekKeys = Object.keys(agg.weekTotals).sort();
+    const weekAvg = weekKeys.length > 0 ? agg.totalMoney / weekKeys.length : 0;
+    document.getElementById('calStatsWeekAvg').textContent = weekKeys.length > 0 ? formatMeso(weekAvg) : '기록 없음';
+
+    let bestWeekKey = null, bestWeekMoney = -1;
+    weekKeys.forEach(k => { if (agg.weekTotals[k].money > bestWeekMoney) { bestWeekMoney = agg.weekTotals[k].money; bestWeekKey = k; } });
+    document.getElementById('calStatsBestWeek').textContent = bestWeekKey
+      ? `${mapleWeekLabel(bestWeekKey)} · ${formatMeso(bestWeekMoney)}`
+      : '기록 없음';
+
+    // 주차별 기록 (최근 주차부터)
+    const weekListEl = document.getElementById('calStatsWeekList');
+    const weekKeysDesc = weekKeys.slice().sort().reverse();
+    weekListEl.innerHTML = weekKeysDesc.length === 0
+      ? '<div class="empty-state">아직 쌓인 기록이 없어요.</div>'
+      : weekKeysDesc.map(k => `
+        <div class="week-total-row">
+          <span class="wt-label">${mapleWeekLabel(k)}</span>
+          <span class="stat time">${CLOCK_ICON_SMALL} ${formatHM(agg.weekTotals[k].time)}</span>
+          <span class="stat money">${COIN_ICON} ${formatMeso(agg.weekTotals[k].money)}</span>
+        </div>
+      `).join('');
+
+    // 최근 8주 추이
+    const chart = document.getElementById('calTrendChart');
+    const last8 = weekKeys.slice(-8);
+    if (last8.length === 0) {
+      chart.innerHTML = '<div class="empty-state">아직 쌓인 기록이 없어요.</div>';
+    } else {
+      const values = last8.map(k => agg.weekTotals[k].money);
+      const max = Math.max(...values, 1);
+      chart.innerHTML = last8.map((k, i) => `
+        <div class="trend-bar-wrap">
+          <div class="trend-bar" style="height:${(values[i] / max * 100).toFixed(0)}%;" title="${formatMeso(values[i])}"></div>
+          <div class="trend-label">${k.slice(5)}</div>
+        </div>
+      `).join('');
+    }
+
+    // 보스별 순위
+    const bossList = Object.entries(agg.bossTotals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const bossMax = Math.max(...bossList.map(b => b[1]), 1);
+    document.getElementById('calBossRankList').innerHTML = bossList.length === 0
+      ? '<div class="empty-state">아직 클리어한 보스 기록이 없어요.</div>'
+      : bossList.map(([name, value], i) => `
+          <div class="rank-row">
+            <span class="rank-num">${i + 1}</span>
+            <span class="rank-name">${escapeHtml(name)}</span>
+            <span class="rank-bar-track"><span class="rank-bar-fill" style="width:${(value / bossMax * 100).toFixed(0)}%;"></span></span>
+            <span class="rank-value">${formatMesoCompact(value)}</span>
+          </div>
+        `).join('');
+
+    // 캐릭터별 순위
+    const charList = Object.entries(agg.charTotals)
+      .map(([charId, value]) => {
+        const c = state.characters.find(x => x.id === charId);
+        return { name: c ? c.name : '(삭제된 캐릭터)', value };
+      })
+      .sort((a, b) => b.value - a.value).slice(0, 8);
+    const charMax = Math.max(...charList.map(c => c.value), 1);
+    document.getElementById('calCharRankList').innerHTML = charList.length === 0
+      ? '<div class="empty-state">아직 결정석 기록이 없어요.</div>'
+      : charList.map((c, i) => `
+          <div class="rank-row">
+            <span class="rank-num">${i + 1}</span>
+            <span class="rank-name">${escapeHtml(c.name)}</span>
+            <span class="rank-bar-track"><span class="rank-bar-fill" style="width:${(c.value / charMax * 100).toFixed(0)}%;"></span></span>
+            <span class="rank-value">${formatMesoCompact(c.value)}</span>
+          </div>
+        `).join('');
+  }
+
 
   const BOSS_ICONS = {
     "자쿰": "data:image/png;base64,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",
@@ -658,6 +1262,7 @@
     listTitle: '메이플 타임 스케줄러',
     expTitle: '주간 진행도',
     lastReset: { daily: 0, weekly: 0, monthly: 0 },
+    completionLog: {}, // { 'YYYY-MM-DD'(KST): { taskId: {time, money, isBoss, bossName, characterId, categoryId} } }
     characters: [
       { id: 'char_1', name: '섀도어' },
       { id: 'char_2', name: '나이트로드' }
@@ -679,6 +1284,179 @@
   };
 
   const openBossPanels = new Set();
+
+  // --- 드래그&드롭 (드롭하는 순간에만 한 번 순서를 바꿉니다 — 드래그 중 실시간 재배치 없음) ---
+  let dragSourceId = null;
+  let dragSourceType = null; // 'char' | 'task' | 'board'
+
+  function onDragWheel(ev) {
+    if (dragSourceType === null) return;
+    window.scrollBy(0, ev.deltaY);
+  }
+
+  function onDragStart(ev, type, id) {
+    dragSourceId = id;
+    dragSourceType = type;
+    try {
+      ev.dataTransfer.effectAllowed = 'move';
+      ev.dataTransfer.setData('text/plain', String(id));
+    } catch (e) { /* 일부 환경에서는 필요 없음 */ }
+    const item = ev.currentTarget.closest('[data-id]');
+    if (item) item.classList.add('drag-live');
+    document.body.classList.add('dragging-active');
+    document.addEventListener('wheel', onDragWheel, { passive: true });
+  }
+
+  function onDragEnd(ev) {
+    const item = ev.currentTarget.closest('[data-id]');
+    if (item) item.classList.remove('drag-live');
+    if (dragOverTargetEl) { dragOverTargetEl.classList.remove('drag-over-target'); dragOverTargetEl = null; }
+    document.body.classList.remove('dragging-active');
+    document.removeEventListener('wheel', onDragWheel);
+    dragSourceId = null;
+    dragSourceType = null;
+  }
+
+  let dragOverTargetEl = null; // 지금 반투명하게 미리보기 중인, "밀려난" 항목
+
+  function setDragOverPreview(el) {
+    if (el === dragOverTargetEl) return;
+    if (dragOverTargetEl) dragOverTargetEl.classList.remove('drag-over-target');
+    dragOverTargetEl = el;
+    if (dragOverTargetEl) dragOverTargetEl.classList.add('drag-over-target');
+  }
+
+  // 드래그 중인 항목을 실제로 그 자리에 옮겨서 미리보기를 보여줍니다.
+  // 되돌아가는 떨림을 막기 위해: (1) 항목 가운데 30% 구간은 무시하고 (2) 실제로 위치가 달라질 때만 옮깁니다.
+  function isGridType(type) { return type === 'board'; } // 캐릭터는 실시간 미리보기를 다시 사용, 보드만 드롭 시 한 번에 계산
+
+  function onDragOverItem(ev) {
+    if (dragSourceType === null) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    try { ev.dataTransfer.dropEffect = 'move'; } catch (e) {}
+    if (isGridType(dragSourceType)) return; // 격자 배치는 실시간 미리보기 없이, 놓는 순간에만 위치를 계산합니다.
+
+    const targetEl = ev.currentTarget;
+    if (targetEl.classList.contains('drag-live')) return; // 자기 자신 위에서는 아무 것도 안 함
+
+    const draggedEl = document.querySelector('.drag-live');
+    if (!draggedEl || draggedEl.parentElement !== targetEl.parentElement) return; // 같은 목록 안에서만 미리보기
+
+    const rect = targetEl.getBoundingClientRect();
+    let before;
+    if (dragSourceType === 'char') {
+      const relX = (ev.clientX - rect.left) / rect.width;
+      if (relX > 0.35 && relX < 0.65) return; // 가운데 데드존 (좌우 기준, 격자 배치라서)
+      before = relX < 0.5;
+    } else {
+      const relY = (ev.clientY - rect.top) / rect.height;
+      if (relY > 0.35 && relY < 0.65) return; // 가운데 데드존 (위아래 기준)
+      before = relY < 0.5;
+    }
+    const desiredNext = before ? targetEl : targetEl.nextElementSibling;
+    if (draggedEl.nextElementSibling === desiredNext) return; // 이미 그 위치임
+
+    targetEl.parentElement.insertBefore(draggedEl, desiredNext);
+    if (dragSourceType !== 'char') setDragOverPreview(targetEl); // 캐릭터 카드는 옆 항목 반투명 표시를 하지 않음
+  }
+
+  function onDragOverContainer(ev) {
+    if (dragSourceType === null) return;
+    ev.preventDefault();
+    try { ev.dataTransfer.dropEffect = 'move'; } catch (e) {}
+    if (isGridType(dragSourceType)) return;
+
+    const container = ev.currentTarget;
+    const draggedEl = document.querySelector('.drag-live');
+    if (!draggedEl || draggedEl.parentElement !== container) return;
+
+    const addCard = container.querySelector('.add-board');
+    const desiredNext = addCard || null;
+    if (draggedEl.nextElementSibling === desiredNext) return;
+    if (addCard) container.insertBefore(draggedEl, addCard);
+    else container.appendChild(draggedEl);
+    setDragOverPreview(null);
+  }
+
+  // 드롭 시점에 화면에 보이는(미리보기된) 순서를 그대로 실제 데이터에 반영합니다. (할 일 목록 전용)
+  function commitOrderFromDOM(type, scopeKey, container) {
+    const orderedIds = Array.from(container.children)
+      .filter(el => el.dataset && el.dataset.id)
+      .map(el => el.dataset.id);
+
+    if (type === 'char') {
+      const byId = {};
+      state.characters.forEach(c => { byId[c.id] = c; });
+      const newOrder = orderedIds.map(id => byId[id]).filter(Boolean);
+      if (newOrder.length === state.characters.length) state.characters = newOrder;
+      return;
+    }
+
+    const indices = [];
+    state.tasks.forEach((t, i) => { if (t.categoryId === scopeKey) indices.push(i); });
+    // 보스 항목은 화면(DOM)에 아예 렌더링되지 않으므로, 순서 비교 대상에서 빼고 원래 자리에 그대로 둡니다.
+    const visibleIndices = indices.filter(i => !state.tasks[i].isBoss);
+    const byId = {};
+    visibleIndices.forEach(i => { byId[state.tasks[i].id] = state.tasks[i]; });
+    const newOrder = orderedIds.map(id => byId[id]).filter(Boolean);
+    if (newOrder.length === visibleIndices.length) {
+      visibleIndices.forEach((idx, i) => { state.tasks[idx] = newOrder[i]; });
+    }
+  }
+
+  // 격자 배치(캐릭터·카드) 전용: 놓는 순간의 좌/우 위치만으로 한 번에 순서를 계산합니다.
+  function reorderGridById(list, fromId, toId, before) {
+    const fromIdx = list.findIndex(x => x.id === fromId);
+    if (fromIdx === -1) return;
+    const [item] = list.splice(fromIdx, 1);
+    let insertIdx = toId === null ? list.length : list.findIndex(x => x.id === toId);
+    if (insertIdx === -1) insertIdx = list.length;
+    else if (!before) insertIdx += 1;
+    list.splice(insertIdx, 0, item);
+  }
+
+  function reorderScopedBoardsById(themeKey, fromId, toId, before) {
+    const indices = [];
+    state.categories.forEach((c, i) => { if (c.theme === themeKey) indices.push(i); });
+    const list = indices.map(i => state.categories[i]);
+    reorderGridById(list, fromId, toId, before);
+    indices.forEach((idx, i) => { state.categories[idx] = list[i]; });
+  }
+
+  function onDropOnItem(ev, type, targetId, scopeKey) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (!dragSourceId || dragSourceType !== type) return;
+
+    if (type === 'board') {
+      const rect = ev.currentTarget.getBoundingClientRect();
+      const before = (ev.clientX - rect.left) < rect.width / 2;
+      reorderScopedBoardsById(scopeKey, dragSourceId, targetId, before);
+    } else if (type === 'char') {
+      commitOrderFromDOM('char', null, ev.currentTarget.parentElement);
+    } else {
+      commitOrderFromDOM(type, scopeKey, ev.currentTarget.parentElement);
+    }
+
+    dragSourceId = null;
+    dragSourceType = null;
+    render(); saveState();
+  }
+
+  function onDropOnContainer(ev, type, scopeKey) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (!dragSourceId || dragSourceType !== type) return;
+
+    if (type === 'board') reorderScopedBoardsById(scopeKey, dragSourceId, null, true);
+    else if (type === 'char') commitOrderFromDOM('char', null, ev.currentTarget);
+    else commitOrderFromDOM(type, scopeKey, ev.currentTarget);
+
+    dragSourceId = null;
+    dragSourceType = null;
+    render(); saveState();
+  }
 
   function toggleBossPanel(catId) {
     if (openBossPanels.has(catId)) openBossPanels.delete(catId);
@@ -724,6 +1502,10 @@
 
   const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
   function kstNow() { return new Date(Date.now() + KST_OFFSET_MS); }
+  function kstDateString(date) {
+    const y = date.getUTCFullYear(), mo = date.getUTCMonth() + 1, d = date.getUTCDate();
+    return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  }
   function kstWallToEpoch(y, mo, d, h = 0, mi = 0, s = 0) { return Date.UTC(y, mo, d, h, mi, s) - KST_OFFSET_MS; }
   function getResetBoundaries() {
     const kst = kstNow();
@@ -809,6 +1591,7 @@
         state.characters = state.characters || [];
         state.tasks = (state.tasks || []).map(t => ({ characterId: null, ...t }));
         state.lastReset = { daily: 0, weekly: 0, monthly: 0, ...(state.lastReset || {}) };
+        state.completionLog = state.completionLog || {};
       }
     } catch (e) {
       console.error('저장된 데이터를 불러오지 못했습니다:', e);
@@ -867,6 +1650,7 @@
     render(); saveState();
   }
   function markAllComplete(catId) {
+    state.tasks.forEach(t => { if (t.categoryId === catId && !t.completed) logTaskCompletion(t, true); });
     state.tasks = state.tasks.map(t => t.categoryId === catId ? { ...t, completed: true } : t);
     render(); saveState();
   }
@@ -884,7 +1668,8 @@
 
 
   function openBossModal(catId, taskId, prefilledCharacterId, linkTaskId) {
-    bossModalState = { catId, taskId: taskId || null, linkTaskId: linkTaskId || null, addedIds: [] };
+    const board = state.categories.find(c => c.id === catId);
+    bossModalState = { catId, taskId: taskId || null, linkTaskId: linkTaskId || null, addedIds: [], theme: board ? board.theme : 'weekly' };
     bossModalScope = 'card';
     hideModalWarning();
     const nameInput = document.getElementById('modalBossName');
@@ -926,9 +1711,11 @@
   }
 
   function bossIconGridHtml(selectedName) {
-    return BOSS_NAMES.map(name => `
+    const names = currentBossNames();
+    const icons = currentBossIconsMap();
+    return names.map(name => `
       <button type="button" class="boss-icon-btn ${name === selectedName ? 'selected' : ''}" title="${escapeHtml(name)}" onclick="selectModalBossName('${escapeHtml(name)}')">
-        <img src="${BOSS_ICONS[name]}" alt="${escapeHtml(name)}">
+        <img src="${icons[name]}" alt="${escapeHtml(name)}">
         <span>${escapeHtml(name)}</span>
       </button>
     `).join('');
@@ -950,7 +1737,7 @@
   function updateModalDifficultyOptions() {
     const nameVal = document.getElementById('modalBossName').value;
     const diffSel = document.getElementById('modalBossDifficulty');
-    const options = BOSS_GROUPS[nameVal] || [];
+    const options = currentBossGroups()[nameVal] || [];
     diffSel.innerHTML = options.map(o => `<option value="${o.difficulty}">${o.difficulty} · ${formatMeso(o.price)}</option>`).join('');
     diffSel.selectedIndex = 0; // 보스가 바뀌면 이전 난이도가 우연히 겹쳐 남지 않도록 항상 첫 옵션으로 초기화
   }
@@ -960,28 +1747,36 @@
     const hint = document.getElementById('modalBossHint');
     const characterId = charSel.value;
     if (!characterId) { hint.textContent = ''; renderModalBossList(null); return; }
-    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
-    if (bossModalState.taskId) {
-      const editing = state.tasks.find(t => t.id === bossModalState.taskId);
-      if (editing && editing.characterId === characterId) count -= 1; // 수정 중인 자기 자신은 중복 카운트하지 않음
+    const charName = state.characters.find(c => c.id === characterId)?.name || '';
+    if (bossModalState.theme === 'monthly') {
+      hint.textContent = `${charName} · 월간 보스는 캐릭터당 한 번만 등록할 수 있어요`;
+    } else {
+      let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+      if (bossModalState.taskId) {
+        const editing = state.tasks.find(t => t.id === bossModalState.taskId);
+        if (editing && editing.characterId === characterId) count -= 1; // 수정 중인 자기 자신은 중복 카운트하지 않음
+      }
+      hint.textContent = `${charName} · 이번 주 ${count}/${WEEKLY_BOSS_LIMIT}마리 등록됨`;
     }
-    hint.textContent = `${state.characters.find(c => c.id === characterId)?.name || ''} · 이번 주 ${count}/${WEEKLY_BOSS_LIMIT}마리 등록됨`;
     renderModalBossList(characterId);
   }
 
   function bossSortIndex(bossName, difficulty) {
-    const nameIdx = BOSS_NAMES.indexOf(bossName);
-    const diffOptions = BOSS_GROUPS[bossName] || [];
+    const inWeekly = BOSS_NAMES.includes(bossName);
+    const names = inWeekly ? BOSS_NAMES : MONTHLY_BOSS_NAMES;
+    const groups = inWeekly ? BOSS_GROUPS : MONTHLY_BOSS_GROUPS;
+    const nameIdx = names.indexOf(bossName);
+    const diffOptions = groups[bossName] || [];
     const diffIdx = diffOptions.findIndex(o => o.difficulty === difficulty);
-    return (nameIdx === -1 ? BOSS_NAMES.length : nameIdx) * 100 + (diffIdx === -1 ? 0 : diffIdx);
+    return (inWeekly ? 0 : 100000) + (nameIdx === -1 ? names.length : nameIdx) * 100 + (diffIdx === -1 ? 0 : diffIdx);
   }
 
   function renderModalBossList(characterId) {
     const listEl = document.getElementById('modalBossList');
     const titleEl = document.getElementById('modalBossStatusTitle');
     if (!characterId) { listEl.innerHTML = ''; return; }
-    let bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId));
-    if (titleEl) titleEl.textContent = '이 캐릭터의 보스 현황';
+    let bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isBoardOfTheme(t.categoryId, bossModalState.theme));
+    if (titleEl) titleEl.textContent = bossModalState.theme === 'monthly' ? '이 캐릭터의 월간 보스 현황' : '이 캐릭터의 보스 현황';
     bosses = bosses.slice().sort((a, b) => bossSortIndex(a.bossName, a.bossDifficulty) - bossSortIndex(b.bossName, b.bossDifficulty));
     if (bosses.length === 0) {
       listEl.innerHTML = '<div class="modal-boss-empty">등록된 보스가 없어요.</div>';
@@ -990,7 +1785,7 @@
     listEl.innerHTML = bosses.map(b => `
       <div class="modal-boss-row ${bossModalState.taskId === b.id ? 'editing' : ''}">
         <span class="modal-boss-row-left">
-          ${BOSS_ICONS[b.bossName] ? `<img class="modal-boss-icon" src="${BOSS_ICONS[b.bossName]}" alt="">` : ''}
+          ${iconForBossName(b.bossName) ? `<img class="modal-boss-icon" src="${iconForBossName(b.bossName)}" alt="">` : ''}
           <span>${b.bossDifficulty} ${escapeHtml(b.bossName)}${b.partySize > 1 ? ` (${b.partySize}인)` : ''}</span>
         </span>
         <span class="modal-boss-row-right">
@@ -1035,7 +1830,7 @@
   function isDuplicateBossForCharacter(characterId, bossName, excludeTaskId) {
     return state.tasks.some(t =>
       t.isBoss && t.characterId === characterId && t.bossName === bossName &&
-      isWeeklyBoardId(t.categoryId) && t.id !== excludeTaskId
+      isBoardOfTheme(t.categoryId, bossModalState.theme) && t.id !== excludeTaskId
     );
   }
 
@@ -1046,10 +1841,11 @@
     const charSel = document.getElementById('modalBossChar');
     const bossName = nameSel.value;
     const difficulty = diffSel.value;
-    const entry = (BOSS_GROUPS[bossName] || []).find(o => o.difficulty === difficulty);
+    const entry = (currentBossGroups()[bossName] || []).find(o => o.difficulty === difficulty);
     if (!entry) { showModalWarning('보스와 난이도를 선택해주세요!'); return null; }
     const characterId = charSel.value;
-    if (!characterId) { showModalWarning('캐릭터를 선택해주세요! (보스는 캐릭터당 주 12마리 제한이 있어요)'); return null; }
+    const limitHint = bossModalState.theme === 'monthly' ? '' : ' (보스는 캐릭터당 주 12마리 제한이 있어요)';
+    if (!characterId) { showModalWarning(`캐릭터를 선택해주세요!${limitHint}`); return null; }
     const partySize = parseInt(partySel.value) || 1;
     return { bossName, difficulty, entry, characterId, partySize };
   }
@@ -1071,14 +1867,18 @@
       return;
     }
 
-    let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
-    const editing = state.tasks.find(t => t.id === bossModalState.taskId);
-    if (editing && editing.characterId === characterId) count -= 1;
-    if (count >= WEEKLY_BOSS_LIMIT) {
-      const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
-      showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
-      return;
+    if (bossModalState.theme !== 'monthly') {
+      let count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+      const editing2 = state.tasks.find(t => t.id === bossModalState.taskId);
+      if (editing2 && editing2.characterId === characterId) count -= 1;
+      if (count >= WEEKLY_BOSS_LIMIT) {
+        const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
+        showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+        return;
+      }
     }
+
+    const editing = state.tasks.find(t => t.id === bossModalState.taskId);
 
     if (editing) {
       editing.bossName = bossName; editing.bossDifficulty = difficulty; editing.partySize = partySize;
@@ -1101,11 +1901,13 @@
       return;
     }
 
-    const count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
-    if (count >= WEEKLY_BOSS_LIMIT) {
-      const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
-      showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
-      return;
+    if (bossModalState.theme !== 'monthly') {
+      const count = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isWeeklyBoardId(t.categoryId)).length;
+      if (count >= WEEKLY_BOSS_LIMIT) {
+        const charName = state.characters.find(c => c.id === characterId)?.name || '이 캐릭터';
+        showModalWarning(`${charName}은(는) 이번 주 보스 ${WEEKLY_BOSS_LIMIT}마리를 이미 모두 등록했어요!`);
+        return;
+      }
     }
 
     const newId = Date.now();
@@ -1153,13 +1955,39 @@
     render(); saveState();
   }
 
+  function logTaskCompletion(task, completed) {
+    if (!state.completionLog) state.completionLog = {};
+    const dateStr = kstDateString(kstNow());
+    if (completed) {
+      if (!state.completionLog[dateStr]) state.completionLog[dateStr] = {};
+      const board = state.categories.find(c => c.id === task.categoryId);
+      state.completionLog[dateStr][task.id] = {
+        time: task.time || 0,
+        money: task.isBoss ? (task.price || 0) : 0,
+        isBoss: !!task.isBoss,
+        bossName: task.bossName || null,
+        characterId: task.characterId || null,
+        categoryId: task.categoryId,
+        theme: board ? board.theme : null
+      };
+    } else if (state.completionLog[dateStr]) {
+      // 오늘 체크했다가 오늘 안에 다시 해제한 경우에만 오늘자 기록에서 제거합니다.
+      // (지난 날짜의 기록은 그 날짜가 지나면 그대로 역사로 남고, 나중에 취소해도 지워지지 않습니다.)
+      delete state.completionLog[dateStr][task.id];
+    }
+  }
+
   function toggleTask(id) {
     const target = state.tasks.find(t => t.id === id);
     if (!target) return;
     const newCompleted = !target.completed;
     state.tasks = state.tasks.map(t => t.id === id ? { ...t, completed: newCompleted } : t);
+    logTaskCompletion(target, newCompleted);
     if (!target.isBoss) {
       // 이 항목에 연결해서 등록해둔 보스들도 함께 체크/해제
+      state.tasks.forEach(t => {
+        if (t.isBoss && t.linkedTaskId === id) logTaskCompletion(t, newCompleted);
+      });
       state.tasks = state.tasks.map(t => (t.isBoss && t.linkedTaskId === id) ? { ...t, completed: newCompleted } : t);
     }
     render(); saveState();
@@ -1238,7 +2066,11 @@
       const potential = characterBossPotential(c.id);
       const timeTotal = characterTimeTotal(c.id);
       return `
-      <div class="char-grid-item" data-id="${c.id}">
+      <div class="char-grid-item" data-id="${c.id}"
+           ondragover="onDragOverItem(event)"
+           ondrop="onDropOnItem(event, 'char', '${c.id}', null)">
+        <span class="drag-handle char-drag-handle" title="드래그하여 순서 변경" draggable="true"
+              ondragstart="onDragStart(event, 'char', '${c.id}')" ondragend="onDragEnd(event)">⠿</span>
         <div class="char-grid-actions">
           <button class="char-icon-btn" title="열람" onclick="openCharacterViewModal('${c.id}')">👁</button>
           <button class="char-icon-btn" title="수정" onclick="openCharacterEditModal('${c.id}')">✎</button>
@@ -1476,13 +2308,15 @@
       tasksHtml = visibleTasks.map(task => {
         if (task.isDivider) {
           return `
-        <li class="task-divider ${panelOpen ? 'editable' : ''}" data-id="${task.id}">
+        <li class="task-divider ${panelOpen ? 'editable' : ''}" data-id="${task.id}"
+            draggable="${panelOpen}"
+            ondragstart="onDragStart(event, 'task', ${task.id})" ondragend="onDragEnd(event)"
+            ondragover="onDragOverItem(event)"
+            ondrop="onDropOnItem(event, 'task', ${task.id}, '${cat.id}')">
           <span class="divider-line"></span>
-          ${panelOpen ? `
           <div class="row-hover-actions">
             <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})" title="구분선 삭제">&times;</button>
           </div>
-          ` : ''}
         </li>`;
         }
         const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
@@ -1508,7 +2342,11 @@
         <li class="task-item ${task.completed ? 'completed' : ''} ${panelOpen ? 'editable' : ''}"
             style="--chip-accent: ${color};"
             onclick="toggleTask(${task.id})"
-            data-id="${task.id}">
+            data-id="${task.id}"
+            draggable="${panelOpen}"
+            ondragstart="onDragStart(event, 'task', ${task.id})" ondragend="onDragEnd(event)"
+            ondragover="onDragOverItem(event)"
+            ondrop="onDropOnItem(event, 'task', ${task.id}, '${cat.id}')">
           <div class="task-left">
             <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTask(${task.id})">
             <span class="task-text" id="taskText_${task.id}" onclick="if(this.isContentEditable){event.stopPropagation();}else if(${panelOpen}){startEditTask(event, ${task.id});}">${escapeHtml(task.text)}</span>
@@ -1516,19 +2354,21 @@
           <div class="task-meta">
             ${metaHtml}
           </div>
-          ${panelOpen ? `
           <div class="row-hover-actions">
-            ${(isWeekly && character) ? `<button class="row-add-btn" title="${escapeHtml(character.name)} 보스 추가" onclick="event.stopPropagation(); openBossModal('${cat.id}', null, '${character.id}', ${task.id})">✎</button>` : ''}
+            ${(panelOpen && (isWeekly || isMonthly) && character) ? `<button class="row-add-btn" title="${escapeHtml(character.name)} 보스 추가" onclick="event.stopPropagation(); openBossModal('${cat.id}', null, '${character.id}', ${task.id})">✎</button>` : ''}
             <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
           </div>
-          ` : ''}
         </li>`;
       }).join('');
     }
 
     return `
-      <div class="card board" data-id="${cat.id}">
+      <div class="card board" data-id="${cat.id}"
+           ondragover="onDragOverItem(event)"
+           ondrop="onDropOnItem(event, 'board', '${cat.id}', '${cat.theme}')">
         <div class="board-header">
+          <span class="drag-handle" title="드래그하여 순서 변경" draggable="true"
+                ondragstart="onDragStart(event, 'board', '${cat.id}')" ondragend="onDragEnd(event)">⠿</span>
           <div class="board-name-wrap">
             <span class="board-dot" style="background:${color}"></span>
             <span class="board-name" contenteditable="true" spellcheck="false" id="boardName_${cat.id}">${escapeHtml(cat.name)}</span>
@@ -1543,14 +2383,14 @@
           <div class="board-progress-track"><div class="board-progress-fill" style="width:${catPct}%"></div></div>
           <div class="board-progress-label">완료 ${formatHM(catDone)} / ${formatHM(catTotal)} (${catPct}%)</div>
         ` : ''}
-        ${(isWeekly && bossTasks.length > 0) ? `
+        ${((isWeekly || isMonthly) && bossTasks.length > 0) ? `
           <div class="board-money-track"><div class="board-money-fill" style="width:${bossPct}%"></div></div>
           <div class="board-money-label">${COIN_ICON} 결정석 수익 ${formatMeso(bossEarned)} / ${formatMeso(bossPotential)} (${bossPct}%)</div>
         ` : ''}
-        <ul class="board-tasks">${tasksHtml}</ul>
+        <ul class="board-tasks" ondragover="onDragOverContainer(event)" ondrop="onDropOnContainer(event, 'task', '${cat.id}')">${tasksHtml}</ul>
         <button class="add-divider-btn" onclick="addDivider('${cat.id}')" title="구분선 추가">— 구분선 추가 —</button>
         <div class="boss-panel" id="bossPanel_${cat.id}" style="display:${openBossPanels.has(cat.id) ? 'block' : 'none'};">
-          ${isWeekly ? `
+          ${(isWeekly || isMonthly) ? `
           <button class="boss-form-toggle" onclick="openBossModal('${cat.id}', null)">+ 보스 등록</button>
           ` : `
           <div class="edit-hint">✏️ 편집 모드예요. 이름이나 시간을 클릭하면 바로 수정할 수 있어요.</div>
@@ -1599,7 +2439,7 @@
           <h3>${meta.label}</h3>
           ${badgeHtml}
         </div>
-        <div class="board-grid" id="grid_${themeKey}"></div>
+        <div class="board-grid" id="grid_${themeKey}" ondragover="onDragOverContainer(event)" ondrop="onDropOnContainer(event, 'board', '${themeKey}')"></div>
       `;
       container.appendChild(section);
 
