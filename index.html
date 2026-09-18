@@ -645,11 +645,12 @@
       <div class="hunt-form-row">
         <select id="huntCharSelect"></select>
         <input type="date" id="huntDateInput" onchange="renderHuntList()">
-        <input type="text" inputmode="numeric" id="huntTimeInput" placeholder="시간(분)" oninput="this.value = this.value.replace(/[^\d]/g, '')">
-        <input type="text" inputmode="numeric" id="huntMoneyInput" placeholder="메소" oninput="formatPriceInput(this)">
+        <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간(예:5.5)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
+        <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억, 예:5.8)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="numeric" id="huntShardInput" placeholder="조각 개수" oninput="this.value = this.value.replace(/[^\d]/g, '')">
         <button onclick="addHuntEntry()">추가</button>
       </div>
+      <div style="font-size:10.5px; color:var(--muted); margin:-4px 0 8px;">메소는 그대로, 조각은 거래 수수료 3%를 제외하고 기록돼요.</div>
       <div class="modal-warning" id="huntWarning" style="display:none;"></div>
       <div class="modal-boss-list" id="huntList" style="height:auto; max-height:160px;"></div>
     </div>
@@ -846,6 +847,7 @@
     <div class="modal-field">
       <label>판매 가격 (메소)</label>
       <input type="text" inputmode="numeric" id="itemLogPriceInput" placeholder="예: 50,000,000" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+      <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
     </div>
     <div class="modal-boss-status">
       <div class="modal-boss-status-title">이 보스에서 획득한 기록</div>
@@ -976,6 +978,8 @@
     { difficulty: '익스트림', boss: '카링', price: 5387000000 }
   ];
   const WEEKLY_BOSS_LIMIT = 12;
+  const TRADE_FEE_RATE = 0.03; // 거래(유저 간 판매) 수수료 3% — 조각, 물욕템에 적용. 순수 드랍 메소·보스 결정석은 해당 없음
+  function applyTradeFee(amount) { return Math.round(amount * (1 - TRADE_FEE_RATE)); }
   const MAX_CHARACTERS = 30;
 
   const BOSS_GROUPS = {};
@@ -1141,14 +1145,14 @@
     const characterId = charSel.value;
     if (!characterId) { showHuntWarning('캐릭터를 선택해주세요!'); return; }
     const dateStr = dateInput.value || kstDateString(kstNow());
-    const time = parseInt(timeInput.value) || 0;
-    const meso = parseInt(moneyInput.value.replace(/,/g, '')) || 0;
+    const time = Math.round((parseFloat(timeInput.value) || 0) * 60);
+    const meso = Math.round((parseFloat(moneyInput.value) || 0) * 100000000);
     const shardCount = parseInt(shardInput.value) || 0;
     if (shardCount > 0 && !(state.shardPrice > 0)) {
       showHuntWarning('조각 개수를 입력하려면 먼저 위에서 조각 시세를 설정해주세요!');
       return;
     }
-    const shardMoney = shardCount * (state.shardPrice || 0);
+    const shardMoney = applyTradeFee(shardCount * (state.shardPrice || 0));
     const money = meso + shardMoney;
     if (time <= 0 && money <= 0) { showHuntWarning('소요 시간이나 수입 중 하나는 입력해주세요!'); return; }
 
@@ -1184,7 +1188,7 @@
           const c = state.characters.find(x => x.id === e.characterId);
           const shardCount = e.shardCount || 0;
           const breakdown = shardCount > 0
-            ? `메소 ${formatMesoCompact(e.meso != null ? e.meso : e.money)} + 조각 ${shardCount}개(${formatMesoCompact(e.shardMoney || 0)})`
+            ? `메소 ${formatMesoCompact(e.meso != null ? e.meso : e.money)} + 조각 ${shardCount}개(수수료 제외 ${formatMesoCompact(e.shardMoney || 0)})`
             : formatMeso(e.money);
           return `
           <div class="modal-boss-row">
@@ -2271,7 +2275,7 @@
               <span>${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
             </span>
             <span class="modal-boss-row-right">
-              <span class="price rare-price">${formatMeso(e.price)}</span>
+              <span class="price rare-price" title="${e.grossPrice ? `정가 ${formatMeso(e.grossPrice)} · 수수료 3% 제외` : ''}">${formatMeso(e.price)}</span>
               <button class="modal-boss-delete-btn" title="삭제" onclick="deleteItemLogEntry(${e.id})">&times;</button>
             </span>
           </div>
@@ -2281,8 +2285,9 @@
   function addItemLogEntry() {
     if (!selectedRareItemName) { showItemLogWarning('아이템을 선택해주세요!'); return; }
     const priceInput = document.getElementById('itemLogPriceInput');
-    const price = parseInt(priceInput.value.replace(/,/g, '')) || 0;
-    if (price <= 0) { showItemLogWarning('판매 가격을 입력해주세요!'); return; }
+    const grossPrice = parseInt(priceInput.value.replace(/,/g, '')) || 0;
+    if (grossPrice <= 0) { showItemLogWarning('판매 가격을 입력해주세요!'); return; }
+    const price = applyTradeFee(grossPrice); // 거래 수수료 3% 제외한 실수령액을 기록
     const meta = RARE_ITEM_BY_NAME[selectedRareItemName];
     if (!meta) return;
 
@@ -2296,7 +2301,7 @@
       itemName: selectedRareItemName,
       category: meta.category,
       rare: meta.rare,
-      price
+      grossPrice, price
     };
     if (!state.rareItemLog) state.rareItemLog = [];
     state.rareItemLog.push(entry);
