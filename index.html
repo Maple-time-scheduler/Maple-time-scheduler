@@ -29,6 +29,7 @@
     --money-grad-1: #D9A400;
     --money-grad-2: #4C9F70;
     --money-grad-pale: #EED68C;
+    --rare-color: #4B4B4B;
   }
   [data-theme="dark"] {
     --bg: #18171C;
@@ -54,6 +55,7 @@
     --money-grad-1: #FFC94D;
     --money-grad-2: #6FCB9F;
     --money-grad-pale: #FFE19D;
+    --rare-color: #B0B0B0;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -116,6 +118,7 @@
   #calendarPage .summary-card .value { font-size: 20px; font-weight: 700; }
   #calendarPage .summary-card.time .value { color: var(--time-grad-1); }
   #calendarPage .summary-card.money .value { color: var(--money-grad-1); }
+  #calendarPage .summary-card.rare .value { color: var(--rare-color); }
 
   #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   #calendarPage .day-card {
@@ -168,12 +171,8 @@
     padding: 6px 6px 8px; min-height: 74px; display: flex; flex-direction: column;
   }
   #calendarPage .month-cell.other-month { opacity: 0.35; }
+  #calendarPage .month-cell.wk-even { background: var(--track); }
   #calendarPage .month-cell.today { border-color: var(--accent); border-width: 2px; }
-  #calendarPage .month-cell.mw-top { border-top: 2px solid var(--accent); }
-  #calendarPage .month-cell.mw-bottom { border-bottom: 2px solid var(--accent); }
-  #calendarPage .month-cell.mw-left { border-left: 2px solid var(--accent); }
-  #calendarPage .month-cell.mw-right { border-right: 2px solid var(--accent); }
-  #calendarPage .mw-label { font-size: 9px; font-weight: 700; color: var(--accent); margin-bottom: 1px; }
   #calendarPage .month-cell .date { font-size: 11.5px; font-weight: 700; margin-bottom: auto; }
   #calendarPage .month-cell .mini-row { display: flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 700; }
   #calendarPage .month-cell .mini-row.time { color: var(--time-grad-1); }
@@ -183,11 +182,11 @@
   #calendarPage .stat-section h2 { font-size: 13.5px; margin: 0 0 10px; color: var(--muted); }
   #calendarPage .trend-chart {
     background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
-    padding: 16px; box-shadow: var(--shadow); display: flex; align-items: flex-end; gap: 6px; height: 140px;
+    padding: 16px; box-shadow: var(--shadow); display: flex; align-items: flex-end; justify-content: center; gap: 6px; height: 140px;
   }
-  #calendarPage .trend-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  #calendarPage .trend-bar-wrap { flex: 0 1 60px; max-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
   #calendarPage .trend-bar { width: 60%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--money-grad-1), var(--money-grad-pale)); }
-  #calendarPage .trend-label { font-size: 9.5px; color: var(--muted); }
+  #calendarPage .trend-label { font-size: 8.5px; color: var(--muted); white-space: nowrap; }
   #calendarPage .rank-list { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 6px 16px; box-shadow: var(--shadow); }
   #calendarPage .rank-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   #calendarPage .rank-row:last-child { border-bottom: none; }
@@ -196,6 +195,8 @@
   #calendarPage .rank-bar-track { flex: 2; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
   #calendarPage .rank-bar-fill { height: 100%; background: var(--money-grad-1); }
   #calendarPage .rank-value { font-size: 12px; font-weight: 700; color: var(--money-grad-1); width: 60px; text-align: right; }
+  #calendarPage .rank-list.rare .rank-bar-fill { background: var(--rare-color); }
+  #calendarPage .rank-list.rare .rank-value { color: var(--rare-color); }
   #calendarPage .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 600px) { #calendarPage .two-col { grid-template-columns: 1fr; } }
   #calendarPage .hidden { display: none !important; }
@@ -294,7 +295,9 @@
   .money-top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
   .money-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .money-figure { font-size: 20px; font-weight: 700; color: var(--money-grad-1); }
-  .money-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .money-sub-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .money-sub { font-size: 12.5px; color: var(--muted); }
+  .money-breakdown { font-size: 11px; color: var(--muted); opacity: 0.85; white-space: nowrap; }
   .money-track {
     width: 100%; height: 22px; border-radius: 999px; background: var(--track); border: 1px solid var(--border);
     overflow: hidden; position: relative;
@@ -482,6 +485,7 @@
   }
   .modal-boss-row.editing { border: 1px solid var(--accent); background: var(--accent-soft); }
   .modal-boss-row .price { color: var(--money-grad-1); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+  .modal-boss-row .price.rare-price { color: var(--rare-color); }
   .modal-boss-row-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .modal-boss-delete-btn {
     background: none; border: none; color: var(--danger); cursor: pointer; font-size: 15px;
@@ -609,10 +613,13 @@
     </div>
     <div class="money-block" id="moneyBlock" style="display:none;">
       <div class="money-top">
-        <div class="money-title"><svg class="coin-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg> 주간 결정석 수익</div>
+        <div class="money-title"><svg class="coin-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg> 주간 수익</div>
         <div class="money-figure" id="moneyFigure">0 메소</div>
       </div>
-      <div class="money-sub" id="moneySub"></div>
+      <div class="money-sub-line">
+        <span class="money-sub" id="moneySub"></span>
+        <span class="money-breakdown" id="moneyBreakdown"></span>
+      </div>
       <div class="money-track">
         <div class="money-fill" id="moneyFill"></div>
         <span class="money-pct" id="moneyPct">0%</span>
@@ -649,6 +656,10 @@
         <div class="label" id="calSummaryMoneyLabel">이번 주 결정석 수익</div>
         <div class="value" id="calWeekSummaryMoney">0억</div>
       </div>
+      <div class="summary-card rare">
+        <div class="label" id="calSummaryRareLabel">이번 주 물욕템 수익</div>
+        <div class="value" id="calWeekSummaryRare">0억</div>
+      </div>
     </div>
 
     <div id="calWeekView">
@@ -679,13 +690,13 @@
           <div class="label">누적 총 결정석 수익</div>
           <div class="value" id="calStatsTotalMoney">0억</div>
         </div>
+        <div class="summary-card rare">
+          <div class="label">누적 총 물욕 수익</div>
+          <div class="value" id="calStatsRareTotal">0억</div>
+        </div>
         <div class="summary-card">
           <div class="label">주 평균 수익</div>
           <div class="value" id="calStatsWeekAvg">기록 없음</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">최고 기록 주</div>
-          <div class="value" id="calStatsBestWeek">기록 없음</div>
         </div>
       </div>
 
@@ -713,7 +724,7 @@
       <div class="stat-section">
         <h2>✨ 물욕템 판매 수익 (결정석 수익과 별도 집계)</h2>
         <div class="summary-bar">
-          <div class="summary-card money">
+          <div class="summary-card rare">
             <div class="label">누적 물욕템 판매액</div>
             <div class="value" id="calRareItemTotal">0억</div>
           </div>
@@ -723,11 +734,11 @@
       <div class="two-col">
         <div class="stat-section">
           <h2>아이템별 판매 순위 (누적)</h2>
-          <div class="rank-list" id="calRareItemRankList"></div>
+          <div class="rank-list rare" id="calRareItemRankList"></div>
         </div>
         <div class="stat-section">
           <h2>캐릭터별 물욕템 수익 (누적)</h2>
-          <div class="rank-list" id="calRareItemCharRankList"></div>
+          <div class="rank-list rare" id="calRareItemCharRankList"></div>
         </div>
       </div>
     </div>
@@ -780,7 +791,7 @@
     </div>
     <div class="modal-field">
       <label>판매 가격 (메소)</label>
-      <input type="number" id="itemLogPriceInput" placeholder="예: 50000000" min="0" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+      <input type="text" inputmode="numeric" id="itemLogPriceInput" placeholder="예: 50,000,000" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
     </div>
     <div class="modal-boss-status">
       <div class="modal-boss-status-title">이 보스에서 획득한 기록</div>
@@ -1158,8 +1169,10 @@
     }
     document.getElementById('calSummaryTimeLabel').textContent = '이번 주 완료 시간';
     document.getElementById('calSummaryMoneyLabel').textContent = '이번 주 결정석 수익';
+    document.getElementById('calSummaryRareLabel').textContent = '이번 주 물욕템 수익';
     document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
     document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+    document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(weeklyRareItemTotal());
   }
 
   // 월간 뷰에서는 상단 요약을 '이번 달' 기준(모든 컨텐츠 포함, 월간 보스도 포함)으로 보여줍니다.
@@ -1167,16 +1180,19 @@
     const today = new Date();
     const year = today.getFullYear(), month = today.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    let timeMin = 0, moneyRaw = 0;
+    let timeMin = 0, moneyRaw = 0, rareRaw = 0;
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = kstDateString(new Date(Date.UTC(year, month, d)));
       const data = calDayTotals(dateStr);
       timeMin += data.timeMin; moneyRaw += data.moneyRaw;
+      rareRaw += calRareItemsOnDate(dateStr).reduce((s, e) => s + (e.price || 0), 0);
     }
     document.getElementById('calSummaryTimeLabel').textContent = '이번 달 완료 시간';
     document.getElementById('calSummaryMoneyLabel').textContent = '이번 달 결정석 수익';
+    document.getElementById('calSummaryRareLabel').textContent = '이번 달 물욕템 수익';
     document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
     document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+    document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(rareRaw);
   }
 
   function calRenderMonth() {
@@ -1200,15 +1216,12 @@
       days.push(d);
     }
 
+    // 목~수 단위로 몇 째 주인지 계산 (격주 배경 음영에 사용)
     const week1Start = calThisWeekThursday(firstDay);
     function mapleWeekIndex(d) {
       const diffDays = Math.floor((d - week1Start) / 86400000);
       return Math.floor(diffDays / 7);
     }
-    const cols = 7;
-    const rows = days.length / cols;
-    const weekIdxOf = days.map(mapleWeekIndex);
-    function sameGroup(idx) { return idx >= 0 && idx < days.length ? weekIdxOf[idx] : null; }
 
     grid.innerHTML = '';
     grid.insertAdjacentHTML('beforeend', `
@@ -1222,34 +1235,19 @@
 
     days.forEach((d, i) => {
       const other = d.getMonth() !== month;
-      const myGroup = weekIdxOf[i];
-      const row = Math.floor(i / cols), col = i % cols;
-      const up = row > 0 ? sameGroup(i - cols) : null;
-      const down = row < rows - 1 ? sameGroup(i + cols) : null;
-      // 좌우 바깥쪽 끝(일요일 왼쪽 / 토요일 오른쪽)은 실제 주 경계가 아니라 다음 줄로 이어지는 지점이라, 테두리를 닫지 않고 열어둡니다.
-      const left = col > 0 ? sameGroup(i - 1) : myGroup;
-      const right = col < cols - 1 ? sameGroup(i + 1) : myGroup;
-      const borderClasses = [
-        up !== myGroup ? 'mw-top' : '',
-        down !== myGroup ? 'mw-bottom' : '',
-        left !== myGroup ? 'mw-left' : '',
-        right !== myGroup ? 'mw-right' : '',
-      ].filter(Boolean).join(' ');
-      const isThuStart = d.getDay() === 4;
-      const label = isThuStart ? `<div class="mw-label">${myGroup + 1}주차</div>` : '';
       const isToday = d.toDateString() === today.toDateString();
       const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
       const data = calDayTotals(dateStr);
       const hasRare = calHasRareItemOnDate(dateStr);
+      const weekShade = mapleWeekIndex(d) % 2 === 0 ? 'wk-even' : '';
 
       if (other) {
-        cellsWrap.insertAdjacentHTML('beforeend', `<div class="month-cell other-month ${borderClasses}">${label}<div class="date">${d.getDate()}</div></div>`);
+        cellsWrap.insertAdjacentHTML('beforeend', `<div class="month-cell other-month ${weekShade}"><div class="date">${d.getDate()}</div></div>`);
         return;
       }
       cellsWrap.insertAdjacentHTML('beforeend', `
-        <div class="month-cell ${isToday ? 'today' : ''} ${borderClasses} ${hasRare ? 'rare-day' : ''}">
+        <div class="month-cell ${isToday ? 'today' : ''} ${hasRare ? 'rare-day' : ''} ${weekShade}">
           ${hasRare ? '<span class="rare-badge rare-badge-sm" title="물욕템 획득!">✨</span>' : ''}
-          ${label}
           <div class="date">${d.getDate()}</div>
           ${data.doneCount > 0 ? `
             <div class="mini-row time">${CLOCK_ICON_SMALL} ${formatHMShort(data.timeMin)}</div>
@@ -1308,11 +1306,8 @@
     const weekAvg = weekKeys.length > 0 ? agg.totalMoney / weekKeys.length : 0;
     document.getElementById('calStatsWeekAvg').textContent = weekKeys.length > 0 ? formatMeso(weekAvg) : '기록 없음';
 
-    let bestWeekKey = null, bestWeekMoney = -1;
-    weekKeys.forEach(k => { if (agg.weekTotals[k].money > bestWeekMoney) { bestWeekMoney = agg.weekTotals[k].money; bestWeekKey = k; } });
-    document.getElementById('calStatsBestWeek').textContent = bestWeekKey
-      ? `${mapleWeekLabel(bestWeekKey)} · ${formatMeso(bestWeekMoney)}`
-      : '기록 없음';
+    const rareTotalTop = (state.rareItemLog || []).reduce((s, e) => s + (e.price || 0), 0);
+    document.getElementById('calStatsRareTotal').textContent = formatMeso(rareTotalTop);
 
     // 주차별 기록 (최근 주차부터)
     const weekListEl = document.getElementById('calStatsWeekList');
@@ -1338,7 +1333,7 @@
       chart.innerHTML = last8.map((k, i) => `
         <div class="trend-bar-wrap">
           <div class="trend-bar" style="height:${(values[i] / max * 100).toFixed(0)}%;" title="${formatMeso(values[i])}"></div>
-          <div class="trend-label">${k.slice(5)}</div>
+          <div class="trend-label">${mapleWeekLabel(k)}</div>
         </div>
       `).join('');
     }
@@ -2022,6 +2017,11 @@
     `).join('');
   }
 
+  function formatPriceInput(el) {
+    const digits = el.value.replace(/[^\d]/g, '');
+    el.value = digits ? Number(digits).toLocaleString('en-US') : '';
+  }
+
   function selectRareItem(name) {
     selectedRareItemName = name;
     document.querySelectorAll('#rareItemGrid .boss-icon-btn').forEach(btn => {
@@ -2062,7 +2062,7 @@
               <span>${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
             </span>
             <span class="modal-boss-row-right">
-              <span class="price">${formatMeso(e.price)}</span>
+              <span class="price rare-price">${formatMeso(e.price)}</span>
               <button class="modal-boss-delete-btn" title="삭제" onclick="deleteItemLogEntry(${e.id})">&times;</button>
             </span>
           </div>
@@ -2072,7 +2072,7 @@
   function addItemLogEntry() {
     if (!selectedRareItemName) { showItemLogWarning('아이템을 선택해주세요!'); return; }
     const priceInput = document.getElementById('itemLogPriceInput');
-    const price = parseInt(priceInput.value) || 0;
+    const price = parseInt(priceInput.value.replace(/,/g, '')) || 0;
     if (price <= 0) { showItemLogWarning('판매 가격을 입력해주세요!'); return; }
     const meta = RARE_ITEM_BY_NAME[selectedRareItemName];
     if (!meta) return;
@@ -2320,6 +2320,21 @@
     const earned = bossTasks.filter(t => t.completed).reduce((s, t) => s + t.price, 0);
     const potential = bossTasks.reduce((s, t) => s + t.price, 0);
     return { earned, potential };
+  }
+
+  // 이번 주(목~수)에 판매한 물욕템 합계 — 캘린더 쪽 주간 계산과 같은 기준을 사용합니다.
+  function weeklyRareItemTotal() {
+    const today = new Date();
+    const thursday = calThisWeekThursday(today);
+    const dateStrs = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(thursday);
+      d.setDate(thursday.getDate() + i);
+      dateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
+    }
+    return (state.rareItemLog || [])
+      .filter(e => dateStrs.includes(e.dateStr))
+      .reduce((s, e) => s + (e.price || 0), 0);
   }
 
   function characterBossEarned(characterId) {
@@ -2581,12 +2596,16 @@
     document.getElementById('totalPct').textContent = pct + '%';
 
     const { earned, potential } = weeklyBossTotals();
+    const itemMoney = weeklyRareItemTotal();
+    const combinedEarned = earned + itemMoney;
+    const combinedPotential = potential + itemMoney; // 물욕템은 '판매 완료' 즉시 기록이라 잠재치 없이 그대로 더해짐
     const moneyBlock = document.getElementById('moneyBlock');
-    if (potential > 0) {
+    if (combinedPotential > 0) {
       moneyBlock.style.display = 'block';
-      const moneyPct = Math.round((earned / potential) * 100);
-      document.getElementById('moneyFigure').textContent = formatMeso(earned);
-      document.getElementById('moneySub').textContent = `완료 ${formatMeso(earned)} / 전체 ${formatMeso(potential)}`;
+      const moneyPct = Math.round((combinedEarned / combinedPotential) * 100);
+      document.getElementById('moneyFigure').textContent = formatMeso(combinedEarned);
+      document.getElementById('moneySub').textContent = `완료 ${formatMeso(combinedEarned)} / 전체 ${formatMeso(combinedPotential)}`;
+      document.getElementById('moneyBreakdown').textContent = `결정석 ${formatMesoCompact(earned)} · 물욕템 ${formatMesoCompact(itemMoney)}`;
       document.getElementById('moneyFill').style.width = moneyPct + '%';
       document.getElementById('moneyPct').textContent = moneyPct + '%';
     } else {
