@@ -81,12 +81,13 @@
 
   .header-right { display: flex; align-items: center; gap: 10px; }
   .main-nav {
-    display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 3px;
+    display: flex; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0 3px; height: 30px;
   }
   .main-nav .nav-btn {
     border: none; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 700;
-    padding: 7px 16px; border-radius: 16px; cursor: pointer; font-family: inherit;
+    padding: 0 16px; height: 24px; border-radius: 16px; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
   }
   .main-nav .nav-btn.active { background: var(--accent); color: #fff; }
   [data-theme="dark"] .main-nav .nav-btn.active { color: #201404; }
@@ -109,20 +110,20 @@
   #calendarPage .view-toggle button.active { background: var(--accent); color: #fff; }
   [data-theme="dark"] #calendarPage .view-toggle button.active { color: #201404; }
 
-  #calendarPage .summary-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
-  #calendarPage .summary-card {
+  .summary-bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .summary-card {
     flex: 1; min-width: 150px; background: var(--surface); border: 2px solid var(--border);
     border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow);
   }
-  #calendarPage .summary-card .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  #calendarPage .summary-card .value { font-size: 20px; font-weight: 700; }
-  #calendarPage .summary-card.time .value { color: var(--time-grad-1); }
-  #calendarPage .summary-card.money .value { color: var(--money-grad-1); }
-  #calendarPage .summary-card.rare .value { color: var(--rare-color); }
+  .summary-card .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .summary-card .value { font-size: 20px; font-weight: 700; }
+  .summary-card.time .value { color: var(--time-grad-1); }
+  .summary-card.money .value { color: var(--money-grad-1); }
+  .summary-card.rare .value { color: var(--rare-color); }
 
   #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   #calendarPage .day-card {
-    position: relative;
+    position: relative; cursor: pointer;
     background: var(--surface); border: 2px solid var(--border); border-radius: 12px;
     padding: 10px 8px; box-shadow: var(--shadow); min-height: 128px; display: flex; flex-direction: column;
   }
@@ -166,10 +167,11 @@
   #calendarPage .week-total-row .stat.time { color: var(--time-grad-1); width: 130px; }
   #calendarPage .week-total-row .stat.money { color: var(--money-grad-1); }
   #calendarPage .month-cell {
-    position: relative;
+    position: relative; cursor: pointer;
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
     padding: 6px 6px 8px; min-height: 74px; display: flex; flex-direction: column;
   }
+  #calendarPage .month-cell.other-month { cursor: default; }
   #calendarPage .month-cell.other-month { opacity: 0.35; }
   #calendarPage .month-cell.wk-even { background: var(--track); }
   #calendarPage .month-cell.today { border-color: var(--accent); border-width: 2px; }
@@ -178,8 +180,43 @@
   #calendarPage .month-cell .mini-row.time { color: var(--time-grad-1); }
   #calendarPage .month-cell .mini-row.money { color: var(--money-grad-1); }
 
-  #calendarPage .stat-section { margin-bottom: 22px; }
-  #calendarPage .stat-section h2 { font-size: 13.5px; margin: 0 0 10px; color: var(--muted); }
+  .stat-section { margin-bottom: 22px; }
+  .donut-card .cal-nav-row { gap: 4px; margin-bottom: 8px; }
+  .donut-picker-wrap { position: relative; margin-bottom: 8px; display: flex; justify-content: center; }
+  .donut-picker-label {
+    font-size: 13px; font-weight: 700; color: var(--ink); background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px;
+  }
+  .donut-picker-label::after { content: '▾'; font-size: 10px; color: var(--muted); }
+  .donut-picker-label:hover { border-color: var(--accent); }
+  .donut-picker-list {
+    position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 20;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow);
+    max-height: 220px; overflow-y: auto; min-width: 140px; padding: 4px;
+  }
+  .donut-picker-item {
+    display: block; width: 100%; text-align: center; padding: 7px 10px; border: none; background: none;
+    color: var(--ink); font-size: 12.5px; font-family: inherit; cursor: pointer; border-radius: 6px; white-space: nowrap;
+  }
+  .donut-picker-item:hover { background: var(--accent-soft); }
+  .donut-picker-item.active { background: var(--accent); color: #fff; font-weight: 700; }
+  [data-theme="dark"] .donut-picker-item.active { color: #201404; }
+
+  .donut-card .cal-nav-label { min-width: 0; font-size: 12px; white-space: nowrap; }
+  .donut-card .cal-nav-btn { padding: 4px 7px; font-size: 11px; flex-shrink: 0; }
+  .donut-cards-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .donut-card {
+    flex: 1; min-width: 210px; background: var(--surface); border: 2px solid var(--border);
+    border-radius: 14px; padding: 14px; box-shadow: var(--shadow); overflow: hidden; box-sizing: border-box;
+  }
+  .donut-chart-row { display: flex; align-items: center; gap: 10px; justify-content: center; min-width: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .donut-legend-row { display: flex; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .donut-legend-label { font-weight: 700; width: 32px; flex-shrink: 0; }
+  .donut-legend-pct { color: var(--muted); width: 32px; flex-shrink: 0; }
+  .donut-legend-value { color: var(--muted); font-size: 10px; }
+  .stat-section h2 { font-size: 13.5px; margin: 0 0 10px; color: var(--muted); }
   #calendarPage .trend-chart {
     background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
     padding: 16px; box-shadow: var(--shadow); display: flex; align-items: flex-end; justify-content: center; gap: 6px; height: 140px;
@@ -303,7 +340,7 @@
   .exp-top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
   .exp-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .exp-figure { font-size: 20px; font-weight: 700; color: var(--time-grad-1); }
-  .exp-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .exp-sub { font-size: 12.5px; color: var(--muted); }
   .exp-track {
     width: 100%; height: 24px; border-radius: 999px; background: var(--track); border: 1px solid var(--border);
     overflow: hidden; position: relative;
@@ -426,6 +463,8 @@
     box-shadow: 0 0 0 3px var(--accent-soft);
     display: block; width: 100%; box-sizing: border-box; text-align: center;
   }
+  .task-item.editable .task-text:not([contenteditable="true"]) { cursor: text; }
+  .task-item.editable .task-time:not([contenteditable="true"]) { cursor: text; }
   .task-char.chip-placeholder, .task-time.chip-placeholder, .task-boss-total.chip-placeholder { visibility: hidden; pointer-events: none; cursor: default; }
   .task-boss-total {
     font-size: 10.5px; font-weight: 700; color: var(--money-grad-1); background: transparent;
@@ -638,15 +677,16 @@
       <div class="shard-price-mini-row">
         <div class="shard-price-mini">
           <span class="shard-price-mini-label">조각시세</span>
-          <input type="text" inputmode="numeric" id="shardPriceInput" placeholder="0" oninput="formatPriceInput(this)">
+          <input type="text" inputmode="numeric" id="shardPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+          <span class="shard-price-mini-label">만</span>
           <button onclick="saveShardPrice()">✓</button>
         </div>
       </div>
       <div class="hunt-form-row">
         <select id="huntCharSelect"></select>
         <input type="date" id="huntDateInput" onchange="renderHuntList()">
-        <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간(예:5.5)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
-        <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억, 예:5.8)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
+        <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
+        <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="numeric" id="huntShardInput" placeholder="조각 개수" oninput="this.value = this.value.replace(/[^\d]/g, '')">
         <button onclick="addHuntEntry()">추가</button>
       </div>
@@ -661,7 +701,10 @@
       <div class="exp-title" id="expTitleEl"><svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="12" y="1" width="8" height="3" rx="1.5" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="none" stroke-opacity="0.25" stroke="#000" stroke-width="1"/><line x1="16" y1="18" x2="16" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="20" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="18" r="1.5" fill="#fff"/></svg> 주간 진행도</div>
       <div class="exp-figure" id="totalFigure">0분</div>
     </div>
-    <div class="exp-sub" id="totalSub">완료 0분 / 전체 0분</div>
+    <div class="money-sub-line">
+      <span class="exp-sub" id="totalSub">완료 0분 / 전체 0분</span>
+      <span class="money-breakdown" id="timeBreakdown"></span>
+    </div>
     <div class="exp-track">
       <div class="exp-fill" id="totalFill"></div>
       <span class="exp-pct" id="totalPct">0%</span>
@@ -690,8 +733,8 @@
   <div id="calendarPage" style="display:none;">
     <div class="top-row">
       <h2 class="calendar-h2">
-        <svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="12" y="1" width="8" height="3" rx="1.5" fill="var(--time-grad-1)"/><circle cx="16" cy="18" r="13" fill="var(--time-grad-1)"/><line x1="16" y1="18" x2="16" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="20" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="18" r="1.5" fill="#fff"/></svg>
-        보상 캘린더
+        <span id="calTitleIconWrap"><svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="4" y="6" width="24" height="22" rx="3" fill="#ffffff" stroke="#1F1F1F" stroke-width="1.4"/><rect x="4" y="6" width="24" height="6" rx="3" fill="#1F1F1F" opacity="0.25"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><circle cx="10" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="22" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="10" cy="23" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="23" r="1.6" fill="#1F1F1F"/></svg></span>
+        <span id="calPageTitle">주간 캘린더</span>
       </h2>
       <div class="view-toggle">
         <button class="active" onclick="setCalView('week')" id="calBtnWeek">주간</button>
@@ -699,8 +742,6 @@
         <button onclick="setCalView('stats')" id="calBtnStats">통계</button>
       </div>
     </div>
-
-    <div class="note">📌 카드 안 항목을 체크한 시점(KST 기준)부터 기록이 쌓여요. 지난 기록은 초기화돼도 사라지지 않아요.</div>
 
     <div class="summary-bar" id="calTopSummaryBar">
       <div class="summary-card time">
@@ -714,6 +755,10 @@
       <div class="summary-card rare">
         <div class="label" id="calSummaryRareLabel">이번 주 물욕템 수익</div>
         <div class="value" id="calWeekSummaryRare">0억</div>
+      </div>
+      <div class="summary-card money">
+        <div class="label" id="calSummaryHuntLabel">이번 주 재획 수입</div>
+        <div class="value" id="calWeekSummaryHunt">0억</div>
       </div>
     </div>
 
@@ -736,6 +781,32 @@
     </div>
 
     <div id="calStatsView" class="hidden">
+      <div class="stat-section">
+        <h2>수익 구성비 (결정석 · 물욕 · 재획)</h2>
+        <div class="donut-cards-row">
+          <div class="donut-card">
+            <div class="donut-picker-wrap">
+              <button class="donut-picker-label" id="donutWeekLabel" onclick="toggleDonutPicker('week')"></button>
+              <div class="donut-picker-list" id="donutWeekPickerList" style="display:none;"></div>
+            </div>
+            <div id="donutWeekChart"></div>
+          </div>
+          <div class="donut-card">
+            <div class="donut-picker-wrap">
+              <button class="donut-picker-label" id="donutMonthLabel" onclick="toggleDonutPicker('month')"></button>
+              <div class="donut-picker-list" id="donutMonthPickerList" style="display:none;"></div>
+            </div>
+            <div id="donutMonthChart"></div>
+          </div>
+          <div class="donut-card">
+            <div class="cal-nav-row" style="margin-bottom:8px; justify-content:center;">
+              <span class="cal-nav-label">누적 전체</span>
+            </div>
+            <div id="donutCumulativeChart"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="summary-bar">
         <div class="summary-card time">
           <div class="label">누적 총 시간</div>
@@ -846,7 +917,7 @@
     </div>
     <div class="modal-field">
       <label>판매 가격 (메소)</label>
-      <input type="text" inputmode="numeric" id="itemLogPriceInput" placeholder="예: 50,000,000" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+      <input type="text" inputmode="numeric" id="itemLogPriceInput" placeholder="메소" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
       <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
     </div>
     <div class="modal-boss-status">
@@ -856,6 +927,32 @@
     <div class="modal-actions">
       <button class="modal-cancel-btn" onclick="closeItemLogModal()">닫기</button>
       <button class="modal-add-btn" onclick="addItemLogEntry()">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dayDetailModalOverlay" style="display:none;" onclick="if(event.target===this) closeDayDetailModal()">
+  <div class="modal-card">
+    <div class="modal-title" id="dayDetailTitle">날짜</div>
+    <div class="summary-bar" id="dayDetailSummary" style="margin-bottom:16px;"></div>
+
+    <div class="stat-section">
+      <h2>💰 결정석 (보스)</h2>
+      <div class="modal-boss-list" id="dayDetailBossList" style="height:auto; max-height:140px;"></div>
+    </div>
+
+    <div class="stat-section">
+      <h2>✨ 물욕템</h2>
+      <div class="modal-boss-list rare" id="dayDetailItemList" style="height:auto; max-height:140px;"></div>
+    </div>
+
+    <div class="stat-section">
+      <h2 style="display:flex; align-items:center; gap:5px;"><svg class="potion-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="17" cy="20.5" r="10.3" fill="#CFEFEA" stroke="#1F1F1F" stroke-width="1.6"/></svg> 재획</h2>
+      <div class="modal-boss-list" id="dayDetailHuntList" style="height:auto; max-height:140px;"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeDayDetailModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -1116,13 +1213,13 @@
     if (!el) return;
     // 입력 중일 땐(포커스 상태) 덮어쓰지 않음 — 타이핑 중 값이 튀지 않게
     if (document.activeElement === el) return;
-    el.value = state.shardPrice > 0 ? state.shardPrice.toLocaleString('en-US') : '';
+    el.value = state.shardPrice > 0 ? String(Math.round(state.shardPrice / 10000)) : '';
   }
 
   function saveShardPrice() {
     const el = document.getElementById('shardPriceInput');
-    const value = parseInt(el.value.replace(/,/g, '')) || 0;
-    state.shardPrice = value;
+    const manUnits = parseInt(el.value) || 0;
+    state.shardPrice = manUnits * 10000;
     saveState();
     renderShardPriceInput();
   }
@@ -1235,14 +1332,24 @@
   }
 
   let calCurrentView = 'week';
+  const CAL_ICON_CALENDAR = '<svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="4" y="6" width="24" height="22" rx="3" fill="#ffffff" stroke="#1F1F1F" stroke-width="1.4"/><rect x="4" y="6" width="24" height="6" rx="3" fill="#1F1F1F" opacity="0.25"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><circle cx="10" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="22" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="10" cy="23" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="23" r="1.6" fill="#1F1F1F"/></svg>';
+  const CAL_ICON_STATS = '<svg class="clock-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><rect x="3" y="18" width="7" height="11" rx="1.5" fill="var(--time-grad-1)" stroke="#1F1F1F" stroke-width="1.4"/><rect x="12.5" y="10" width="7" height="19" rx="1.5" fill="var(--money-grad-1)" stroke="#1F1F1F" stroke-width="1.4"/><rect x="22" y="3" width="7" height="26" rx="1.5" fill="var(--rare-color)" stroke="#1F1F1F" stroke-width="1.4"/></svg>';
+
   function setCalView(v) {
     calCurrentView = v;
+    if (v === 'stats') {
+      donutSelectedWeekKey = null; donutSelectedMonthKey = null;
+      renderDonutWeek(); renderDonutMonth(); renderDonutCumulative();
+    }
     document.getElementById('calWeekView').classList.toggle('hidden', v !== 'week');
     document.getElementById('calMonthView').classList.toggle('hidden', v !== 'month');
     document.getElementById('calStatsView').classList.toggle('hidden', v !== 'stats');
     document.getElementById('calBtnWeek').classList.toggle('active', v === 'week');
     document.getElementById('calBtnMonth').classList.toggle('active', v === 'month');
     document.getElementById('calBtnStats').classList.toggle('active', v === 'stats');
+    document.getElementById('calPageTitle').textContent =
+      v === 'week' ? '주간 캘린더' : v === 'month' ? '월간 캘린더' : '통계 보기';
+    document.getElementById('calTitleIconWrap').innerHTML = v === 'stats' ? CAL_ICON_STATS : CAL_ICON_CALENDAR;
 
     // 상단 요약 카드: 통계 탭은 자체 요약이 있으니 숨기고, 주간/월간 탭은 그에 맞는 기준으로 보여줍니다.
     document.getElementById('calTopSummaryBar').classList.toggle('hidden', v === 'stats');
@@ -1281,7 +1388,7 @@
 
   // --- 실제 완료 기록(state.completionLog)에서 날짜별 합계를 읽어옵니다 ---
   function calDayTotals(dateStr, excludeMonthly) {
-    let timeMin = 0, moneyRaw = 0, doneCount = 0;
+    let timeMin = 0, moneyRaw = 0, doneCount = 0, huntMoney = 0, huntTime = 0;
     const day = state.completionLog && state.completionLog[dateStr];
     if (day) {
       Object.values(day).forEach(e => {
@@ -1289,11 +1396,13 @@
         timeMin += (e.time || 0); moneyRaw += (e.money || 0); doneCount++;
       });
     }
+    const crystalMoney = moneyRaw; // 여기까지는 결정석(보스)에서만 나온 수익
     (state.huntLog || []).forEach(e => {
       if (e.dateStr !== dateStr) return;
-      timeMin += (e.time || 0); moneyRaw += (e.money || 0); doneCount++;
+      huntTime += (e.time || 0); huntMoney += (e.money || 0); doneCount++;
     });
-    return { timeMin, moneyRaw, doneCount };
+    timeMin += huntTime; moneyRaw += huntMoney;
+    return { timeMin, moneyRaw, doneCount, crystalMoney, huntMoney, huntTime };
   }
 
   // 그 날짜에 희귀(물욕) 아이템을 획득했는지 — 캘린더에서 특별히 강조하는 데 씁니다.
@@ -1327,7 +1436,7 @@
       const isFuture = d > today && !isToday;
       const hasRare = calHasRareItemOnDate(dateStr);
       grid.insertAdjacentHTML('beforeend', `
-        <div class="day-card ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''} ${hasRare ? 'rare-day' : ''}">
+        <div class="day-card ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''} ${hasRare ? 'rare-day' : ''}" onclick="openDayDetailModal('${dateStr}')">
           ${hasRare ? '<span class="rare-badge" title="물욕템 획득!">✨</span>' : ''}
           <div class="dow">${calDowNames[i]}</div>
           <div class="date">${d.getDate()}일</div>
@@ -1349,20 +1458,23 @@
   function calRenderCurrentWeekSummary() {
     const today = new Date();
     const thursday = calThisWeekThursday(today);
-    let timeMin = 0, moneyRaw = 0;
+    let timeMin = 0, moneyRaw = 0, crystalMoney = 0, huntMoney = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(thursday);
       d.setDate(thursday.getDate() + i);
       const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
       const data = calDayTotals(dateStr, true);
       timeMin += data.timeMin; moneyRaw += data.moneyRaw;
+      crystalMoney += data.crystalMoney; huntMoney += data.huntMoney;
     }
     document.getElementById('calSummaryTimeLabel').textContent = '이번 주 완료 시간';
     document.getElementById('calSummaryMoneyLabel').textContent = '이번 주 결정석 수익';
     document.getElementById('calSummaryRareLabel').textContent = '이번 주 물욕템 수익';
+    document.getElementById('calSummaryHuntLabel').textContent = '이번 주 재획 수입';
     document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
-    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(crystalMoney);
     document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(weeklyRareItemTotal());
+    document.getElementById('calWeekSummaryHunt').textContent = formatMesoCompact(huntMoney);
   }
 
   // 월간 뷰에서는 상단 요약을 '이번 달' 기준(모든 컨텐츠 포함, 월간 보스도 포함)으로 보여줍니다.
@@ -1370,19 +1482,22 @@
     const today = new Date();
     const year = today.getFullYear(), month = today.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    let timeMin = 0, moneyRaw = 0, rareRaw = 0;
+    let timeMin = 0, moneyRaw = 0, rareRaw = 0, crystalMoney = 0, huntMoney = 0;
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = kstDateString(new Date(Date.UTC(year, month, d)));
       const data = calDayTotals(dateStr);
       timeMin += data.timeMin; moneyRaw += data.moneyRaw;
+      crystalMoney += data.crystalMoney; huntMoney += data.huntMoney;
       rareRaw += calRareItemsOnDate(dateStr).reduce((s, e) => s + (e.price || 0), 0);
     }
     document.getElementById('calSummaryTimeLabel').textContent = '이번 달 완료 시간';
     document.getElementById('calSummaryMoneyLabel').textContent = '이번 달 결정석 수익';
     document.getElementById('calSummaryRareLabel').textContent = '이번 달 물욕템 수익';
+    document.getElementById('calSummaryHuntLabel').textContent = '이번 달 재획 수입';
     document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
-    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(moneyRaw);
+    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(crystalMoney);
     document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(rareRaw);
+    document.getElementById('calWeekSummaryHunt').textContent = formatMesoCompact(huntMoney);
   }
 
   function calRenderMonth() {
@@ -1436,7 +1551,7 @@
         return;
       }
       cellsWrap.insertAdjacentHTML('beforeend', `
-        <div class="month-cell ${isToday ? 'today' : ''} ${hasRare ? 'rare-day' : ''} ${weekShade}">
+        <div class="month-cell ${isToday ? 'today' : ''} ${hasRare ? 'rare-day' : ''} ${weekShade}" onclick="openDayDetailModal('${dateStr}')">
           ${hasRare ? '<span class="rare-badge rare-badge-sm" title="물욕템 획득!">✨</span>' : ''}
           <div class="date">${d.getDate()}</div>
           ${data.doneCount > 0 ? `
@@ -1450,6 +1565,154 @@
   }
 
   // --- 전체 기록을 순회하며 통계에 필요한 값들을 한 번에 집계합니다 ---
+  // 결정석·물욕·재획 세 카테고리를 주차별/월별/누적으로 따로 집계합니다 (원형 그래프용)
+  function calCategoryTotals() {
+    const cumulative = { crystal: 0, item: 0, hunt: 0 };
+    const byWeek = {};
+    const byMonth = {};
+
+    function weekKeyFor(dateStr) {
+      const [y, mo, d] = dateStr.split('-').map(Number);
+      const dateObj = new Date(Date.UTC(y, mo - 1, d));
+      const diffToThu = (dateObj.getUTCDay() - 4 + 7) % 7;
+      const thuDate = new Date(dateObj);
+      thuDate.setUTCDate(dateObj.getUTCDate() - diffToThu);
+      return kstDateString(thuDate);
+    }
+    function monthKeyFor(dateStr) { return dateStr.slice(0, 7); }
+
+    function addTo(dateStr, cat, amount) {
+      if (!amount) return;
+      const wk = weekKeyFor(dateStr), mk = monthKeyFor(dateStr);
+      if (!byWeek[wk]) byWeek[wk] = { crystal: 0, item: 0, hunt: 0 };
+      if (!byMonth[mk]) byMonth[mk] = { crystal: 0, item: 0, hunt: 0 };
+      byWeek[wk][cat] += amount;
+      byMonth[mk][cat] += amount;
+      cumulative[cat] += amount;
+    }
+
+    Object.keys(state.completionLog || {}).forEach(dateStr => {
+      Object.values(state.completionLog[dateStr]).forEach(e => {
+        if (e.isBoss) addTo(dateStr, 'crystal', e.money || 0);
+      });
+    });
+    (state.rareItemLog || []).forEach(e => addTo(e.dateStr, 'item', e.price || 0));
+    (state.huntLog || []).forEach(e => addTo(e.dateStr, 'hunt', e.money || 0));
+
+    return { cumulative, byWeek, byMonth };
+  }
+
+  // 결정석/물욕/재획 구성비를 보여주는 도넛 차트를 그립니다 (외부 라이브러리 없이 순수 SVG)
+  function renderDonutChart(containerId, data) {
+    const container = document.getElementById(containerId);
+    const total = (data.crystal || 0) + (data.item || 0) + (data.hunt || 0);
+    if (total <= 0) {
+      container.innerHTML = '<div class="empty-state" style="text-align:center; padding:20px 0;">기록이 없어요.</div>';
+      return;
+    }
+    const r = 15.9155;
+    const circumference = 2 * Math.PI * r;
+    const segments = [
+      { label: '결정석', value: data.crystal || 0, color: 'var(--money-grad-1)' },
+      { label: '물욕', value: data.item || 0, color: 'var(--rare-color)' },
+      { label: '재획', value: data.hunt || 0, color: 'var(--time-grad-1)' },
+    ];
+    let offsetAccum = 0;
+    const circles = segments.map(seg => {
+      if (seg.value <= 0) return '';
+      const dash = (seg.value / total) * circumference;
+      const gap = circumference - dash;
+      const el = `<circle cx="21" cy="21" r="${r}" fill="transparent" stroke="${seg.color}" stroke-width="6" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offsetAccum}" transform="rotate(-90 21 21)"/>`;
+      offsetAccum += dash;
+      return el;
+    }).join('');
+    const legend = segments.filter(s => s.value > 0).map(s => `
+      <div class="donut-legend-row">
+        <span class="donut-dot" style="background:${s.color}"></span>
+        <span class="donut-legend-label">${s.label}</span>
+        <span class="donut-legend-pct">${Math.round(s.value / total * 100)}%</span>
+        <span class="donut-legend-value">${formatMesoCompact(s.value)}</span>
+      </div>
+    `).join('');
+    container.innerHTML = `
+      <div class="donut-chart-row">
+        <svg viewBox="0 0 42 42" width="104" height="104">${circles}</svg>
+        <div class="donut-legend">${legend}</div>
+      </div>
+    `;
+  }
+
+  let donutSelectedWeekKey = null;  // null이면 이번 주
+  let donutSelectedMonthKey = null; // null이면 이번 달
+
+  function currentWeekKey() {
+    const thursday = calThisWeekThursday(new Date());
+    return kstDateString(new Date(Date.UTC(thursday.getFullYear(), thursday.getMonth(), thursday.getDate())));
+  }
+  function currentMonthKey() {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  }
+  function monthKeyLabel(monthKey) {
+    const [y, mo] = monthKey.split('-').map(Number);
+    return `${y}년 ${mo}월`;
+  }
+
+  function closeDonutPickers() {
+    document.getElementById('donutWeekPickerList').style.display = 'none';
+    document.getElementById('donutMonthPickerList').style.display = 'none';
+  }
+
+  function toggleDonutPicker(kind) {
+    const listEl = document.getElementById(kind === 'week' ? 'donutWeekPickerList' : 'donutMonthPickerList');
+    const willOpen = listEl.style.display === 'none';
+    closeDonutPickers();
+    if (!willOpen) return;
+
+    const catTotals = calCategoryTotals();
+    const curKey = kind === 'week' ? currentWeekKey() : currentMonthKey();
+    const selectedKey = kind === 'week' ? (donutSelectedWeekKey || curKey) : (donutSelectedMonthKey || curKey);
+    const dataKeys = Object.keys(kind === 'week' ? catTotals.byWeek : catTotals.byMonth);
+    const allKeys = Array.from(new Set([...dataKeys, curKey])).sort().reverse(); // 최신부터, 기록 없어도 이번 주/달은 항상 포함
+
+    listEl.innerHTML = allKeys.map(k => {
+      const label = kind === 'week' ? mapleWeekLabel(k) : monthKeyLabel(k);
+      return `<button type="button" class="donut-picker-item ${k === selectedKey ? 'active' : ''}" onclick="event.stopPropagation(); selectDonutPeriod('${kind}', '${k}')">${label}</button>`;
+    }).join('');
+    listEl.style.display = 'block';
+  }
+
+  function selectDonutPeriod(kind, key) {
+    if (kind === 'week') donutSelectedWeekKey = key;
+    else donutSelectedMonthKey = key;
+    closeDonutPickers();
+    if (kind === 'week') renderDonutWeek();
+    else renderDonutMonth();
+  }
+
+  document.addEventListener('click', (ev) => {
+    if (!ev.target.closest('.donut-picker-wrap')) closeDonutPickers();
+  });
+
+  function renderDonutWeek() {
+    const catTotals = calCategoryTotals();
+    const weekKey = donutSelectedWeekKey || currentWeekKey();
+    document.getElementById('donutWeekLabel').innerHTML = `${mapleWeekLabel(weekKey)}`;
+    renderDonutChart('donutWeekChart', catTotals.byWeek[weekKey] || { crystal: 0, item: 0, hunt: 0 });
+  }
+
+  function renderDonutMonth() {
+    const catTotals = calCategoryTotals();
+    const monthKey = donutSelectedMonthKey || currentMonthKey();
+    document.getElementById('donutMonthLabel').innerHTML = monthKeyLabel(monthKey);
+    renderDonutChart('donutMonthChart', catTotals.byMonth[monthKey] || { crystal: 0, item: 0, hunt: 0 });
+  }
+
+  function renderDonutCumulative() {
+    const catTotals = calCategoryTotals();
+    renderDonutChart('donutCumulativeChart', catTotals.cumulative);
+  }
+
   function calAggregateAll() {
     const log = state.completionLog || {};
     const dateStrs = Object.keys(log).sort();
@@ -1507,6 +1770,10 @@
 
   function calRenderStats() {
     const agg = calAggregateAll();
+
+    renderDonutWeek();
+    renderDonutMonth();
+    renderDonutCumulative();
 
     document.getElementById('calStatsTotalTime').textContent = formatHM(agg.totalTime);
     document.getElementById('calStatsTotalMoney').textContent = formatMeso(agg.totalMoney);
@@ -2629,6 +2896,100 @@
     }).join('');
   }
 
+  // --- 캘린더 날짜 클릭 시: 그날의 결정석·물욕·재획을 한눈에 보여주는 대시보드 ---
+  function openDayDetailModal(dateStr) {
+    const [y, mo, d] = dateStr.split('-').map(Number);
+    const dateObj = new Date(y, mo - 1, d);
+    const dowNames = ['일', '월', '화', '수', '목', '금', '토'];
+    document.getElementById('dayDetailTitle').textContent = `${mo}월 ${d}일 (${dowNames[dateObj.getDay()]})`;
+
+    // 결정석(보스) — completionLog에서 그 날짜의 보스 완료 기록만
+    const day = (state.completionLog && state.completionLog[dateStr]) || {};
+    const bossEntries = Object.values(day).filter(e => e.isBoss);
+    const crystalTotal = bossEntries.reduce((s, e) => s + (e.money || 0), 0);
+    const dayTimeTotal = Object.values(day).reduce((s, e) => s + (e.time || 0), 0);
+
+    // 물욕템
+    const itemEntries = (state.rareItemLog || []).filter(e => e.dateStr === dateStr);
+    const itemTotal = itemEntries.reduce((s, e) => s + (e.price || 0), 0);
+
+    // 재획
+    const huntEntries = (state.huntLog || []).filter(e => e.dateStr === dateStr);
+    const huntTotal = huntEntries.reduce((s, e) => s + (e.money || 0), 0);
+    const huntTimeTotal = huntEntries.reduce((s, e) => s + (e.time || 0), 0);
+
+    document.getElementById('dayDetailSummary').innerHTML = `
+      <div class="summary-card time">
+        <div class="label">완료 시간</div>
+        <div class="value">${formatHM(dayTimeTotal + huntTimeTotal)}</div>
+      </div>
+      <div class="summary-card money">
+        <div class="label">결정석</div>
+        <div class="value">${formatMesoCompact(crystalTotal)}</div>
+      </div>
+      <div class="summary-card rare">
+        <div class="label">물욕템</div>
+        <div class="value">${formatMesoCompact(itemTotal)}</div>
+      </div>
+      <div class="summary-card money">
+        <div class="label">재획</div>
+        <div class="value">${formatMesoCompact(huntTotal)}</div>
+      </div>
+    `;
+
+    document.getElementById('dayDetailBossList').innerHTML = bossEntries.length === 0
+      ? '<div class="modal-boss-empty">이 날 클리어한 보스가 없어요.</div>'
+      : bossEntries.map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              ${iconForBossName(e.bossName) ? `<img class="modal-boss-icon" src="${iconForBossName(e.bossName)}" alt="">` : ''}
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.bossName || '')}</span>
+            </span>
+            <span class="price">${formatMeso(e.money || 0)}</span>
+          </div>
+        `;
+        }).join('');
+
+    document.getElementById('dayDetailItemList').innerHTML = itemEntries.length === 0
+      ? '<div class="modal-boss-empty">이 날 획득한 물욕템이 없어요.</div>'
+      : itemEntries.map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
+            </span>
+            <span class="price rare-price">${formatMeso(e.price)}</span>
+          </div>
+        `;
+        }).join('');
+
+    document.getElementById('dayDetailHuntList').innerHTML = huntEntries.length === 0
+      ? '<div class="modal-boss-empty">이 날 등록된 재획 기록이 없어요.</div>'
+      : huntEntries.map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(e.time)}</span>
+            </span>
+            <span class="price">${formatMeso(e.money)}</span>
+          </div>
+        `;
+        }).join('');
+
+    document.getElementById('dayDetailModalOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDayDetailModal() {
+    document.getElementById('dayDetailModalOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
   // --- 캐릭터 열람(읽기 전용) 팝업 ---
   function openCharacterViewModal(charId) {
     const c = state.characters.find(x => x.id === charId);
@@ -2809,6 +3170,7 @@
     const pct = combinedTotal > 0 ? Math.round((combinedDone / combinedTotal) * 100) : 0;
     document.getElementById('totalFigure').textContent = formatHM(combinedDone);
     document.getElementById('totalSub').textContent = `완료 ${formatHM(combinedDone)} / 전체 ${formatHM(combinedTotal)}`;
+    document.getElementById('timeBreakdown').textContent = `보스 ${formatHM(done)} · 사냥 ${formatHM(huntTotals.time)}`;
     document.getElementById('totalFill').style.width = pct + '%';
     document.getElementById('totalPct').textContent = pct + '%';
 
