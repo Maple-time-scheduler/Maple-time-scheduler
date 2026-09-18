@@ -2761,10 +2761,23 @@
         categoryId: task.categoryId,
         theme: board ? board.theme : null
       };
-    } else if (state.completionLog[dateStr]) {
-      // 오늘 체크했다가 오늘 안에 다시 해제한 경우에만 오늘자 기록에서 제거합니다.
-      // (지난 날짜의 기록은 그 날짜가 지나면 그대로 역사로 남고, 나중에 취소해도 지워지지 않습니다.)
-      delete state.completionLog[dateStr][task.id];
+    } else {
+      // 체크 해제 시: "이번 주(목~수)" 안에 있는, 이 항목의 가장 최근 기록만 찾아서 지웁니다.
+      // (다른 주에 있는 기록은 손대지 않고 그대로 역사로 남깁니다.)
+      const thursday = calThisWeekThursday(new Date());
+      const weekDateStrs = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(thursday);
+        d.setDate(thursday.getDate() + i);
+        weekDateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
+      }
+      const sortedThisWeek = weekDateStrs.sort().reverse();
+      for (const ds of sortedThisWeek) {
+        if (state.completionLog[ds] && state.completionLog[ds][task.id]) {
+          delete state.completionLog[ds][task.id];
+          break; // 이번 주 안에서 가장 최근 것 하나만 지우고 더 과거 기록은 그대로 둠
+        }
+      }
     }
   }
 
