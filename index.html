@@ -30,6 +30,7 @@
     --money-grad-2: #4C9F70;
     --money-grad-pale: #EED68C;
     --rare-color: #4B4B4B;
+    --hunt-color: #1AA398;
   }
   [data-theme="dark"] {
     --bg: #18171C;
@@ -56,6 +57,7 @@
     --money-grad-2: #6FCB9F;
     --money-grad-pale: #FFE19D;
     --rare-color: #B0B0B0;
+    --hunt-color: #4FE0D0;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -120,6 +122,7 @@
   .summary-card.time .value { color: var(--time-grad-1); }
   .summary-card.money .value { color: var(--money-grad-1); }
   .summary-card.rare .value { color: var(--rare-color); }
+  .summary-card.hunt .value { color: var(--hunt-color); }
 
   #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   #calendarPage .day-card {
@@ -230,7 +233,7 @@
   #calendarPage .rank-num { font-size: 12px; font-weight: 700; color: var(--muted); width: 16px; }
   #calendarPage .rank-name { flex: 1; font-size: 13px; font-weight: 700; }
   #calendarPage .rank-bar-track { flex: 2; height: 6px; background: var(--track); border-radius: 4px; overflow: hidden; }
-  #calendarPage .rank-bar-fill { height: 100%; background: var(--money-grad-1); }
+  #calendarPage .rank-bar-fill { display: block; height: 100%; background: var(--money-grad-1); transition: width 0.3s ease; }
   #calendarPage .rank-value { font-size: 12px; font-weight: 700; color: var(--money-grad-1); width: 60px; text-align: right; }
   #calendarPage .rank-list.rare .rank-bar-fill { background: var(--rare-color); }
   #calendarPage .rank-list.rare .rank-value { color: var(--rare-color); }
@@ -347,10 +350,9 @@
     background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(0,0,0,0.05) 10%);
   }
   [data-theme="dark"] .exp-track { background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(255,255,255,0.06) 10%); }
-  .exp-fill {
-    height: 100%; width: 0%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%);
-    transition: width 0.4s ease;
-  }
+  .exp-fill-wrap { display: flex; height: 100%; width: 0%; transition: width 0.4s ease; }
+  .exp-fill-boss { height: 100%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%); flex-shrink: 0; }
+  .exp-fill-hunt { height: 100%; background: var(--hunt-color); flex-shrink: 0; }
   .exp-pct {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     font-size: 12px; font-weight: 700; color: var(--ink); text-shadow: 0 1px 0 rgba(255,255,255,0.4);
@@ -389,6 +391,7 @@
   @media (max-width: 600px) { .board-grid { grid-template-columns: 1fr; } }
 
   .board { display: flex; flex-direction: column; padding: 14px 14px 16px; }
+  .board.board-editing { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
   .board-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
   .board-name-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; flex: 1; }
   .drag-handle { color: var(--muted); font-size: 14px; cursor: grab; flex-shrink: 0; touch-action: none; padding: 2px; }
@@ -413,6 +416,7 @@
     font-size: 12px; padding: 4px 7px; border-radius: 999px; border: 1px solid var(--border);
     background: transparent; cursor: pointer; line-height: 1;
   }
+  .boss-settings-btn.active { background: var(--accent); border-color: var(--accent); }
   .boss-settings-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
   .board-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; flex-shrink: 0; opacity: 0.7; }
   .board-delete:hover { color: var(--danger); opacity: 1; }
@@ -470,6 +474,11 @@
     font-size: 10.5px; font-weight: 700; color: var(--money-grad-1); background: transparent;
     border: 1px dashed var(--money-grad-1); padding: 1px 7px; border-radius: 20px; white-space: nowrap;
     flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box;
+  }
+  .task-boss-total.chip-glow { animation: chipGlow 0.7s ease; }
+  @keyframes chipGlow {
+    0% { background: var(--money-grad-1); color: #fff; box-shadow: 0 0 0 4px var(--accent-soft); border-color: var(--money-grad-1); }
+    100% { background: transparent; color: var(--money-grad-1); box-shadow: 0 0 0 0 transparent; }
   }
   .delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; line-height: 1; opacity: 0.7; }
   .row-hover-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s ease; }
@@ -544,7 +553,7 @@
   .modal-hint { font-size: 11.5px; color: var(--muted); margin: 4px 0 12px; }
   .modal-boss-status { margin-bottom: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
   .modal-boss-status-title { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
-  .modal-boss-list { display: flex; flex-direction: column; gap: 4px; height: 140px; overflow-y: auto; }
+  .modal-boss-list { display: flex; flex-direction: column; gap: 4px; height: 140px; overflow-y: auto; scrollbar-gutter: stable; }
   .char-view-boss-list { height: auto; max-height: none; overflow-y: visible; }
   .modal-boss-row {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -553,6 +562,7 @@
   .modal-boss-row.editing { border: 1px solid var(--accent); background: var(--accent-soft); }
   .modal-boss-row .price { color: var(--money-grad-1); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
   .modal-boss-row .price.rare-price { color: var(--rare-color); }
+  .modal-boss-row .price.hunt-price { color: var(--hunt-color); }
   .modal-boss-row-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .modal-boss-delete-btn {
     background: none; border: none; color: var(--danger); cursor: pointer; font-size: 15px;
@@ -706,7 +716,10 @@
       <span class="money-breakdown" id="timeBreakdown"></span>
     </div>
     <div class="exp-track">
-      <div class="exp-fill" id="totalFill"></div>
+      <div class="exp-fill-wrap" id="totalFillWrap">
+        <div class="exp-fill-boss" id="bossTimeFill"></div>
+        <div class="exp-fill-hunt" id="huntTimeFill"></div>
+      </div>
       <span class="exp-pct" id="totalPct">0%</span>
     </div>
     <div class="money-block" id="moneyBlock" style="display:none;">
@@ -756,7 +769,7 @@
         <div class="label" id="calSummaryRareLabel">이번 주 물욕템 수익</div>
         <div class="value" id="calWeekSummaryRare">0억</div>
       </div>
-      <div class="summary-card money">
+      <div class="summary-card hunt">
         <div class="label" id="calSummaryHuntLabel">이번 주 재획 수입</div>
         <div class="value" id="calWeekSummaryHunt">0억</div>
       </div>
@@ -769,6 +782,15 @@
         <button class="cal-nav-btn" onclick="calShiftWeek(1)">다음 주 ▶</button>
       </div>
       <div class="week-grid" id="calWeekGrid"></div>
+
+      <div class="stat-section" style="margin-top:20px;">
+        <h2>✨ 이번 주 물욕템 내역</h2>
+        <div class="modal-boss-list rare" id="calWeekItemDetailList" style="height:auto; max-height:220px;"></div>
+      </div>
+      <div class="stat-section">
+        <h2 style="display:flex; align-items:center; gap:5px;"><svg class="potion-icon" viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true"><circle cx="17" cy="20.5" r="10.3" fill="#CFEFEA" stroke="#1F1F1F" stroke-width="1.6"/></svg> 이번 주 재획 내역</h2>
+        <div class="modal-boss-list" id="calWeekHuntDetailList" style="height:auto; max-height:220px;"></div>
+      </div>
     </div>
 
     <div id="calMonthView" class="hidden">
@@ -808,16 +830,16 @@
       </div>
 
       <div class="summary-bar">
-        <div class="summary-card time">
-          <div class="label">누적 총 시간</div>
+        <div class="summary-card time" style="cursor:pointer;" onclick="cycleStatsCardMode('time')">
+          <div class="label" id="calStatsTimeLabel">누적 총 시간</div>
           <div class="value" id="calStatsTotalTime">00:00</div>
         </div>
-        <div class="summary-card money">
-          <div class="label">누적 총 결정석 수익</div>
+        <div class="summary-card money" style="cursor:pointer;" onclick="cycleStatsCardMode('crystal')">
+          <div class="label" id="calStatsCrystalLabel">누적 총 결정석 수익</div>
           <div class="value" id="calStatsTotalMoney">0억</div>
         </div>
-        <div class="summary-card rare">
-          <div class="label">누적 총 물욕 수익</div>
+        <div class="summary-card rare" style="cursor:pointer;" onclick="cycleStatsCardMode('item')">
+          <div class="label" id="calStatsItemLabel">누적 총 물욕 수익</div>
           <div class="value" id="calStatsRareTotal">0억</div>
         </div>
         <div class="summary-card">
@@ -920,6 +942,10 @@
       <input type="text" inputmode="numeric" id="itemLogPriceInput" placeholder="메소" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
       <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
     </div>
+    <div class="modal-field">
+      <label>인원</label>
+      <select id="itemLogParty"></select>
+    </div>
     <div class="modal-boss-status">
       <div class="modal-boss-status-title">이 보스에서 획득한 기록</div>
       <div class="modal-boss-list" id="itemLogList"></div>
@@ -937,7 +963,7 @@
     <div class="summary-bar" id="dayDetailSummary" style="margin-bottom:16px;"></div>
 
     <div class="stat-section">
-      <h2>💰 결정석 (보스)</h2>
+      <h2>💰 결정석</h2>
       <div class="modal-boss-list" id="dayDetailBossList" style="height:auto; max-height:140px;"></div>
     </div>
 
@@ -1277,25 +1303,32 @@
     if (!el) return;
     const dateInput = document.getElementById('huntDateInput');
     if (dateInput && !dateInput.value) dateInput.value = kstDateString(kstNow()); // 처음엔 오늘 날짜로 기본 설정
-    const targetDate = dateInput ? dateInput.value : kstDateString(kstNow());
-    const list = (state.huntLog || []).filter(e => e.dateStr === targetDate).slice().reverse();
-    el.innerHTML = list.length === 0
-      ? `<div class="modal-boss-empty">${targetDate}에 등록된 재획 기록이 없어요.</div>`
-      : list.map(e => {
-          const c = state.characters.find(x => x.id === e.characterId);
-          const shardCount = e.shardCount || 0;
-          const breakdown = shardCount > 0
-            ? `메소 ${formatMesoCompact(e.meso != null ? e.meso : e.money)} + 조각 ${shardCount}개(수수료 제외 ${formatMesoCompact(e.shardMoney || 0)})`
-            : formatMeso(e.money);
+
+    // 이번 주(목~수) 전체를 날짜별로 묶어서 합산 표시합니다.
+    const dowNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const thursday = calThisWeekThursday(new Date());
+    const weekDateStrs = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(thursday);
+      d.setDate(thursday.getDate() + i);
+      weekDateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
+    }
+    const byDate = {};
+    (state.huntLog || []).forEach(e => {
+      if (!weekDateStrs.includes(e.dateStr)) return;
+      byDate[e.dateStr] = (byDate[e.dateStr] || 0) + (e.money || 0);
+    });
+    const withData = weekDateStrs.filter(ds => byDate[ds] > 0);
+    el.innerHTML = withData.length === 0
+      ? '<div class="modal-boss-empty">이번 주 등록된 재획 기록이 없어요.</div>'
+      : withData.map(ds => {
+          const [y, mo, d] = ds.split('-').map(Number);
+          const dow = dowNames[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+          const label = `${String(mo).padStart(2, '0')}${String(d).padStart(2, '0')}${dow}`;
           return `
           <div class="modal-boss-row">
-            <span class="modal-boss-row-left">
-              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(e.time)} · ${breakdown}</span>
-            </span>
-            <span class="modal-boss-row-right">
-              <span class="price">${formatMeso(e.money)}</span>
-              <button class="modal-boss-delete-btn" title="삭제" onclick="deleteHuntEntry(${e.id})">&times;</button>
-            </span>
+            <span class="modal-boss-row-left"><span>${label}</span></span>
+            <span class="price">${formatMeso(byDate[ds])}</span>
           </div>
         `;
         }).join('');
@@ -1353,7 +1386,7 @@
 
     // 상단 요약 카드: 통계 탭은 자체 요약이 있으니 숨기고, 주간/월간 탭은 그에 맞는 기준으로 보여줍니다.
     document.getElementById('calTopSummaryBar').classList.toggle('hidden', v === 'stats');
-    if (v === 'week') calRenderCurrentWeekSummary();
+    if (v === 'week') calRenderWeek();
     else if (v === 'month') calRenderCurrentMonthSummary();
   }
 
@@ -1425,13 +1458,16 @@
     grid.innerHTML = '';
     const thursday = calThisWeekThursday(today);
     thursday.setDate(thursday.getDate() + calWeekOffset * 7);
-    let weekTimeMin = 0, weekMoneyRaw = 0;
+    let weekTimeMin = 0, weekMoneyRaw = 0, weekCrystalMoney = 0, weekHuntMoney = 0;
+    const weekDateStrs = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(thursday);
       d.setDate(thursday.getDate() + i);
       const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+      weekDateStrs.push(dateStr);
       const data = calDayTotals(dateStr, true);
       weekTimeMin += data.timeMin; weekMoneyRaw += data.moneyRaw;
+      weekCrystalMoney += data.crystalMoney; weekHuntMoney += data.huntMoney;
       const isToday = d.toDateString() === today.toDateString();
       const isFuture = d > today && !isToday;
       const hasRare = calHasRareItemOnDate(dateStr);
@@ -1452,30 +1488,52 @@
     weekEnd.setDate(thursday.getDate() + 6);
     document.getElementById('calWeekLabel').textContent =
       `${thursday.getMonth() + 1}/${thursday.getDate()} ~ ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+
+    // 상단 요약: 열람 중인 주 기준으로 표시
+    const itemEntries = (state.rareItemLog || []).filter(e => weekDateStrs.includes(e.dateStr));
+    const weekItemMoney = itemEntries.reduce((s, e) => s + (e.price || 0), 0);
+    const huntEntries = (state.huntLog || []).filter(e => weekDateStrs.includes(e.dateStr));
+    document.getElementById('calSummaryTimeLabel').textContent = '완료 시간';
+    document.getElementById('calSummaryMoneyLabel').textContent = '결정석 수익';
+    document.getElementById('calSummaryRareLabel').textContent = '물욕템 수익';
+    document.getElementById('calSummaryHuntLabel').textContent = '재획 수익';
+    document.getElementById('calWeekSummaryTime').textContent = formatHM(weekTimeMin);
+    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(weekCrystalMoney);
+    document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(weekItemMoney);
+    document.getElementById('calWeekSummaryHunt').textContent = formatMesoCompact(weekHuntMoney);
+
+    // 물욕/재획 상세 내역 (캐릭터별)
+    document.getElementById('calWeekItemDetailList').innerHTML = itemEntries.length === 0
+      ? '<div class="modal-boss-empty">이번 주 물욕템 기록이 없어요.</div>'
+      : itemEntries.slice().reverse().map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
+            </span>
+            <span class="price rare-price">${formatMeso(e.price)}</span>
+          </div>
+        `;
+        }).join('');
+
+    document.getElementById('calWeekHuntDetailList').innerHTML = huntEntries.length === 0
+      ? '<div class="modal-boss-empty">이번 주 재획 기록이 없어요.</div>'
+      : huntEntries.slice().reverse().map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(e.time)}</span>
+            </span>
+            <span class="price hunt-price">${formatMeso(e.money)}</span>
+          </div>
+        `;
+        }).join('');
   }
 
-  // 상단 "이번 주" 요약 카드는 열람 중인 주와 무관하게 항상 실제 이번 주 기준으로 보여줍니다.
-  function calRenderCurrentWeekSummary() {
-    const today = new Date();
-    const thursday = calThisWeekThursday(today);
-    let timeMin = 0, moneyRaw = 0, crystalMoney = 0, huntMoney = 0;
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(thursday);
-      d.setDate(thursday.getDate() + i);
-      const dateStr = kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
-      const data = calDayTotals(dateStr, true);
-      timeMin += data.timeMin; moneyRaw += data.moneyRaw;
-      crystalMoney += data.crystalMoney; huntMoney += data.huntMoney;
-    }
-    document.getElementById('calSummaryTimeLabel').textContent = '이번 주 완료 시간';
-    document.getElementById('calSummaryMoneyLabel').textContent = '이번 주 결정석 수익';
-    document.getElementById('calSummaryRareLabel').textContent = '이번 주 물욕템 수익';
-    document.getElementById('calSummaryHuntLabel').textContent = '이번 주 재획 수입';
-    document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
-    document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(crystalMoney);
-    document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(weeklyRareItemTotal());
-    document.getElementById('calWeekSummaryHunt').textContent = formatMesoCompact(huntMoney);
-  }
+
 
   // 월간 뷰에서는 상단 요약을 '이번 달' 기준(모든 컨텐츠 포함, 월간 보스도 포함)으로 보여줍니다.
   function calRenderCurrentMonthSummary() {
@@ -1581,19 +1639,22 @@
     }
     function monthKeyFor(dateStr) { return dateStr.slice(0, 7); }
 
-    function addTo(dateStr, cat, amount) {
+    function addTo(dateStr, cat, amount, opts) {
       if (!amount) return;
       const wk = weekKeyFor(dateStr), mk = monthKeyFor(dateStr);
-      if (!byWeek[wk]) byWeek[wk] = { crystal: 0, item: 0, hunt: 0 };
+      if (!(opts && opts.excludeFromWeek)) {
+        if (!byWeek[wk]) byWeek[wk] = { crystal: 0, item: 0, hunt: 0 };
+        byWeek[wk][cat] += amount;
+      }
       if (!byMonth[mk]) byMonth[mk] = { crystal: 0, item: 0, hunt: 0 };
-      byWeek[wk][cat] += amount;
       byMonth[mk][cat] += amount;
       cumulative[cat] += amount;
     }
 
     Object.keys(state.completionLog || {}).forEach(dateStr => {
       Object.values(state.completionLog[dateStr]).forEach(e => {
-        if (e.isBoss) addTo(dateStr, 'crystal', e.money || 0);
+        // 월간 보스(검은 마법사)의 결정석은 '주간' 집계에서는 제외 (월간/누적에는 그대로 포함)
+        if (e.isBoss) addTo(dateStr, 'crystal', e.money || 0, { excludeFromWeek: e.theme === 'monthly' });
       });
     });
     (state.rareItemLog || []).forEach(e => addTo(e.dateStr, 'item', e.price || 0));
@@ -1615,7 +1676,7 @@
     const segments = [
       { label: '결정석', value: data.crystal || 0, color: 'var(--money-grad-1)' },
       { label: '물욕', value: data.item || 0, color: 'var(--rare-color)' },
-      { label: '재획', value: data.hunt || 0, color: 'var(--time-grad-1)' },
+      { label: '재획', value: data.hunt || 0, color: 'var(--hunt-color)' },
     ];
     let offsetAccum = 0;
     const circles = segments.map(seg => {
@@ -1768,22 +1829,52 @@
     return { dateStrs, totalTime, totalMoney, bossTotals, charTotals, weekTotals };
   }
 
+  let statsCardMode = { time: 'cumulative', crystal: 'cumulative', item: 'cumulative' };
+  function cycleStatsCardMode(key) {
+    const modes = ['cumulative', 'week', 'month'];
+    const idx = modes.indexOf(statsCardMode[key]);
+    statsCardMode[key] = modes[(idx + 1) % modes.length];
+    calRenderStats();
+  }
+  function statsModeLabelSuffix(mode) {
+    return mode === 'week' ? '주 평균' : mode === 'month' ? '월 평균' : '누적 총';
+  }
+
   function calRenderStats() {
     const agg = calAggregateAll();
+    const catTotals = calCategoryTotals();
 
     renderDonutWeek();
     renderDonutMonth();
     renderDonutCumulative();
 
-    document.getElementById('calStatsTotalTime').textContent = formatHM(agg.totalTime);
-    document.getElementById('calStatsTotalMoney').textContent = formatMeso(agg.totalMoney);
+    // 주차/월 개수 (주평균·월평균 계산용)
+    const weekKeySet = new Set(Object.keys(agg.weekTotals));
+    const monthKeySet = new Set();
+    Object.keys(state.completionLog || {}).forEach(ds => monthKeySet.add(ds.slice(0, 7)));
+    (state.rareItemLog || []).forEach(e => monthKeySet.add(e.dateStr.slice(0, 7)));
+    (state.huntLog || []).forEach(e => monthKeySet.add(e.dateStr.slice(0, 7)));
+    const weekCount = weekKeySet.size || 1;
+    const monthCount = monthKeySet.size || 1;
+
+    function valueForMode(cumulativeValue, mode) {
+      if (mode === 'week') return cumulativeValue / weekCount;
+      if (mode === 'month') return cumulativeValue / monthCount;
+      return cumulativeValue;
+    }
+
+    document.getElementById('calStatsTimeLabel').textContent = `${statsModeLabelSuffix(statsCardMode.time)} 시간`;
+    document.getElementById('calStatsTotalTime').textContent = formatHM(Math.round(valueForMode(agg.totalTime, statsCardMode.time)));
+
+    document.getElementById('calStatsCrystalLabel').textContent = `${statsModeLabelSuffix(statsCardMode.crystal)} 결정석 수익`;
+    document.getElementById('calStatsTotalMoney').textContent = formatMeso(Math.round(valueForMode(catTotals.cumulative.crystal, statsCardMode.crystal)));
+
+    document.getElementById('calStatsItemLabel').textContent = `${statsModeLabelSuffix(statsCardMode.item)} 물욕 수익`;
+    document.getElementById('calStatsRareTotal').textContent = formatMeso(Math.round(valueForMode(catTotals.cumulative.item, statsCardMode.item)));
 
     const weekKeys = Object.keys(agg.weekTotals).sort();
     const weekAvg = weekKeys.length > 0 ? agg.totalMoney / weekKeys.length : 0;
     document.getElementById('calStatsWeekAvg').textContent = weekKeys.length > 0 ? formatMeso(weekAvg) : '기록 없음';
-
-    const rareTotalTop = (state.rareItemLog || []).reduce((s, e) => s + (e.price || 0), 0);
-    document.getElementById('calStatsRareTotal').textContent = formatMeso(rareTotalTop);
 
     // 주차별 기록 (최근 주차부터)
     const weekListEl = document.getElementById('calStatsWeekList');
@@ -2000,7 +2091,7 @@
 
   // 드래그 중인 항목을 실제로 그 자리에 옮겨서 미리보기를 보여줍니다.
   // 되돌아가는 떨림을 막기 위해: (1) 항목 가운데 30% 구간은 무시하고 (2) 실제로 위치가 달라질 때만 옮깁니다.
-  function isGridType(type) { return type === 'board'; } // 캐릭터는 실시간 미리보기를 다시 사용, 보드만 드롭 시 한 번에 계산
+  function isGridType(type) { return type === 'char'; } // 캐릭터만 격자 전용(놓는 순간 계산), 보드는 항목과 동일하게 실시간 미리보기
 
   function onDragOverItem(ev) {
     if (dragSourceType === null) return;
@@ -2017,7 +2108,7 @@
 
     const rect = targetEl.getBoundingClientRect();
     let before;
-    if (dragSourceType === 'char') {
+    if (dragSourceType === 'char' || dragSourceType === 'board') {
       const relX = (ev.clientX - rect.left) / rect.width;
       if (relX > 0.35 && relX < 0.65) return; // 가운데 데드존 (좌우 기준, 격자 배치라서)
       before = relX < 0.5;
@@ -2030,7 +2121,7 @@
     if (draggedEl.nextElementSibling === desiredNext) return; // 이미 그 위치임
 
     targetEl.parentElement.insertBefore(draggedEl, desiredNext);
-    if (dragSourceType !== 'char') setDragOverPreview(targetEl); // 캐릭터 카드는 옆 항목 반투명 표시를 하지 않음
+    if (dragSourceType !== 'char' && dragSourceType !== 'board') setDragOverPreview(targetEl); // 격자 배치는 옆 항목 반투명 표시를 하지 않음
   }
 
   function onDragOverContainer(ev) {
@@ -2062,6 +2153,18 @@
       state.characters.forEach(c => { byId[c.id] = c; });
       const newOrder = orderedIds.map(id => byId[id]).filter(Boolean);
       if (newOrder.length === state.characters.length) state.characters = newOrder;
+      return;
+    }
+
+    if (type === 'board') {
+      const indices = [];
+      state.categories.forEach((c, i) => { if (c.theme === scopeKey) indices.push(i); });
+      const byId = {};
+      indices.forEach(i => { byId[state.categories[i].id] = state.categories[i]; });
+      const newOrder = orderedIds.map(id => byId[id]).filter(Boolean);
+      if (newOrder.length === indices.length) {
+        indices.forEach((idx, i) => { state.categories[idx] = newOrder[i]; });
+      }
       return;
     }
 
@@ -2101,11 +2204,7 @@
     ev.stopPropagation();
     if (!dragSourceId || dragSourceType !== type) return;
 
-    if (type === 'board') {
-      const rect = ev.currentTarget.getBoundingClientRect();
-      const before = (ev.clientX - rect.left) < rect.width / 2;
-      reorderScopedBoardsById(scopeKey, dragSourceId, targetId, before);
-    } else if (type === 'char') {
+    if (type === 'char') {
       commitOrderFromDOM('char', null, ev.currentTarget.parentElement);
     } else {
       commitOrderFromDOM(type, scopeKey, ev.currentTarget.parentElement);
@@ -2121,8 +2220,7 @@
     ev.stopPropagation();
     if (!dragSourceId || dragSourceType !== type) return;
 
-    if (type === 'board') reorderScopedBoardsById(scopeKey, dragSourceId, null, true);
-    else if (type === 'char') commitOrderFromDOM('char', null, ev.currentTarget);
+    if (type === 'char') commitOrderFromDOM('char', null, ev.currentTarget);
     else commitOrderFromDOM(type, scopeKey, ev.currentTarget);
 
     dragSourceId = null;
@@ -2522,6 +2620,9 @@
     document.getElementById('itemLogWarning').style.display = 'none';
     document.getElementById('rareItemGrid').innerHTML = rareItemGridHtml('');
     document.getElementById('itemLogPriceInput').value = '';
+    const itemPartySel = document.getElementById('itemLogParty');
+    itemPartySel.innerHTML = [1, 2, 3, 4, 5, 6].map(n => `<option value="${n}">${n}인</option>`).join('');
+    itemPartySel.value = '1';
     renderItemLogList();
     document.getElementById('itemLogModalOverlay').style.display = 'flex';
   }
@@ -2542,7 +2643,7 @@
               <span>${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
             </span>
             <span class="modal-boss-row-right">
-              <span class="price rare-price" title="${e.grossPrice ? `정가 ${formatMeso(e.grossPrice)} · 수수료 3% 제외` : ''}">${formatMeso(e.price)}</span>
+              <span class="price rare-price" title="${e.grossPrice ? `정가 ${formatMeso(e.fullGrossPrice || e.grossPrice)}${e.partySize > 1 ? ` · ${e.partySize}인분배` : ''} · 수수료 3% 제외` : ''}">${formatMeso(e.price)}</span>
               <button class="modal-boss-delete-btn" title="삭제" onclick="deleteItemLogEntry(${e.id})">&times;</button>
             </span>
           </div>
@@ -2552,8 +2653,10 @@
   function addItemLogEntry() {
     if (!selectedRareItemName) { showItemLogWarning('아이템을 선택해주세요!'); return; }
     const priceInput = document.getElementById('itemLogPriceInput');
-    const grossPrice = parseInt(priceInput.value.replace(/,/g, '')) || 0;
-    if (grossPrice <= 0) { showItemLogWarning('판매 가격을 입력해주세요!'); return; }
+    const fullGrossPrice = parseInt(priceInput.value.replace(/,/g, '')) || 0;
+    if (fullGrossPrice <= 0) { showItemLogWarning('판매 가격을 입력해주세요!'); return; }
+    const partySize = parseInt(document.getElementById('itemLogParty').value) || 1;
+    const grossPrice = Math.floor(fullGrossPrice / partySize); // 인원수로 분배한 내 몫(정가)
     const price = applyTradeFee(grossPrice); // 거래 수수료 3% 제외한 실수령액을 기록
     const meta = RARE_ITEM_BY_NAME[selectedRareItemName];
     if (!meta) return;
@@ -2568,7 +2671,7 @@
       itemName: selectedRareItemName,
       category: meta.category,
       rare: meta.rare,
-      grossPrice, price
+      partySize, fullGrossPrice, grossPrice, price
     };
     if (!state.rareItemLog) state.rareItemLog = [];
     state.rareItemLog.push(entry);
@@ -2762,20 +2865,35 @@
         theme: board ? board.theme : null
       };
     } else {
-      // 체크 해제 시: "이번 주(목~수)" 안에 있는, 이 항목의 가장 최근 기록만 찾아서 지웁니다.
-      // (다른 주에 있는 기록은 손대지 않고 그대로 역사로 남깁니다.)
-      const thursday = calThisWeekThursday(new Date());
-      const weekDateStrs = [];
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(thursday);
-        d.setDate(thursday.getDate() + i);
-        weekDateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
+      // 체크 해제 시: 그 항목의 리셋 주기(일간=오늘/주간=이번 주/월간=이번 달) 안에 있는
+      // 가장 최근 기록만 찾아서 지웁니다. (해당 주기 밖의 기록은 손대지 않고 역사로 남깁니다.)
+      const board = state.categories.find(c => c.id === task.categoryId);
+      const theme = board ? board.theme : null;
+      let validDateStrs;
+      const now = new Date();
+      if (theme === 'monthly') {
+        const y = now.getFullYear(), mo = now.getMonth();
+        validDateStrs = [];
+        for (let d = 1; d <= now.getDate(); d++) {
+          validDateStrs.push(kstDateString(new Date(Date.UTC(y, mo, d))));
+        }
+      } else if (theme === 'weekly') {
+        const thursday = calThisWeekThursday(now);
+        validDateStrs = [];
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(thursday);
+          d.setDate(thursday.getDate() + i);
+          validDateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
+        }
+      } else {
+        // 일간, 메모 등은 매일 초기화되니 오늘 하루만 대상으로 합니다.
+        validDateStrs = [kstDateString(kstNow())];
       }
-      const sortedThisWeek = weekDateStrs.sort().reverse();
-      for (const ds of sortedThisWeek) {
+      const sortedValid = validDateStrs.sort().reverse();
+      for (const ds of sortedValid) {
         if (state.completionLog[ds] && state.completionLog[ds][task.id]) {
           delete state.completionLog[ds][task.id];
-          break; // 이번 주 안에서 가장 최근 것 하나만 지우고 더 과거 기록은 그대로 둠
+          break; // 해당 주기 안에서 가장 최근 것 하나만 지우고 더 과거 기록은 그대로 둠
         }
       }
     }
@@ -2795,9 +2913,17 @@
       state.tasks = state.tasks.map(t => (t.isBoss && t.linkedTaskId === id) ? { ...t, completed: newCompleted } : t);
     }
     render(); saveState();
+    if (newCompleted) {
+      const chip = document.getElementById(`bossChip_${id}`);
+      if (chip) {
+        chip.classList.add('chip-glow');
+        setTimeout(() => chip.classList.remove('chip-glow'), 700);
+      }
+    }
   }
   function deleteTask(id) {
-    state.tasks = state.tasks.filter(t => t.id !== id);
+    // 이 항목에 연동해서 등록해둔 보스들도 함께 삭제 (그 캐릭터에 대한 등록 정보만)
+    state.tasks = state.tasks.filter(t => t.id !== id && !(t.isBoss && t.linkedTaskId === id));
     render(); saveState();
   }
 
@@ -2847,6 +2973,11 @@
   function taskLinkedBossEarned(taskId) {
     return state.tasks
       .filter(t => t.isBoss && t.completed && t.linkedTaskId === taskId)
+      .reduce((s, t) => s + t.price, 0);
+  }
+  function taskLinkedBossPotential(taskId) {
+    return state.tasks
+      .filter(t => t.isBoss && t.linkedTaskId === taskId)
       .reduce((s, t) => s + t.price, 0);
   }
 
@@ -2944,23 +3075,27 @@
         <div class="label">물욕템</div>
         <div class="value">${formatMesoCompact(itemTotal)}</div>
       </div>
-      <div class="summary-card money">
+      <div class="summary-card hunt">
         <div class="label">재획</div>
         <div class="value">${formatMesoCompact(huntTotal)}</div>
       </div>
     `;
 
+    const charCrystalMap = {};
+    bossEntries.forEach(e => {
+      const cid = e.characterId || '__none__';
+      charCrystalMap[cid] = (charCrystalMap[cid] || 0) + (e.money || 0);
+    });
     document.getElementById('dayDetailBossList').innerHTML = bossEntries.length === 0
       ? '<div class="modal-boss-empty">이 날 클리어한 보스가 없어요.</div>'
-      : bossEntries.map(e => {
-          const c = state.characters.find(x => x.id === e.characterId);
+      : Object.keys(charCrystalMap).map(cid => {
+          const c = state.characters.find(x => x.id === cid);
           return `
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
-              ${iconForBossName(e.bossName) ? `<img class="modal-boss-icon" src="${iconForBossName(e.bossName)}" alt="">` : ''}
-              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.bossName || '')}</span>
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')}</span>
             </span>
-            <span class="price">${formatMeso(e.money || 0)}</span>
+            <span class="price">${formatMeso(charCrystalMap[cid])}</span>
           </div>
         `;
         }).join('');
@@ -2989,7 +3124,7 @@
             <span class="modal-boss-row-left">
               <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(e.time)}</span>
             </span>
-            <span class="price">${formatMeso(e.money)}</span>
+            <span class="price hunt-price">${formatMeso(e.money)}</span>
           </div>
         `;
         }).join('');
@@ -3184,7 +3319,12 @@
     document.getElementById('totalFigure').textContent = formatHM(combinedDone);
     document.getElementById('totalSub').textContent = `완료 ${formatHM(combinedDone)} / 전체 ${formatHM(combinedTotal)}`;
     document.getElementById('timeBreakdown').textContent = `보스 ${formatHM(done)} · 사냥 ${formatHM(huntTotals.time)}`;
-    document.getElementById('totalFill').style.width = pct + '%';
+    document.getElementById('totalFillWrap').style.width = pct + '%';
+    const bossPctOfTrack = combinedTotal > 0 ? (done / combinedTotal) * 100 : 0;
+    const huntPctOfTrack = combinedTotal > 0 ? (huntTotals.time / combinedTotal) * 100 : 0;
+    const trackTotalPct = bossPctOfTrack + huntPctOfTrack;
+    document.getElementById('bossTimeFill').style.width = (trackTotalPct > 0 ? (bossPctOfTrack / trackTotalPct) * 100 : 0) + '%';
+    document.getElementById('huntTimeFill').style.width = (trackTotalPct > 0 ? (huntPctOfTrack / trackTotalPct) * 100 : 0) + '%';
     document.getElementById('totalPct').textContent = pct + '%';
 
     const { earned, potential } = weeklyBossTotals();
@@ -3252,9 +3392,10 @@
               : `<span class="task-time chip-placeholder">0분</span>`)
           : '';
         const bossEarnedForChar = taskLinkedBossEarned(task.id);
+        const bossPotentialForChar = taskLinkedBossPotential(task.id);
         const bossChipHtml = (isWeekly || isMonthly)
-          ? (character && bossEarnedForChar > 0
-              ? `<span class="task-boss-total">${COIN_ICON} ${formatMesoCompact(bossEarnedForChar)}</span>`
+          ? (character && bossPotentialForChar > 0
+              ? `<span class="task-boss-total" id="bossChip_${task.id}">${COIN_ICON} ${formatMesoCompact(task.completed ? bossEarnedForChar : bossPotentialForChar)}</span>`
               : `<span class="task-boss-total chip-placeholder">${COIN_ICON} 0억</span>`)
           : '';
         const metaHtml = (!character && !isMemo && task.time > 0)
@@ -3285,7 +3426,7 @@
     }
 
     return `
-      <div class="card board" data-id="${cat.id}"
+      <div class="card board ${panelOpen ? 'board-editing' : ''}" data-id="${cat.id}"
            ondragover="onDragOverItem(event)"
            ondrop="onDropOnItem(event, 'board', '${cat.id}', '${cat.theme}')">
         <div class="board-header">
@@ -3297,7 +3438,7 @@
           </div>
           <div class="board-header-actions">
             <button class="mark-all-btn" onclick="markAllComplete('${cat.id}')">모두 완료</button>
-            <button class="boss-settings-btn" title="편집" onclick="toggleBossPanel('${cat.id}')">🛠️</button>
+            <button class="boss-settings-btn ${panelOpen ? 'active' : ''}" title="편집" onclick="toggleBossPanel('${cat.id}')">🛠️</button>
             <button class="board-delete" title="목록 삭제" onclick="deleteBoard('${cat.id}')">🗑</button>
           </div>
         </div>
