@@ -477,7 +477,8 @@
     font-size: 11px; color: var(--muted); padding: 2px 7px 2px 8px; border-radius: 20px;
     white-space: nowrap; flex-shrink: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   }
-  .task-char-icon { display: block; width: 12px; height: 12px; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .task-char-icon-wrap { width: 12px; height: 12px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+  .task-char-icon { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.9); transform-origin: 50% 15%; }
   .task-char {
     background: var(--track);
     border-left: 3px solid var(--chip-accent, var(--accent));
@@ -3532,7 +3533,7 @@
         const character = task.characterId ? state.characters.find(c => c.id === task.characterId) : null;
 
         const charChipHtml = character
-          ? `<span class="task-char">${character.image ? `<img class="task-char-icon" src="${character.image}" alt="">` : ''}${escapeHtml(character.name)}</span>`
+          ? `<span class="task-char">${character.image ? `<span class="task-char-icon-wrap"><img class="task-char-icon" src="${character.image}" alt=""></span>` : ''}${escapeHtml(character.name)}</span>`
           : `<span class="task-char chip-placeholder">-</span>`;
         const timeChipHtml = !isMemo
           ? (task.time > 0
