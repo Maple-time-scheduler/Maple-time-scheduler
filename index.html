@@ -785,6 +785,10 @@
       <div style="font-size:10.5px; color:var(--muted); margin:-4px 0 8px;">메소는 그대로, 조각은 거래 수수료 3%를 제외하고 기록돼요.</div>
       <div class="modal-warning" id="huntWarning" style="display:none;"></div>
       <div class="modal-boss-list" id="huntList" style="height:auto; max-height:160px;"></div>
+      <div style="display:flex; justify-content:flex-end; margin-top:6px; font-size:11.5px; font-weight:700;">
+        <span style="color:var(--muted); font-weight:400; margin-right:4px;">이번 주 합계</span>
+        <span id="huntWeekTotalLabel" style="color:var(--money-grad-1);">0억</span>
+      </div>
     </div>
   </div>
 
@@ -995,7 +999,7 @@
 
       <div class="stat-group-title">💎 고정 리워드 (에리온의 조각 · 에테르넬 조각)</div>
       <div class="stat-section">
-        <h2>메소 환산 없이 개수만 집계 (완료 / 등록된 전체)</h2>
+        <h2>메소 환산 없이 개수만 집계 (이번 주는 등록 기준 확정값 · 누적은 완료 / 등록된 전체)</h2>
         <div class="summary-bar">
           <div class="summary-card erion">
             <div class="label">이번 주 에리온</div>
@@ -1529,6 +1533,10 @@
           </div>
         `;
         }).join('');
+
+    const weekTotalMoney = Object.values(byDate).reduce((s, v) => s + v, 0);
+    const totalLabelEl = document.getElementById('huntWeekTotalLabel');
+    if (totalLabelEl) totalLabelEl.textContent = formatMeso(weekTotalMoney);
   }
 
   // 이번 주(목~수) 재획 시간·수입 합계 — 주간 진행도·주간 수익에 그대로 더해집니다.
@@ -1676,7 +1684,6 @@
           ${data.doneCount > 0 ? `
             <div class="stat-row time">⏱ ${formatHMShort(data.timeMin)}</div>
             <div class="stat-row money">${COIN_ICON} ${formatMesoCompact(data.moneyRaw)}</div>
-            <div class="done-count">완료 ${data.doneCount}개</div>
           ` : `<div class="done-count muted">${isFuture ? '-' : '기록 없음'}</div>`}
         </div>
       `);
@@ -2195,9 +2202,13 @@
     function setCard(elId, doneVal, totalVal) {
       document.getElementById(elId).textContent = `${formatDropCount(doneVal)} / ${formatDropCount(totalVal)}`;
     }
-    setCard('calFixedDropWeekErion', thisWeek.erion, potential.totals.erion);
-    setCard('calFixedDropWeekEternelUpper', thisWeek.eternelUpper, potential.totals.eternelUpper);
-    setCard('calFixedDropWeekEternelAcc', thisWeek.eternelAccessory, potential.totals.eternelAccessory);
+    function setWeekCard(elId, val) {
+      document.getElementById(elId).textContent = formatDropCount(val);
+    }
+    // 이번 주는 체크 여부와 무관하게, 현재 등록된 보스 기준 확정값을 그대로 보여줍니다 (등록 = 이번 주 안에 먹는다는 전제)
+    setWeekCard('calFixedDropWeekErion', potential.totals.erion);
+    setWeekCard('calFixedDropWeekEternelUpper', potential.totals.eternelUpper);
+    setWeekCard('calFixedDropWeekEternelAcc', potential.totals.eternelAccessory);
     setCard('calFixedDropTotalErion', drop.cumulative.erion, potential.totals.erion);
     setCard('calFixedDropTotalEternelUpper', drop.cumulative.eternelUpper, potential.totals.eternelUpper);
     setCard('calFixedDropTotalEternelAcc', drop.cumulative.eternelAccessory, potential.totals.eternelAccessory);
@@ -2768,6 +2779,40 @@
         state.rareItemLog = state.rareItemLog || [];
         state.huntLog = state.huntLog || [];
         state.shardPrice = state.shardPrice || 0;
+
+        // 마이그레이션: 에리온/에테 기능 추가 이전에 등록됐던 보스 항목들은 해당 필드가 없어서
+        // 체크해도 0으로 집계되던 문제를 보정합니다. bossName/difficulty/partySize가 그대로 있으니
+        // 최신 드랍표 기준으로 다시 계산해서 채워넣고, 과거 완료 기록(completionLog)도 같은 taskId를
+        // 가진 현재 항목이 남아있다면 그 값으로 함께 보정합니다.
+        let fixedDropMigrated = false;
+        state.tasks.forEach(t => {
+          if (!t.isBoss) return;
+          const extra = extraDropsFor(t.bossName, t.bossDifficulty, t.partySize);
+          if (t.erionAmount !== extra.erion || t.eternelUpperAmount !== extra.eternelUpper || t.eternelAccessoryAmount !== extra.eternelAccessory) {
+            t.erionAmount = extra.erion;
+            t.eternelUpperAmount = extra.eternelUpper;
+            t.eternelAccessoryAmount = extra.eternelAccessory;
+            fixedDropMigrated = true;
+          }
+        });
+        const tasksById = {};
+        state.tasks.forEach(t => { tasksById[t.id] = t; });
+        Object.keys(state.completionLog).forEach(dateStr => {
+          Object.keys(state.completionLog[dateStr]).forEach(taskId => {
+            const entry = state.completionLog[dateStr][taskId];
+            if (!entry.isBoss) return;
+            const hasAny = (entry.erion || 0) > 0 || (entry.eternelUpper || 0) > 0 || (entry.eternelAccessory || 0) > 0;
+            if (hasAny) return;
+            const liveTask = tasksById[taskId] || tasksById[Number(taskId)];
+            if (!liveTask) return;
+            const le = liveTask.erionAmount || 0, lu = liveTask.eternelUpperAmount || 0, la = liveTask.eternelAccessoryAmount || 0;
+            if (le > 0 || lu > 0 || la > 0) {
+              entry.erion = le; entry.eternelUpper = lu; entry.eternelAccessory = la;
+              fixedDropMigrated = true;
+            }
+          });
+        });
+        if (fixedDropMigrated) migratedFromLegacy = true; // 아래에서 saveState() 트리거용으로 재사용
       }
     } catch (e) {
       console.error('저장된 데이터를 불러오지 못했습니다:', e);
