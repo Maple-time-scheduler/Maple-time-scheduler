@@ -131,6 +131,7 @@
   .summary-card.hunt .value { color: var(--hunt-color); }
   .summary-card.erion .value { color: var(--erion-color); }
   .summary-card.eternel .value { color: var(--eternel-color); }
+  .summary-card-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
   .rank-list.erion .rank-bar-fill { background: var(--erion-color); }
   .rank-list.erion .rank-value { color: var(--erion-color); }
   .rank-list.eternel .rank-bar-fill { background: var(--eternel-color); }
@@ -999,33 +1000,58 @@
 
       <div class="stat-group-title">💎 고정 리워드 (에리온의 조각 · 에테르넬 조각)</div>
       <div class="stat-section">
-        <h2>메소 환산 없이 개수만 집계 (이번 주는 등록 기준 확정값 · 누적은 완료 / 등록된 전체)</h2>
+        <div class="shard-price-mini-row" style="flex-wrap:wrap; gap:6px;">
+          <div class="shard-price-mini">
+            <span class="shard-price-mini-label">에리온 시세</span>
+            <input type="text" inputmode="numeric" id="erionPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <span class="shard-price-mini-label">만</span>
+            <button onclick="saveExtraDropPrice('erion')">✓</button>
+          </div>
+          <div class="shard-price-mini">
+            <span class="shard-price-mini-label">에테(상하모견) 시세</span>
+            <input type="text" inputmode="numeric" id="eternelUpperPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <span class="shard-price-mini-label">억</span>
+            <button onclick="saveExtraDropPrice('eternelUpper')">✓</button>
+          </div>
+          <div class="shard-price-mini">
+            <span class="shard-price-mini-label">에테(장신망) 시세</span>
+            <input type="text" inputmode="numeric" id="eternelAccessoryPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <span class="shard-price-mini-label">억</span>
+            <button onclick="saveExtraDropPrice('eternelAccessory')">✓</button>
+          </div>
+        </div>
         <div class="summary-bar">
           <div class="summary-card erion">
             <div class="label">이번 주 에리온</div>
             <div class="value" id="calFixedDropWeekErion">0개</div>
+            <div class="summary-card-sub" id="calFixedDropWeekErionMoney"></div>
           </div>
           <div class="summary-card eternel">
             <div class="label">이번 주 에테(상하모견)</div>
             <div class="value" id="calFixedDropWeekEternelUpper">0개</div>
+            <div class="summary-card-sub" id="calFixedDropWeekEternelUpperMoney"></div>
           </div>
           <div class="summary-card eternel">
             <div class="label">이번 주 에테(장신망)</div>
             <div class="value" id="calFixedDropWeekEternelAcc">0개</div>
+            <div class="summary-card-sub" id="calFixedDropWeekEternelAccMoney"></div>
           </div>
         </div>
         <div class="summary-bar" style="margin-top:8px;">
           <div class="summary-card erion">
             <div class="label">누적 에리온</div>
             <div class="value" id="calFixedDropTotalErion">0개</div>
+            <div class="summary-card-sub" id="calFixedDropTotalErionMoney"></div>
           </div>
           <div class="summary-card eternel">
             <div class="label">누적 에테(상하모견)</div>
             <div class="value" id="calFixedDropTotalEternelUpper">0개</div>
+            <div class="summary-card-sub" id="calFixedDropTotalEternelUpperMoney"></div>
           </div>
           <div class="summary-card eternel">
             <div class="label">누적 에테(장신망)</div>
             <div class="value" id="calFixedDropTotalEternelAcc">0개</div>
+            <div class="summary-card-sub" id="calFixedDropTotalEternelAccMoney"></div>
           </div>
         </div>
         <div class="rank-section" style="margin-top:14px;">
@@ -1209,26 +1235,26 @@
   // 시세 변동이 너무 커서 메소로 환산하지 않고, 개수만 집계합니다. (사냥의 '솔 에르다 조각'과는 완전히 다른 재화)
   const EXTRA_DROP_DATA = {
     '선택받은 세렌|익스트림': { erion: 30, eternel: 0 },
-    '감시자 칼로스|노멀': { erion: 0, eternel: 1.5 },
-    '감시자 칼로스|카오스': { erion: 0, eternel: 5 },
-    '감시자 칼로스|익스트림': { erion: 180, eternel: 14 },
-    '최초의 대적자|노멀': { erion: 0, eternel: 2 },
-    '최초의 대적자|하드': { erion: 30, eternel: 6 },
-    '최초의 대적자|익스트림': { erion: 240, eternel: 16 },
-    '카링|이지': { erion: 0, eternel: 0.5 },
-    '카링|노멀': { erion: 0, eternel: 2.5 },
-    '카링|하드': { erion: 60, eternel: 7 },
-    '카링|익스트림': { erion: 400, eternel: 18 },
-    '찬란한 흉성|노멀': { erion: 0, eternel: 3 },
-    '찬란한 흉성|하드': { erion: 90, eternel: 18 },
-    '벨로나|노멀': { erion: 0, eternel: 1 },
-    '벨로나|하드': { erion: 100, eternel: 2 },
-    '림보|노멀': { erion: 0, eternel: 1 },
-    '림보|하드': { erion: 60, eternel: 2 },
-    '발드릭스|노멀': { erion: 0, eternel: 1 },
-    '발드릭스|하드': { erion: 120, eternel: 2 },
-    '유피테르|노멀': { erion: 45, eternel: 1 },
-    '유피테르|하드': { erion: 360, eternel: 2 },
+    '감시자 칼로스|노멀': { erion: 0, eternel: 0.15 },
+    '감시자 칼로스|카오스': { erion: 0, eternel: 0.5 },
+    '감시자 칼로스|익스트림': { erion: 180, eternel: 1.4 },
+    '최초의 대적자|노멀': { erion: 0, eternel: 0.2 },
+    '최초의 대적자|하드': { erion: 30, eternel: 0.6 },
+    '최초의 대적자|익스트림': { erion: 240, eternel: 1.6 },
+    '카링|이지': { erion: 0, eternel: 0.05 },
+    '카링|노멀': { erion: 0, eternel: 0.25 },
+    '카링|하드': { erion: 60, eternel: 0.7 },
+    '카링|익스트림': { erion: 400, eternel: 1.8 },
+    '찬란한 흉성|노멀': { erion: 0, eternel: 0.3 },
+    '찬란한 흉성|하드': { erion: 90, eternel: 1.8 },
+    '벨로나|노멀': { erion: 0, eternel: 0.1 },
+    '벨로나|하드': { erion: 100, eternel: 0.2 },
+    '림보|노멀': { erion: 0, eternel: 0.1 },
+    '림보|하드': { erion: 60, eternel: 0.2 },
+    '발드릭스|노멀': { erion: 0, eternel: 0.1 },
+    '발드릭스|하드': { erion: 120, eternel: 0.2 },
+    '유피테르|노멀': { erion: 45, eternel: 0.1 },
+    '유피테르|하드': { erion: 360, eternel: 0.2 },
   };
   // 이 보스들의 에테르넬 조각은 '장신망' 종류(인원수와 무관하게 고정 개수로 드랍). 나머지는 전부 '상하모견' 종류(1/n 분배)
   const ETERNEL_ACCESSORY_BOSSES = new Set(['벨로나', '림보', '발드릭스', '유피테르']);
@@ -1449,6 +1475,27 @@
     state.shardPrice = manUnits * 10000;
     saveState();
     renderShardPriceInput();
+  }
+
+  const EXTRA_DROP_PRICE_FIELD = { erion: 'erionPrice', eternelUpper: 'eternelUpperPrice', eternelAccessory: 'eternelAccessoryPrice' };
+  const EXTRA_DROP_PRICE_INPUT_ID = { erion: 'erionPriceInput', eternelUpper: 'eternelUpperPriceInput', eternelAccessory: 'eternelAccessoryPriceInput' };
+  const EXTRA_DROP_PRICE_UNIT = { erion: 10000, eternelUpper: 100000000, eternelAccessory: 100000000 }; // 에리온=만, 에테=억
+  function saveExtraDropPrice(kind) {
+    const el = document.getElementById(EXTRA_DROP_PRICE_INPUT_ID[kind]);
+    if (!el) return;
+    const units = parseInt(el.value) || 0;
+    state[EXTRA_DROP_PRICE_FIELD[kind]] = units * EXTRA_DROP_PRICE_UNIT[kind];
+    saveState();
+    renderExtraDropPriceInputs();
+    renderFixedDropStats();
+  }
+  function renderExtraDropPriceInputs() {
+    Object.keys(EXTRA_DROP_PRICE_INPUT_ID).forEach(kind => {
+      const el = document.getElementById(EXTRA_DROP_PRICE_INPUT_ID[kind]);
+      if (!el || document.activeElement === el) return;
+      const price = state[EXTRA_DROP_PRICE_FIELD[kind]] || 0;
+      el.value = price > 0 ? String(Math.round(price / EXTRA_DROP_PRICE_UNIT[kind])) : '';
+    });
   }
 
 
@@ -1990,10 +2037,10 @@
     return { cumulative, byWeek, byMonth };
   }
 
-  // 결정석/물욕/재획 구성비를 보여주는 도넛 차트를 그립니다 (외부 라이브러리 없이 순수 SVG)
+  // 결정석/물욕/재획(+선택적으로 고정보상) 구성비를 보여주는 도넛 차트를 그립니다 (외부 라이브러리 없이 순수 SVG)
   function renderDonutChart(containerId, data) {
     const container = document.getElementById(containerId);
-    const total = (data.crystal || 0) + (data.item || 0) + (data.hunt || 0);
+    const total = (data.crystal || 0) + (data.item || 0) + (data.hunt || 0) + (data.fixedReward || 0);
     if (total <= 0) {
       container.innerHTML = '<div class="empty-state" style="text-align:center; padding:20px 0;">기록이 없어요.</div>';
       return;
@@ -2002,6 +2049,7 @@
     const circumference = 2 * Math.PI * r;
     const segments = [
       { label: '결정석', value: data.crystal || 0, color: 'var(--money-grad-1)' },
+      { label: '고정보상', value: data.fixedReward || 0, color: 'var(--theme-daily)' },
       { label: '물욕', value: data.item || 0, color: 'var(--rare-color)' },
       { label: '재획', value: data.hunt || 0, color: 'var(--hunt-color)' },
     ];
@@ -2086,7 +2134,14 @@
     const catTotals = calCategoryTotals();
     const weekKey = donutSelectedWeekKey || currentWeekKey();
     document.getElementById('donutWeekLabel').innerHTML = `${mapleWeekLabel(weekKey)}`;
-    renderDonutChart('donutWeekChart', catTotals.byWeek[weekKey] || { crystal: 0, item: 0, hunt: 0 });
+    const base = catTotals.byWeek[weekKey] || { crystal: 0, item: 0, hunt: 0 };
+    // 고정보상은 '완료' 개념이 없어 현재 등록된 값을 이번 주 확정치로 그대로 반영합니다 (이번 주 도넛에서만)
+    const isCurrentWeek = weekKey === currentWeekKey();
+    const fixedReward = isCurrentWeek ? (() => {
+      const d = fixedDropPotentialTotals().totals;
+      return d.erion * (state.erionPrice || 0) + d.eternelUpper * (state.eternelUpperPrice || 0) + d.eternelAccessory * (state.eternelAccessoryPrice || 0);
+    })() : 0;
+    renderDonutChart('donutWeekChart', { ...base, fixedReward });
   }
 
   function renderDonutMonth() {
@@ -2195,15 +2250,18 @@
   function renderFixedDropStats() {
     const drop = calFixedDropTotals();
     const potential = fixedDropPotentialTotals();
-    const thursday = calThisWeekThursday(new Date());
-    const weekKey = kstDateString(new Date(Date.UTC(thursday.getFullYear(), thursday.getMonth(), thursday.getDate())));
-    const thisWeek = drop.byWeek[weekKey] || { erion: 0, eternelUpper: 0, eternelAccessory: 0 };
+    renderExtraDropPriceInputs();
 
     function setCard(elId, doneVal, totalVal) {
       document.getElementById(elId).textContent = `${formatDropCount(doneVal)} / ${formatDropCount(totalVal)}`;
     }
     function setWeekCard(elId, val) {
       document.getElementById(elId).textContent = formatDropCount(val);
+    }
+    function setMoneySub(elId, count, price) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.textContent = price > 0 ? `≈ ${formatMesoCompact(Math.round(count * price))}` : '';
     }
     // 이번 주는 체크 여부와 무관하게, 현재 등록된 보스 기준 확정값을 그대로 보여줍니다 (등록 = 이번 주 안에 먹는다는 전제)
     setWeekCard('calFixedDropWeekErion', potential.totals.erion);
@@ -2212,6 +2270,13 @@
     setCard('calFixedDropTotalErion', drop.cumulative.erion, potential.totals.erion);
     setCard('calFixedDropTotalEternelUpper', drop.cumulative.eternelUpper, potential.totals.eternelUpper);
     setCard('calFixedDropTotalEternelAcc', drop.cumulative.eternelAccessory, potential.totals.eternelAccessory);
+
+    setMoneySub('calFixedDropWeekErionMoney', potential.totals.erion, state.erionPrice);
+    setMoneySub('calFixedDropWeekEternelUpperMoney', potential.totals.eternelUpper, state.eternelUpperPrice);
+    setMoneySub('calFixedDropWeekEternelAccMoney', potential.totals.eternelAccessory, state.eternelAccessoryPrice);
+    setMoneySub('calFixedDropTotalErionMoney', drop.cumulative.erion, state.erionPrice);
+    setMoneySub('calFixedDropTotalEternelUpperMoney', drop.cumulative.eternelUpper, state.eternelUpperPrice);
+    setMoneySub('calFixedDropTotalEternelAccMoney', drop.cumulative.eternelAccessory, state.eternelAccessoryPrice);
 
     function renderRank(elId, key) {
       const list = Object.keys(drop.byCharacter)
@@ -2422,6 +2487,7 @@
     rareItemLog: [], // 물욕템(희귀 드랍) 획득 기록 — 보스 결정석 수익과는 완전히 별도로 관리
     huntLog: [], // 사냥(재획) 기록 — {id, dateStr, characterId, time, meso, shardCount, shardPriceAtEntry, shardMoney, money}. money(=meso+shardMoney)가 주간 진행도/주간 수익에 합산됨
     shardPrice: 0, // 조각 1개당 시세(메소) — 언제든 수정 가능, 기록 시점의 값이 각 기록에 그대로 저장(고정)됨
+    erionPrice: 0, eternelUpperPrice: 0, eternelAccessoryPrice: 0, // 에리온/에테 1개당 참고 시세(메소) — 변동성이 커서 집계에는 안 쓰고, 예상 금액 참고용으로만
     characters: [
       { id: 'char_1', name: '섀도어' },
       { id: 'char_2', name: '나이트로드' }
@@ -2779,6 +2845,23 @@
         state.rareItemLog = state.rareItemLog || [];
         state.huntLog = state.huntLog || [];
         state.shardPrice = state.shardPrice || 0;
+        state.erionPrice = state.erionPrice || 0;
+        state.eternelUpperPrice = state.eternelUpperPrice || 0;
+        state.eternelAccessoryPrice = state.eternelAccessoryPrice || 0;
+
+        // 일회성 마이그레이션: 에테(상하모견/장신망) 집계 단위를 '조각 개수'에서 '완성 아이템 개수'(조각 10개=1개)로
+        // 변경하면서, 이미 쌓여있던 과거 완료 기록의 에테 수치도 딱 한 번만 1/10로 보정합니다.
+        if (!state.eternelScaleDivBy10Migrated) {
+          Object.keys(state.completionLog || {}).forEach(dateStr => {
+            Object.values(state.completionLog[dateStr]).forEach(entry => {
+              if (!entry.isBoss) return;
+              if (entry.eternelUpper) entry.eternelUpper = entry.eternelUpper / 10;
+              if (entry.eternelAccessory) entry.eternelAccessory = entry.eternelAccessory / 10;
+            });
+          });
+          state.eternelScaleDivBy10Migrated = true;
+          migratedFromLegacy = true;
+        }
 
         // 마이그레이션: 에리온/에테 기능 추가 이전에 등록됐던 보스 항목들은 해당 필드가 없어서
         // 체크해도 0으로 집계되던 문제를 보정합니다. bossName/difficulty/partySize가 그대로 있으니
@@ -3904,15 +3987,19 @@
     const { earned, potential } = weeklyBossTotals();
     const itemMoney = weeklyRareItemTotal();
     const huntMoney = huntTotals.money;
-    const combinedEarned = earned + itemMoney + huntMoney;
-    const combinedPotential = potential + itemMoney + huntMoney; // 물욕템·재획 수입은 '완료' 즉시 기록이라 잠재치 없이 그대로 더해짐
+    const dropPotential = fixedDropPotentialTotals().totals;
+    const fixedRewardMoney = dropPotential.erion * (state.erionPrice || 0)
+      + dropPotential.eternelUpper * (state.eternelUpperPrice || 0)
+      + dropPotential.eternelAccessory * (state.eternelAccessoryPrice || 0);
+    const combinedEarned = earned + itemMoney + huntMoney + fixedRewardMoney;
+    const combinedPotential = potential + itemMoney + huntMoney + fixedRewardMoney; // 물욕템·재획·고정보상은 '완료' 즉시 기록이라 잠재치 없이 그대로 더해짐
     const moneyBlock = document.getElementById('moneyBlock');
     if (combinedPotential > 0) {
       moneyBlock.style.display = 'block';
       const moneyPct = Math.round((combinedEarned / combinedPotential) * 100);
       document.getElementById('moneyFigure').textContent = formatMeso(combinedEarned);
       document.getElementById('moneySub').textContent = `완료 ${formatMeso(combinedEarned)} / 전체 ${formatMeso(combinedPotential)}`;
-      document.getElementById('moneyBreakdown').textContent = `결정석 ${formatMesoCompact(earned)} · 물욕템 ${formatMesoCompact(itemMoney)} · 재획 ${formatMesoCompact(huntMoney)}`;
+      document.getElementById('moneyBreakdown').textContent = `결정석 ${formatMesoCompact(earned)} · 물욕템 ${formatMesoCompact(itemMoney)} · 재획 ${formatMesoCompact(huntMoney)} · 고정보상 ${formatMesoCompact(fixedRewardMoney)}`;
       document.getElementById('moneyFill').style.width = moneyPct + '%';
       document.getElementById('moneyPct').textContent = moneyPct + '%';
     } else {
