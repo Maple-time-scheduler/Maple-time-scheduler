@@ -31,6 +31,7 @@
     --money-grad-pale: #EED68C;
     --rare-color: #4B4B4B;
     --hunt-color: #1AA398;
+    --hunt-color-pale: #A8E8E2;
   }
   [data-theme="dark"] {
     --bg: #18171C;
@@ -58,6 +59,7 @@
     --money-grad-pale: #FFE19D;
     --rare-color: #B0B0B0;
     --hunt-color: #4FE0D0;
+    --hunt-color-pale: #B0F0E8;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -123,6 +125,25 @@
   .summary-card.money .value { color: var(--money-grad-1); }
   .summary-card.rare .value { color: var(--rare-color); }
   .summary-card.hunt .value { color: var(--hunt-color); }
+
+  .stats-toggle-card { cursor: pointer; user-select: none; transition: transform 0.15s ease; }
+  .stats-toggle-card:hover { transform: translateY(-2px); }
+  .stats-toggle-card:active { transform: translateY(0); }
+  .stats-toggle-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px; }
+  .mode-badge {
+    font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    background: var(--track); color: var(--muted); white-space: nowrap; transition: background 0.2s ease, color 0.2s ease;
+  }
+  .stats-toggle-card[data-mode="week"] .mode-badge { background: var(--theme-weekly); color: #fff; }
+  .stats-toggle-card[data-mode="month"] .mode-badge { background: var(--theme-monthly); color: #fff; }
+  .mode-dots { display: flex; gap: 4px; margin-top: 6px; }
+  .mode-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.2s ease; }
+  .mode-dots span.active { background: var(--accent); transform: scale(1.3); }
+  .stats-toggle-card .value.pulse { animation: statsValuePulse 0.4s ease; }
+  @keyframes statsValuePulse {
+    0% { opacity: 0.25; transform: scale(0.94); }
+    100% { opacity: 1; transform: scale(1); }
+  }
 
   #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   #calendarPage .day-card {
@@ -277,11 +298,10 @@
   .char-icon-danger:hover { color: var(--danger); }
   .char-avatar-wrap { position: relative; margin-top: 4px; }
   .char-avatar {
-    width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 16px;
-    background: var(--accent-soft); border: 1px solid var(--border);
+    width: 48px; height: 48px; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
   }
-  .char-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .char-avatar img { width: 100%; height: 100%; object-fit: contain; }
   .char-number-badge {
     position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-radius: 50%;
     background: var(--accent-strong); color: #fff; font-size: 8.5px; font-weight: 700;
@@ -328,6 +348,9 @@
   }
   .hunt-form-row select { flex: 1.4; min-width: 90px; }
   .hunt-form-row input { flex: 1; min-width: 80px; }
+  .hunt-date-input { cursor: pointer; }
+  .hunt-date-input::-webkit-calendar-picker-indicator { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .hunt-date-input { position: relative; }
   .hunt-form-row button {
     padding: 8px 14px; background: var(--accent); color: #fff; border: none; border-radius: 7px;
     font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0;
@@ -350,9 +373,10 @@
     background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(0,0,0,0.05) 10%);
   }
   [data-theme="dark"] .exp-track { background-image: repeating-linear-gradient(90deg, transparent, transparent calc(10% - 1px), rgba(255,255,255,0.06) 10%); }
-  .exp-fill-wrap { display: flex; height: 100%; width: 0%; transition: width 0.4s ease; }
-  .exp-fill-boss { height: 100%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%); flex-shrink: 0; }
-  .exp-fill-hunt { height: 100%; background: var(--hunt-color); flex-shrink: 0; }
+  .exp-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, var(--time-grad-pale) 30%, var(--time-grad-1) 100%);
+    transition: width 0.4s ease;
+  }
   .exp-pct {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
     font-size: 12px; font-weight: 700; color: var(--ink); text-shadow: 0 1px 0 rgba(255,255,255,0.4);
@@ -364,7 +388,7 @@
   .money-figure { font-size: 20px; font-weight: 700; color: var(--money-grad-1); }
   .money-sub-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; }
   .money-sub { font-size: 12.5px; color: var(--muted); }
-  .money-breakdown { font-size: 11px; color: var(--muted); opacity: 0.85; white-space: nowrap; }
+  .money-breakdown { font-size: 11px; color: var(--muted); opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .money-track {
     width: 100%; height: 22px; border-radius: 999px; background: var(--track); border: 1px solid var(--border);
     overflow: hidden; position: relative;
@@ -694,7 +718,7 @@
       </div>
       <div class="hunt-form-row">
         <select id="huntCharSelect"></select>
-        <input type="date" id="huntDateInput" onchange="renderHuntList()">
+        <input type="date" id="huntDateInput" class="hunt-date-input" onchange="renderHuntList()" onclick="this.showPicker && this.showPicker()">
         <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="numeric" id="huntShardInput" placeholder="조각 개수" oninput="this.value = this.value.replace(/[^\d]/g, '')">
@@ -716,10 +740,7 @@
       <span class="money-breakdown" id="timeBreakdown"></span>
     </div>
     <div class="exp-track">
-      <div class="exp-fill-wrap" id="totalFillWrap">
-        <div class="exp-fill-boss" id="bossTimeFill"></div>
-        <div class="exp-fill-hunt" id="huntTimeFill"></div>
-      </div>
+      <div class="exp-fill" id="totalFill"></div>
       <span class="exp-pct" id="totalPct">0%</span>
     </div>
     <div class="money-block" id="moneyBlock" style="display:none;">
@@ -830,17 +851,29 @@
       </div>
 
       <div class="summary-bar">
-        <div class="summary-card time" style="cursor:pointer;" onclick="cycleStatsCardMode('time')">
-          <div class="label" id="calStatsTimeLabel">누적 총 시간</div>
+        <div class="summary-card time stats-toggle-card" id="calStatsTimeCard" onclick="cycleStatsCardMode('time')">
+          <div class="stats-toggle-head">
+            <span class="label" id="calStatsTimeLabel">시간</span>
+            <span class="mode-badge" id="calStatsTimeModeBadge">누적</span>
+          </div>
           <div class="value" id="calStatsTotalTime">00:00</div>
+          <div class="mode-dots" id="calStatsTimeDots"></div>
         </div>
-        <div class="summary-card money" style="cursor:pointer;" onclick="cycleStatsCardMode('crystal')">
-          <div class="label" id="calStatsCrystalLabel">누적 총 결정석 수익</div>
+        <div class="summary-card money stats-toggle-card" id="calStatsCrystalCard" onclick="cycleStatsCardMode('crystal')">
+          <div class="stats-toggle-head">
+            <span class="label" id="calStatsCrystalLabel">결정석 수익</span>
+            <span class="mode-badge" id="calStatsCrystalModeBadge">누적</span>
+          </div>
           <div class="value" id="calStatsTotalMoney">0억</div>
+          <div class="mode-dots" id="calStatsCrystalDots"></div>
         </div>
-        <div class="summary-card rare" style="cursor:pointer;" onclick="cycleStatsCardMode('item')">
-          <div class="label" id="calStatsItemLabel">누적 총 물욕 수익</div>
+        <div class="summary-card rare stats-toggle-card" id="calStatsItemCard" onclick="cycleStatsCardMode('item')">
+          <div class="stats-toggle-head">
+            <span class="label" id="calStatsItemLabel">물욕 수익</span>
+            <span class="mode-badge" id="calStatsItemModeBadge">누적</span>
+          </div>
           <div class="value" id="calStatsRareTotal">0억</div>
+          <div class="mode-dots" id="calStatsItemDots"></div>
         </div>
         <div class="summary-card">
           <div class="label">주 평균 수익</div>
@@ -1836,8 +1869,24 @@
     statsCardMode[key] = modes[(idx + 1) % modes.length];
     calRenderStats();
   }
-  function statsModeLabelSuffix(mode) {
-    return mode === 'week' ? '주 평균' : mode === 'month' ? '월 평균' : '누적 총';
+  function statsModeBadgeText(mode) {
+    return mode === 'week' ? '주평균' : mode === 'month' ? '월평균' : '누적';
+  }
+  function renderStatsToggleCard(opts) {
+    const { key, cardId, badgeId, dotsId, valueId, cumulativeValue, weekCount, monthCount, formatter } = opts;
+    const mode = statsCardMode[key];
+    const rawValue = mode === 'week' ? cumulativeValue / weekCount : mode === 'month' ? cumulativeValue / monthCount : cumulativeValue;
+
+    document.getElementById(cardId).setAttribute('data-mode', mode);
+    document.getElementById(badgeId).textContent = statsModeBadgeText(mode);
+    const modes = ['cumulative', 'week', 'month'];
+    document.getElementById(dotsId).innerHTML = modes.map(m => `<span class="${m === mode ? 'active' : ''}"></span>`).join('');
+
+    const valueEl = document.getElementById(valueId);
+    valueEl.textContent = formatter(Math.round(rawValue));
+    valueEl.classList.remove('pulse');
+    void valueEl.offsetWidth; // 리플로우를 강제해서 애니메이션을 매번 새로 재생시킴
+    valueEl.classList.add('pulse');
   }
 
   function calRenderStats() {
@@ -1857,20 +1906,18 @@
     const weekCount = weekKeySet.size || 1;
     const monthCount = monthKeySet.size || 1;
 
-    function valueForMode(cumulativeValue, mode) {
-      if (mode === 'week') return cumulativeValue / weekCount;
-      if (mode === 'month') return cumulativeValue / monthCount;
-      return cumulativeValue;
-    }
-
-    document.getElementById('calStatsTimeLabel').textContent = `${statsModeLabelSuffix(statsCardMode.time)} 시간`;
-    document.getElementById('calStatsTotalTime').textContent = formatHM(Math.round(valueForMode(agg.totalTime, statsCardMode.time)));
-
-    document.getElementById('calStatsCrystalLabel').textContent = `${statsModeLabelSuffix(statsCardMode.crystal)} 결정석 수익`;
-    document.getElementById('calStatsTotalMoney').textContent = formatMeso(Math.round(valueForMode(catTotals.cumulative.crystal, statsCardMode.crystal)));
-
-    document.getElementById('calStatsItemLabel').textContent = `${statsModeLabelSuffix(statsCardMode.item)} 물욕 수익`;
-    document.getElementById('calStatsRareTotal').textContent = formatMeso(Math.round(valueForMode(catTotals.cumulative.item, statsCardMode.item)));
+    renderStatsToggleCard({
+      key: 'time', cardId: 'calStatsTimeCard', badgeId: 'calStatsTimeModeBadge', dotsId: 'calStatsTimeDots',
+      valueId: 'calStatsTotalTime', cumulativeValue: agg.totalTime, weekCount, monthCount, formatter: formatHM
+    });
+    renderStatsToggleCard({
+      key: 'crystal', cardId: 'calStatsCrystalCard', badgeId: 'calStatsCrystalModeBadge', dotsId: 'calStatsCrystalDots',
+      valueId: 'calStatsTotalMoney', cumulativeValue: catTotals.cumulative.crystal, weekCount, monthCount, formatter: formatMeso
+    });
+    renderStatsToggleCard({
+      key: 'item', cardId: 'calStatsItemCard', badgeId: 'calStatsItemModeBadge', dotsId: 'calStatsItemDots',
+      valueId: 'calStatsRareTotal', cumulativeValue: catTotals.cumulative.item, weekCount, monthCount, formatter: formatMeso
+    });
 
     const weekKeys = Object.keys(agg.weekTotals).sort();
     const weekAvg = weekKeys.length > 0 ? agg.totalMoney / weekKeys.length : 0;
@@ -3189,6 +3236,93 @@
   function renderCharEditAvatarPreview(image) {
     document.getElementById('charEditAvatarPreview').innerHTML = image ? `<img src="${image}" alt="">` : '👤';
   }
+  // 캐릭터 아바타 이미지를 업로드하면: (1) 가장자리 색을 기준으로 배경을 투명 처리하고,
+  // (2) 남은 캐릭터의 bounding box를 찾아 상반신 위주로 정사각형 크롭한 뒤,
+  // (3) 알파 채널이 살아있는 PNG로 저장합니다. (JPEG로 저장하면 투명 영역이 검게 칠해지는 문제가 있었음)
+  function autoProcessCharAvatar(img, outSize, callback) {
+    const workMax = 220;
+    const scale0 = Math.min(1, workMax / Math.max(img.width, img.height));
+    const w0 = Math.max(1, Math.round(img.width * scale0));
+    const h0 = Math.max(1, Math.round(img.height * scale0));
+    const workCanvas = document.createElement('canvas');
+    workCanvas.width = w0; workCanvas.height = h0;
+    const wctx = workCanvas.getContext('2d');
+    wctx.drawImage(img, 0, 0, w0, h0);
+
+    const imgData = wctx.getImageData(0, 0, w0, h0);
+    const data = imgData.data;
+    const total = w0 * h0;
+    const visited = new Uint8Array(total);
+    const removedMask = new Uint8Array(total);
+    const queue = [];
+    let qHead = 0;
+    function pushSeed(x, y) {
+      const i = y * w0 + x;
+      if (visited[i]) return;
+      visited[i] = 1;
+      removedMask[i] = 1;
+      const p = i * 4;
+      queue.push([x, y, data[p], data[p + 1], data[p + 2], 0]);
+    }
+    for (let x = 0; x < w0; x++) { pushSeed(x, 0); pushSeed(x, h0 - 1); }
+    for (let y = 0; y < h0; y++) { pushSeed(0, y); pushSeed(w0 - 1, y); }
+
+    const stepTol = 30, maxTotalTol = 260;
+    while (qHead < queue.length) {
+      const [x, y, r, g, b, drift] = queue[qHead++];
+      const neighbors = [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]];
+      for (const [nx, ny] of neighbors) {
+        if (nx < 0 || ny < 0 || nx >= w0 || ny >= h0) continue;
+        const ni = ny * w0 + nx;
+        if (visited[ni]) continue;
+        const np = ni * 4;
+        const d = Math.abs(data[np] - r) + Math.abs(data[np + 1] - g) + Math.abs(data[np + 2] - b);
+        visited[ni] = 1;
+        if (d <= stepTol && drift + d <= maxTotalTol) {
+          removedMask[ni] = 1;
+          queue.push([nx, ny, data[np], data[np + 1], data[np + 2], drift + d]);
+        }
+      }
+    }
+    for (let i = 0; i < total; i++) { if (removedMask[i]) data[i * 4 + 3] = 0; }
+    wctx.putImageData(imgData, 0, 0);
+
+    // 남은(투명하지 않은) 영역의 bounding box
+    let minX = w0, minY = h0, maxX = -1, maxY = -1;
+    for (let y = 0; y < h0; y++) {
+      for (let x = 0; x < w0; x++) {
+        if (data[(y * w0 + x) * 4 + 3] > 10) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0) { minX = 0; minY = 0; maxX = w0 - 1; maxY = h0 - 1; }
+    const bboxW = maxX - minX + 1, bboxH = maxY - minY + 1;
+
+    // 이제 원형/정사각형으로 자르지 않고, 살짝의 여백만 남긴 채 캐릭터 전체(발끝까지)를
+    // 원본 비율 그대로 저장합니다. 화면에는 object-fit:contain으로 표시되므로 잘리지 않아요.
+    const padFrac = 0.04;
+    const padX = bboxW * padFrac, padY = bboxH * padFrac;
+    let cropX = minX - padX, cropY = minY - padY;
+    let cropW = bboxW + padX * 2, cropH = bboxH + padY * 2;
+    cropX = Math.max(0, cropX);
+    cropY = Math.max(0, cropY);
+    cropW = Math.min(cropW, w0 - cropX);
+    cropH = Math.min(cropH, h0 - cropY);
+
+    const outScale = outSize / Math.max(cropW, cropH);
+    const outW = Math.max(1, Math.round(cropW * outScale));
+    const outH = Math.max(1, Math.round(cropH * outScale));
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outW; outCanvas.height = outH;
+    const octx = outCanvas.getContext('2d');
+    octx.drawImage(workCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+    callback(outCanvas.toDataURL('image/png'));
+  }
+
   function handleCharEditImageChange(ev) {
     const file = ev.target.files && ev.target.files[0];
     if (!file) return;
@@ -3196,16 +3330,10 @@
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const size = 96;
-        const canvas = document.createElement('canvas');
-        canvas.width = size; canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        const scale = Math.max(size / img.width, size / img.height);
-        const w = img.width * scale, h = img.height * scale;
-        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        charEditState.pendingImage = dataUrl;
-        renderCharEditAvatarPreview(dataUrl);
+        autoProcessCharAvatar(img, 96, (dataUrl) => {
+          charEditState.pendingImage = dataUrl;
+          renderCharEditAvatarPreview(dataUrl);
+        });
       };
       img.src = reader.result;
     };
@@ -3318,13 +3446,8 @@
     const pct = combinedTotal > 0 ? Math.round((combinedDone / combinedTotal) * 100) : 0;
     document.getElementById('totalFigure').textContent = formatHM(combinedDone);
     document.getElementById('totalSub').textContent = `완료 ${formatHM(combinedDone)} / 전체 ${formatHM(combinedTotal)}`;
-    document.getElementById('timeBreakdown').textContent = `보스 ${formatHM(done)} · 사냥 ${formatHM(huntTotals.time)}`;
-    document.getElementById('totalFillWrap').style.width = pct + '%';
-    const bossPctOfTrack = combinedTotal > 0 ? (done / combinedTotal) * 100 : 0;
-    const huntPctOfTrack = combinedTotal > 0 ? (huntTotals.time / combinedTotal) * 100 : 0;
-    const trackTotalPct = bossPctOfTrack + huntPctOfTrack;
-    document.getElementById('bossTimeFill').style.width = (trackTotalPct > 0 ? (bossPctOfTrack / trackTotalPct) * 100 : 0) + '%';
-    document.getElementById('huntTimeFill').style.width = (trackTotalPct > 0 ? (huntPctOfTrack / trackTotalPct) * 100 : 0) + '%';
+    document.getElementById('timeBreakdown').textContent = `보스 ${formatHM(done)} / ${formatHM(total)} · 사냥 ${formatHM(huntTotals.time)}`;
+    document.getElementById('totalFill').style.width = pct + '%';
     document.getElementById('totalPct').textContent = pct + '%';
 
     const { earned, potential } = weeklyBossTotals();
