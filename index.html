@@ -1003,19 +1003,19 @@
         <div class="shard-price-mini-row" style="flex-wrap:wrap; gap:6px;">
           <div class="shard-price-mini">
             <span class="shard-price-mini-label">에리온 시세</span>
-            <input type="text" inputmode="numeric" id="erionPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <input type="text" inputmode="numeric" id="erionPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
             <span class="shard-price-mini-label">만</span>
             <button onclick="saveExtraDropPrice('erion')">✓</button>
           </div>
           <div class="shard-price-mini">
             <span class="shard-price-mini-label">에테(상하모견) 시세</span>
-            <input type="text" inputmode="numeric" id="eternelUpperPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <input type="text" inputmode="numeric" id="eternelUpperPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
             <span class="shard-price-mini-label">억</span>
             <button onclick="saveExtraDropPrice('eternelUpper')">✓</button>
           </div>
           <div class="shard-price-mini">
             <span class="shard-price-mini-label">에테(장신망) 시세</span>
-            <input type="text" inputmode="numeric" id="eternelAccessoryPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <input type="text" inputmode="numeric" id="eternelAccessoryPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
             <span class="shard-price-mini-label">억</span>
             <button onclick="saveExtraDropPrice('eternelAccessory')">✓</button>
           </div>
@@ -1483,7 +1483,7 @@
   function saveExtraDropPrice(kind) {
     const el = document.getElementById(EXTRA_DROP_PRICE_INPUT_ID[kind]);
     if (!el) return;
-    const units = parseInt(el.value) || 0;
+    const units = parseFloat(el.value) || 0;
     state[EXTRA_DROP_PRICE_FIELD[kind]] = units * EXTRA_DROP_PRICE_UNIT[kind];
     saveState();
     renderExtraDropPriceInputs();
@@ -1494,7 +1494,7 @@
       const el = document.getElementById(EXTRA_DROP_PRICE_INPUT_ID[kind]);
       if (!el || document.activeElement === el) return;
       const price = state[EXTRA_DROP_PRICE_FIELD[kind]] || 0;
-      el.value = price > 0 ? String(Math.round(price / EXTRA_DROP_PRICE_UNIT[kind])) : '';
+      el.value = price > 0 ? String(Math.round((price / EXTRA_DROP_PRICE_UNIT[kind]) * 100) / 100) : '';
     });
   }
 
