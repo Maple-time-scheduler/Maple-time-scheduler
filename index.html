@@ -1887,7 +1887,7 @@
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
               ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
-              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${escapeHtml(e.bossName)})</span>` : ''}</span>
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)})</span>` : ''}</span>
             </span>
             <span class="price rare-price">${formatMeso(e.price)}</span>
           </div>
@@ -1974,7 +1974,7 @@
             <div class="modal-boss-row">
               <span class="modal-boss-row-left">
                 ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
-                <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${escapeHtml(e.bossName)})</span>` : ''}</span>
+                <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)})</span>` : ''}</span>
               </span>
               <span class="price rare-price">${formatMeso(e.price)}</span>
             </div>
