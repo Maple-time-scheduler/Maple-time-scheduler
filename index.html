@@ -1881,13 +1881,13 @@
     // 물욕/재획 상세 내역 (캐릭터별)
     document.getElementById('calWeekItemDetailList').innerHTML = itemEntries.length === 0
       ? '<div class="modal-boss-empty">이번 주 물욕템 기록이 없어요.</div>'
-      : itemEntries.slice().reverse().map(e => {
+      : itemEntries.slice().sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(e => {
           const c = state.characters.find(x => x.id === e.characterId);
           return `
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
               ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
-              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)})</span>` : ''}</span>
+              <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)}${e.partySize > 1 ? ' ' + e.partySize + '인' : ''})</span>` : ''}</span>
             </span>
             <span class="price rare-price">${formatMeso(e.price)}</span>
           </div>
@@ -1907,7 +1907,7 @@
         byChar[key].time += e.time;
         byChar[key].money += e.money;
       });
-      const rows = Object.values(byChar).sort((a, b) => b.money - a.money).map(g => {
+      const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
         return `
         <div class="modal-boss-row">
@@ -1968,13 +1968,13 @@
       const monthItemMoney = monthItemEntries.reduce((s, e) => s + (e.price || 0), 0);
       monthItemListEl.innerHTML = monthItemEntries.length === 0
         ? '<div class="modal-boss-empty">이번 달 물욕템 기록이 없어요.</div>'
-        : monthItemEntries.slice().reverse().map(e => {
+        : monthItemEntries.slice().sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(e => {
             const c = state.characters.find(x => x.id === e.characterId);
             return `
             <div class="modal-boss-row">
               <span class="modal-boss-row-left">
                 ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
-                <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)})</span>` : ''}</span>
+                <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)}${e.partySize > 1 ? ' ' + e.partySize + '인' : ''})</span>` : ''}</span>
               </span>
               <span class="price rare-price">${formatMeso(e.price)}</span>
             </div>
@@ -1999,7 +1999,7 @@
           byChar[key].money += e.money;
           monthHuntMoneyTotal += e.money || 0;
         });
-        const rows = Object.values(byChar).sort((a, b) => b.money - a.money).map(g => {
+        const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
           const c = state.characters.find(x => x.id === g.characterId);
           return `
           <div class="modal-boss-row">
@@ -2378,6 +2378,12 @@
       void valueEl.offsetWidth; // 리플로우를 강제해서 애니메이션을 매번 새로 재생시킴
       valueEl.classList.add('pulse');
     }
+  }
+
+  // '내 캐릭터'에 등록된 순서(번호) 기준 인덱스를 반환합니다. 없는(삭제된) 캐릭터는 맨 뒤로 보냅니다.
+  function characterOrderIndex(characterId) {
+    const idx = state.characters.findIndex(c => c.id === characterId);
+    return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
   }
 
   function formatDropCount(n) {
@@ -3327,7 +3333,7 @@
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
               ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
-              <span>${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}</span>
+              <span>${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.partySize > 1 ? ` <span style="opacity:0.6; font-weight:400;">(${e.partySize}인)</span>` : ''}</span>
             </span>
             <span class="modal-boss-row-right">
               <span class="price rare-price" title="${e.grossPrice ? `정가 ${formatMeso(e.fullGrossPrice || e.grossPrice)}${e.partySize > 1 ? ` · ${e.partySize}인분배` : ''} · 수수료 3% 제외` : ''}">${formatMeso(e.price)}</span>
