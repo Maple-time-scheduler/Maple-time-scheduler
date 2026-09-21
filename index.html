@@ -384,6 +384,24 @@
   [data-theme="dark"] .char-add-row button { color: #201404; }
   .hunt-card { padding: 14px 16px; margin-bottom: 16px; }
   .shard-price-mini-row { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+  .hunt-day-popover {
+    position: fixed; z-index: 1200; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: var(--shadow); padding: 10px 14px; min-width: 200px; max-width: 260px;
+  }
+  .hunt-day-popover-title { font-size: 12.5px; font-weight: 800; color: var(--ink); margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .hunt-day-popover-row { display: flex; flex-direction: column; gap: 1px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .hunt-day-popover-row:last-child { border-bottom: none; }
+  .hunt-day-popover-row-top { display: flex; justify-content: space-between; align-items: center; }
+  .hunt-day-popover-name { font-size: 12px; font-weight: 700; }
+  .hunt-day-popover-money { font-size: 12px; font-weight: 800; color: var(--money-grad-1); }
+  .hunt-day-popover-sub { font-size: 10px; color: var(--muted); }
+  .hunt-day-popover-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .hunt-day-popover-edit-btn, .hunt-day-popover-delete-btn {
+    background: none; border: none; cursor: pointer; font-size: 12px; padding: 0 2px; line-height: 1; opacity: 0.6;
+  }
+  .hunt-day-popover-edit-btn:hover, .hunt-day-popover-delete-btn:hover { opacity: 1; }
+  .hunt-day-popover-delete-btn { color: var(--danger); }
+  .hunt-form-row button#huntSubmitBtn.editing { background: var(--accent-strong); }
   .shard-price-mini {
     display: flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--border);
     border-radius: 14px; padding: 3px 4px 3px 8px; cursor: default;
@@ -822,11 +840,15 @@
         <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
         <input type="text" inputmode="numeric" id="huntShardInput" placeholder="조각 개수" oninput="this.value = this.value.replace(/[^\d]/g, '')">
-        <button onclick="addHuntEntry()">추가</button>
+        <button id="huntSubmitBtn" onclick="submitHuntEntry()">추가</button>
       </div>
       <div style="font-size:10.5px; color:var(--muted); margin:-4px 0 8px;">메소는 그대로, 조각은 거래 수수료 3%를 제외하고 기록돼요.</div>
       <div class="modal-warning" id="huntWarning" style="display:none;"></div>
       <div class="modal-boss-list" id="huntList" style="height:auto; max-height:160px;"></div>
+      <div class="hunt-day-popover" id="huntDayPopover" style="display:none;">
+        <div class="hunt-day-popover-title" id="huntDayPopoverTitle"></div>
+        <div class="hunt-day-popover-list" id="huntDayPopoverList"></div>
+      </div>
       <div style="display:flex; justify-content:flex-end; margin-top:6px; font-size:11.5px; font-weight:700;">
         <span style="color:var(--muted); font-weight:400; margin-right:4px;">이번 주 합계</span>
         <span id="huntWeekTotalLabel" style="color:var(--money-grad-1);">0억</span>
@@ -1550,7 +1572,9 @@
     el.style.display = 'block';
   }
 
-  function addHuntEntry() {
+  let huntEditingId = null;
+
+  function submitHuntEntry() {
     const charSel = document.getElementById('huntCharSelect');
     const dateInput = document.getElementById('huntDateInput');
     const timeInput = document.getElementById('huntTimeInput');
@@ -1573,22 +1597,67 @@
     if (time <= 0 && money <= 0) { showHuntWarning('소요 시간이나 수입 중 하나는 입력해주세요!'); return; }
 
     if (!state.huntLog) state.huntLog = [];
-    state.huntLog.push({
-      id: Date.now(),
-      dateStr,
-      characterId, time, meso, shardCount,
-      shardPriceAtEntry: state.shardPrice || 0,
-      shardMoney, money
-    });
+    if (huntEditingId !== null) {
+      const entry = state.huntLog.find(e => e.id === huntEditingId);
+      if (entry) {
+        entry.dateStr = dateStr; entry.characterId = characterId; entry.time = time;
+        entry.meso = meso; entry.shardCount = shardCount;
+        entry.shardPriceAtEntry = state.shardPrice || 0;
+        entry.shardMoney = shardMoney; entry.money = money;
+      }
+      cancelHuntEdit();
+    } else {
+      state.huntLog.push({
+        id: Date.now(),
+        dateStr,
+        characterId, time, meso, shardCount,
+        shardPriceAtEntry: state.shardPrice || 0,
+        shardMoney, money
+      });
+    }
     timeInput.value = '';
     moneyInput.value = '';
     shardInput.value = '';
     render(); saveState();
   }
 
+  function editHuntEntry(id) {
+    const entry = (state.huntLog || []).find(e => e.id === id);
+    if (!entry) return;
+    huntEditingId = id;
+    document.getElementById('huntCharSelect').value = entry.characterId;
+    document.getElementById('huntDateInput').value = entry.dateStr;
+    document.getElementById('huntTimeInput').value = entry.time > 0 ? String(Math.round((entry.time / 60) * 100) / 100) : '';
+    document.getElementById('huntMoneyInput').value = entry.meso > 0 ? String(Math.round((entry.meso / 100000000) * 100) / 100) : '';
+    document.getElementById('huntShardInput').value = entry.shardCount > 0 ? String(entry.shardCount) : '';
+    const btn = document.getElementById('huntSubmitBtn');
+    btn.textContent = '수정';
+    btn.classList.add('editing');
+    closeHuntDayPopover();
+  }
+
+  function cancelHuntEdit() {
+    huntEditingId = null;
+    const btn = document.getElementById('huntSubmitBtn');
+    if (btn) { btn.textContent = '추가'; btn.classList.remove('editing'); }
+  }
+
   function deleteHuntEntry(id) {
     state.huntLog = (state.huntLog || []).filter(e => e.id !== id);
     render(); saveState();
+  }
+
+  function deleteHuntEntryFromPopover(id, dateStr, ev) {
+    if (ev) ev.stopPropagation();
+    state.huntLog = (state.huntLog || []).filter(e => e.id !== id);
+    if (huntEditingId === id) cancelHuntEdit();
+    render(); saveState();
+    const stillHasEntries = (state.huntLog || []).some(e => e.dateStr === dateStr);
+    if (stillHasEntries) {
+      openHuntDayPopover(dateStr, ev || { stopPropagation() {}, currentTarget: document.getElementById('huntDayPopover') });
+    } else {
+      closeHuntDayPopover();
+    }
   }
 
   function renderHuntList() {
@@ -1619,7 +1688,7 @@
           const dow = dowNames[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
           const label = `${String(mo).padStart(2, '0')}${String(d).padStart(2, '0')}${dow}`;
           return `
-          <div class="modal-boss-row" style="cursor:pointer;" onclick="openDayDetailModal('${ds}')">
+          <div class="modal-boss-row" style="cursor:pointer;" onclick="openHuntDayPopover('${ds}', event)">
             <span class="modal-boss-row-left"><span>${label}</span></span>
             <span class="price">${formatMeso(byDate[ds])}</span>
           </div>
@@ -3653,6 +3722,54 @@
   }
 
   // --- 캘린더 날짜 클릭 시: 그날의 결정석·물욕·재획을 한눈에 보여주는 대시보드 ---
+  function openHuntDayPopover(dateStr, ev) {
+    ev.stopPropagation();
+    const entries = (state.huntLog || []).filter(e => e.dateStr === dateStr);
+    const [y, mo, d] = dateStr.split('-').map(Number);
+    document.getElementById('huntDayPopoverTitle').textContent = `${mo}월 ${d}일 재획 기록`;
+
+    const listEl = document.getElementById('huntDayPopoverList');
+    listEl.innerHTML = entries.length === 0
+      ? '<div class="modal-boss-empty" style="padding:6px 0;">기록이 없어요.</div>'
+      : entries.map(e => {
+          const c = state.characters.find(x => x.id === e.characterId);
+          return `
+          <div class="hunt-day-popover-row">
+            <div class="hunt-day-popover-row-top">
+              <span class="hunt-day-popover-name">${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(e.time)}</span>
+              <span class="hunt-day-popover-actions">
+                <button class="hunt-day-popover-edit-btn" onclick="editHuntEntry(${e.id})" title="수정">✎</button>
+                <button class="hunt-day-popover-delete-btn" onclick="deleteHuntEntryFromPopover(${e.id}, '${dateStr}', event)" title="삭제">&times;</button>
+              </span>
+            </div>
+            <div class="hunt-day-popover-row-top">
+              <span class="hunt-day-popover-sub">메소 ${formatMesoCompact(e.meso)}, 조각 ${e.shardCount}개</span>
+              <span class="hunt-day-popover-money">${formatMeso(e.money)}</span>
+            </div>
+          </div>
+        `;
+        }).join('');
+
+    const popover = document.getElementById('huntDayPopover');
+    const rect = ev.currentTarget.getBoundingClientRect();
+    popover.style.display = 'block';
+    const popRect = popover.getBoundingClientRect();
+    let top = rect.bottom + 6;
+    let left = rect.left;
+    if (left + popRect.width > window.innerWidth - 8) left = window.innerWidth - popRect.width - 8;
+    if (top + popRect.height > window.innerHeight - 8) top = rect.top - popRect.height - 6;
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+  }
+  function closeHuntDayPopover() {
+    const popover = document.getElementById('huntDayPopover');
+    if (popover) popover.style.display = 'none';
+  }
+  document.addEventListener('click', (ev) => {
+    const popover = document.getElementById('huntDayPopover');
+    if (popover && popover.style.display !== 'none' && !popover.contains(ev.target)) closeHuntDayPopover();
+  });
+
   function openDayDetailModal(dateStr) {
     const [y, mo, d] = dateStr.split('-').map(Number);
     const dateObj = new Date(y, mo - 1, d);
