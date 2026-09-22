@@ -32,7 +32,7 @@
     --rare-color: #4B4B4B;
     --hunt-color: #1AA398;
     --erion-color: #C99400;
-    --eternel-color: #9CA3AC;
+    --eternel-color: #4B4B4B;
     --hunt-color-pale: #A8E8E2;
   }
   [data-theme="dark"] {
@@ -62,7 +62,7 @@
     --rare-color: #B0B0B0;
     --hunt-color: #4FE0D0;
     --erion-color: #FFD54F;
-    --eternel-color: #FFFFFF;
+    --eternel-color: #B0B0B0;
     --hunt-color-pale: #B0F0E8;
   }
 
@@ -344,10 +344,8 @@
   #calStatsView .donut-card,
   #calStatsView .rank-list,
   #calStatsView .trend-chart,
-  #calStatsView .month-week-totals,
-  #calStatsView .rank-medal-card,
-  #calStatsView .rank-plain-list,
-  #calStatsView .rank-c-list {
+  #calStatsView .month-week-totals {
+    background: var(--surface);
     border: none;
     border-radius: 22px;
     box-shadow: 0 12px 28px rgba(74,53,32,0.12);
@@ -356,10 +354,7 @@
   [data-theme="dark"] #calStatsView .donut-card,
   [data-theme="dark"] #calStatsView .rank-list,
   [data-theme="dark"] #calStatsView .trend-chart,
-  [data-theme="dark"] #calStatsView .month-week-totals,
-  [data-theme="dark"] #calStatsView .rank-medal-card,
-  [data-theme="dark"] #calStatsView .rank-plain-list,
-  [data-theme="dark"] #calStatsView .rank-c-list {
+  [data-theme="dark"] #calStatsView .month-week-totals {
     box-shadow: 0 12px 28px rgba(0,0,0,0.45);
   }
   #calStatsView .summary-card { padding: 20px 22px; }
@@ -367,16 +362,38 @@
   #calStatsView .rank-list { padding: 14px 22px; }
   #calStatsView .trend-chart { padding: 22px; }
   #calStatsView .month-week-totals { padding: 8px 22px; }
-  #calStatsView .rank-medal-card { padding: 16px 8px; border-radius: 18px; }
-  #calStatsView .rank-plain-list,
-  #calStatsView .rank-c-list { padding: 6px 20px; border-radius: 18px; }
   #calStatsView .summary-bar { gap: 14px; }
   #calStatsView .donut-cards-row { gap: 14px; }
   #calStatsView .two-col { gap: 18px; }
 
+  /* 캐릭터별 수익 기여도 (누적) 1~3등 — B안(플로팅 카드형) 유지 */
+  #calStatsView .rank-medal-card {
+    background: var(--surface);
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(74,53,32,0.12);
+    padding: 16px 8px;
+  }
+  [data-theme="dark"] #calStatsView .rank-medal-card {
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+  }
+  #calStatsView .rank-medal-card.first {
+    background: linear-gradient(180deg, var(--money-grad-pale) 0%, var(--surface) 100%);
+  }
+
   /* 아이템별/보스별/캐릭터 물욕템 랭킹은 rank-list(바깥) 안에 rank-c-list(안쪽)가 다시 박스로 들어가던 것 — 바깥 박스는 없애고 안쪽 박스만 남김 */
   #calStatsView .rank-list:has(> .rank-c-list) {
     background: transparent; border: none; box-shadow: none; padding: 0; border-radius: 0;
+  }
+
+  /* ===== 캐릭터별 수익 기여도 4등 이하 / 보스별 수익 기여도 / 아이템별 판매 순위 / 캐릭터별 물욕템 순위 — A안(구분선형): 박스 없이 선으로만 구분 ===== */
+  #calStatsView .rank-plain-list,
+  #calStatsView .rank-c-list {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
   }
 
   .theme-toggle {
