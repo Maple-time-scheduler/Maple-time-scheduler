@@ -421,11 +421,24 @@
 
   .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 
+  /* 빠른 물욕템 기록 플로팅 버튼 */
+  .quick-item-log-fab {
+    position: fixed; right: 18px; bottom: 22px; z-index: 60;
+    display: flex; align-items: center; gap: 6px;
+    background: var(--accent); color: #fff; border: none; border-radius: 999px;
+    padding: 13px 18px; font-size: 13.5px; font-weight: 800; font-family: inherit;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25); cursor: pointer;
+  }
+  .quick-item-log-fab:active { transform: scale(0.96); }
+  .quick-item-log-fab-icon { line-height: 1; }
+  [data-theme="dark"] .quick-item-log-fab { box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+
   /* Character panel */
   .char-card { padding: 14px 16px; margin-bottom: 16px; }
   .char-card-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: baseline; gap: 6px; }
   .char-collapse-arrow { font-size: 11px; color: var(--muted); transition: transform 0.2s ease; }
   .char-collapse-arrow.open { transform: rotate(180deg); }
+  .theme-collapse-arrow { margin-left: auto; }
   .hidden { display: none !important; }
   .section-divider { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
   .char-card-count { font-size: 11.5px; font-weight: 400; color: var(--muted); }
@@ -758,6 +771,14 @@
     font-size: 12px; padding: 5px 8px; border-radius: 6px; background: var(--bg);
   }
   .modal-boss-row.editing { border: 1px solid var(--accent); background: var(--accent-soft); }
+  .modal-boss-row.completed { filter: brightness(0.8) saturate(0.9); }
+  .modal-boss-icon-wrap { position: relative; width: 20px; height: 20px; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+  .modal-boss-icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-boss-check-overlay {
+    position: absolute; inset: 0; background: rgba(20, 20, 20, 0.45);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-boss-check-overlay > span { width: 60%; height: 60%; }
   .modal-boss-row .price { color: var(--money-grad-1); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
   .modal-boss-row .price.rare-price { color: var(--rare-color); }
   .modal-boss-row .price.hunt-price { color: var(--hunt-color); }
@@ -982,6 +1003,11 @@
   <hr class="section-divider">
 
   <div id="themeSections"></div>
+
+  <button id="quickItemLogFab" class="quick-item-log-fab" title="물욕템 빠르게 기록" onclick="openQuickItemLogModal()">
+    <span class="quick-item-log-fab-icon">+</span>
+    <span class="quick-item-log-fab-label">물욕 추가</span>
+  </button>
   </div>
 
   <div id="calendarPage" style="display:none;">
@@ -1298,6 +1324,46 @@
   </div>
 </div>
 
+<!-- 빠른 물욕템 기록 — 보스를 거치지 않고 바로 캐릭터+아이템만 골라 기록하는 팝업 -->
+<div class="modal-overlay" id="quickItemLogModalOverlay" style="display:none;" onclick="if(event.target===this) closeQuickItemLogModal()">
+  <div class="modal-card" style="max-height:90vh; overflow-y:auto;">
+    <div class="modal-title"><img id="quickItemLogModalTitleIcon" alt="" style="width:18px; height:18px; object-fit:contain; vertical-align:-3px; margin-right:4px;"> 물욕 추가</div>
+    <div class="modal-warning" id="quickItemLogWarning" style="display:none;"></div>
+    <div class="modal-field">
+      <label>캐릭터</label>
+      <select id="quickItemLogCharacter" onchange="populateQuickItemLogBossOptions(this.value)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;"></select>
+    </div>
+    <div class="modal-field">
+      <label>보스 (선택, 등록된 보스 중에서 고를 수 있어요)</label>
+      <div class="boss-icon-grid" id="quickItemLogBossGrid"></div>
+    </div>
+    <div class="modal-field">
+      <label>아이템</label>
+      <div class="rare-item-grid" id="quickRareItemGrid"></div>
+    </div>
+    <div class="modal-field">
+      <label>판매 가격 (메소)</label>
+      <input type="text" inputmode="numeric" id="quickItemLogPriceInput" placeholder="메소" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+      <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
+    </div>
+    <div class="modal-field">
+      <label>인원</label>
+      <select id="quickItemLogParty"></select>
+    </div>
+    <div class="modal-boss-status">
+      <div class="modal-boss-status-title" onclick="toggleQuickItemLogRecent()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+        <span>최근 기록</span>
+        <span class="char-collapse-arrow" id="quickItemLogRecentArrow">▼</span>
+      </div>
+      <div class="modal-boss-list hidden" id="quickItemLogRecentList"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeQuickItemLogModal()">닫기</button>
+      <button class="modal-add-btn" onclick="addQuickItemLogEntry()">추가</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="dayDetailModalOverlay" style="display:none;" onclick="if(event.target===this) closeDayDetailModal()">
   <div class="modal-card">
     <div class="modal-title" id="dayDetailTitle">날짜</div>
@@ -1572,7 +1638,7 @@
     { category: "소비", name: "익셉셔널 해머(귀고리)", rare: true }
   ];
 
-  const RARE_ITEM_CATEGORIES = [...new Set(RARE_ITEM_DATA.map(i => i.category))];
+  const RARE_ITEM_CATEGORIES = ["칠흑", "소비", "장비", "광휘"];
   const RARE_ITEM_BY_NAME = {};
   RARE_ITEM_DATA.forEach(i => { RARE_ITEM_BY_NAME[i.name] = i; });
 
@@ -2776,6 +2842,16 @@
 
   const openBossPanels = new Set();
 
+  // 각 테마(일간/주간/월간/메모) 섹션도 내 캐릭터/재획 기록처럼 클릭해서 접었다 펼 수 있게
+  const themeCollapsed = { daily: false, weekly: false, monthly: false, memo: false };
+  function toggleThemeSection(themeKey) {
+    themeCollapsed[themeKey] = !themeCollapsed[themeKey];
+    const body = document.getElementById('themeBody_' + themeKey);
+    const arrow = document.getElementById('themeCollapseArrow_' + themeKey);
+    if (body) body.classList.toggle('hidden', themeCollapsed[themeKey]);
+    if (arrow) arrow.classList.toggle('open', !themeCollapsed[themeKey]);
+  }
+
   // --- 드래그&드롭 (드롭하는 순간에만 한 번 순서를 바꿉니다 — 드래그 중 실시간 재배치 없음) ---
   let dragSourceId = null;
   // 체크/해제 시 카드 상단 진행바(시간·결정석)가 이전 값에서 새 값으로 서서히 전환되도록 직전 목표값을 기억해둡니다.
@@ -3381,13 +3457,14 @@
   let itemLogContext = { characterId: null, bossTaskId: null, bossName: null, bossDifficulty: null };
   let selectedRareItemName = '';
 
-  function rareItemGridHtml(selectedName) {
+  function rareItemGridHtml(selectedName, selectFnName) {
+    selectFnName = selectFnName || 'selectRareItem';
     return RARE_ITEM_CATEGORIES.map(cat => `
       <div class="rare-item-cat-label">${escapeHtml(cat)}</div>
       <div class="rare-item-cat-grid">
         ${RARE_ITEM_DATA.filter(i => i.category === cat).map(i => `
           <button type="button" class="boss-icon-btn ${i.name === selectedName ? 'selected' : ''}"
-                  title="${escapeHtml(i.name)}" onclick="selectRareItem('${escapeHtml(i.name)}')">
+                  title="${escapeHtml(i.name)}" onclick="${selectFnName}('${escapeHtml(i.name)}')">
             <img src="${RARE_ITEM_ICONS[i.name]}" alt="${escapeHtml(i.name)}">
             <span>${escapeHtml(i.name)}</span>
           </button>
@@ -3493,6 +3570,135 @@
 
   function showItemLogWarning(msg) {
     const el = document.getElementById('itemLogWarning');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  // ===================== 빠른 물욕템 기록 (보스를 거치지 않고 캐릭터+아이템만 골라 바로 기록) =====================
+  let quickSelectedRareItemName = '';
+  let quickSelectedBossTaskId = null;
+
+  function openQuickItemLogModal() {
+    if (!state.characters || state.characters.length === 0) {
+      alert('먼저 캐릭터를 등록해주세요!');
+      return;
+    }
+    quickSelectedRareItemName = '';
+    document.getElementById('quickItemLogWarning').style.display = 'none';
+    const charSel = document.getElementById('quickItemLogCharacter');
+    charSel.innerHTML = state.characters.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    populateQuickItemLogBossOptions(charSel.value);
+    document.getElementById('quickRareItemGrid').innerHTML = rareItemGridHtml('', 'selectQuickRareItem');
+    document.getElementById('quickItemLogPriceInput').value = '';
+    const partySel = document.getElementById('quickItemLogParty');
+    partySel.innerHTML = [1, 2, 3, 4, 5, 6].map(n => `<option value="${n}">${n}인</option>`).join('');
+    partySel.value = '1';
+    renderQuickItemLogRecentList();
+    document.getElementById('quickItemLogRecentList').classList.add('hidden');
+    const recentArrow = document.getElementById('quickItemLogRecentArrow');
+    if (recentArrow) recentArrow.classList.remove('open');
+    document.getElementById('quickItemLogModalOverlay').style.display = 'flex';
+  }
+
+  function toggleQuickItemLogRecent() {
+    const body = document.getElementById('quickItemLogRecentList');
+    const arrow = document.getElementById('quickItemLogRecentArrow');
+    const willOpen = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !willOpen);
+    arrow.classList.toggle('open', willOpen);
+  }
+
+  function closeQuickItemLogModal() {
+    document.getElementById('quickItemLogModalOverlay').style.display = 'none';
+  }
+
+  function populateQuickItemLogBossOptions(characterId) {
+    const bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId);
+    quickSelectedBossTaskId = null;
+    const grid = document.getElementById('quickItemLogBossGrid');
+    grid.innerHTML = bosses.map(t => `
+      <button type="button" class="boss-icon-btn" title="${escapeHtml(t.bossDifficulty)} ${escapeHtml(t.bossName)}" onclick="selectQuickItemLogBoss(${t.id})">
+        ${iconForBossName(t.bossName) ? `<img src="${iconForBossName(t.bossName)}" alt="${escapeHtml(t.bossName)}">` : '<span style="font-size:20px;">👹</span>'}
+        <span>${escapeHtml(t.bossDifficulty)} ${escapeHtml(t.bossName)}</span>
+      </button>
+    `).join('');
+  }
+
+  function selectQuickItemLogBoss(taskId) {
+    quickSelectedBossTaskId = (quickSelectedBossTaskId === taskId) ? null : taskId;
+    document.querySelectorAll('#quickItemLogBossGrid .boss-icon-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.getAttribute('onclick') === `selectQuickItemLogBoss(${taskId})` && quickSelectedBossTaskId === taskId);
+    });
+  }
+
+  function selectQuickRareItem(name) {
+    quickSelectedRareItemName = name;
+    document.querySelectorAll('#quickRareItemGrid .boss-icon-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.title === name);
+    });
+  }
+
+  function renderQuickItemLogRecentList() {
+    const list = (state.rareItemLog || []).slice(-5).reverse();
+    const el = document.getElementById('quickItemLogRecentList');
+    el.innerHTML = list.length === 0
+      ? '<div class="modal-boss-empty">아직 기록이 없어요.</div>'
+      : list.map(e => {
+          const charName = state.characters.find(c => c.id === e.characterId)?.name || '';
+          return `
+          <div class="modal-boss-row">
+            <span class="modal-boss-row-left">
+              ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
+              <span>${escapeHtml(charName)} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.partySize > 1 ? ` <span style="opacity:0.6; font-weight:400;">(${e.partySize}인)</span>` : ''}</span>
+            </span>
+            <span class="modal-boss-row-right">
+              <span class="price rare-price">${formatMeso(e.price)}</span>
+            </span>
+          </div>
+        `;
+        }).join('');
+  }
+
+  function addQuickItemLogEntry() {
+    const characterId = document.getElementById('quickItemLogCharacter').value;
+    if (!characterId) { showQuickItemLogWarning('캐릭터를 선택해주세요!'); return; }
+    if (!quickSelectedRareItemName) { showQuickItemLogWarning('아이템을 선택해주세요!'); return; }
+    const priceInput = document.getElementById('quickItemLogPriceInput');
+    const fullGrossPrice = parseInt(priceInput.value.replace(/,/g, '')) || 0;
+    if (fullGrossPrice <= 0) { showQuickItemLogWarning('판매 가격을 입력해주세요!'); return; }
+    const partySize = parseInt(document.getElementById('quickItemLogParty').value) || 1;
+    const grossPrice = Math.floor(fullGrossPrice / partySize);
+    const price = applyTradeFee(grossPrice);
+    const meta = RARE_ITEM_BY_NAME[quickSelectedRareItemName];
+    if (!meta) return;
+
+    const selectedBoss = quickSelectedBossTaskId ? state.tasks.find(t => t.id === quickSelectedBossTaskId) : null;
+
+    const entry = {
+      id: Date.now(),
+      dateStr: kstDateString(kstNow()),
+      characterId,
+      bossTaskId: selectedBoss ? selectedBoss.id : null,
+      bossName: selectedBoss ? selectedBoss.bossName : null,
+      bossDifficulty: selectedBoss ? selectedBoss.bossDifficulty : null,
+      itemName: quickSelectedRareItemName,
+      category: meta.category,
+      rare: meta.rare,
+      partySize, fullGrossPrice, grossPrice, price
+    };
+    if (!state.rareItemLog) state.rareItemLog = [];
+    state.rareItemLog.push(entry);
+    saveState();
+
+    quickSelectedRareItemName = '';
+    priceInput.value = '';
+    document.getElementById('quickRareItemGrid').innerHTML = rareItemGridHtml('', 'selectQuickRareItem');
+    document.getElementById('quickItemLogWarning').style.display = 'none';
+    renderQuickItemLogRecentList();
+  }
+
+  function showQuickItemLogWarning(msg) {
+    const el = document.getElementById('quickItemLogWarning');
     el.textContent = msg;
     el.style.display = 'block';
   }
@@ -4031,9 +4237,9 @@
     listEl.innerHTML = bosses.length === 0
       ? '<div class="modal-boss-empty">등록된 보스가 없어요.</div>'
       : bosses.map(b => `
-          <div class="modal-boss-row">
+          <div class="modal-boss-row ${b.completed ? 'completed' : ''}">
             <span class="modal-boss-row-left">
-              ${BOSS_ICONS[b.bossName] ? `<img class="modal-boss-icon" src="${BOSS_ICONS[b.bossName]}" alt="">` : ''}
+              ${BOSS_ICONS[b.bossName] ? `<span class="modal-boss-icon-wrap"><img class="modal-boss-icon" src="${BOSS_ICONS[b.bossName]}" alt="">${b.completed ? `<span class="modal-boss-check-overlay"><span>${BOSS_CHECK_ICON}</span></span>` : ''}</span>` : ''}
               <span>${b.bossDifficulty} ${escapeHtml(b.bossName)}${b.partySize > 1 ? ` (${b.partySize}인)` : ''}</span>
             </span>
             <span class="price">${formatMeso(b.price)}</span>
@@ -4391,7 +4597,7 @@
             ${metaHtml}
           </div>
           <div class="row-hover-actions">
-            ${(panelOpen && (isWeekly || isMonthly) && character) ? `<button class="row-add-btn" title="${escapeHtml(character.name)} 보스 추가" onclick="event.stopPropagation(); openBossModal('${cat.id}', null, '${character.id}', ${task.id})"><img src="${BOSS_ADD_ICON_SRC}" alt="" style="width:15px; height:15px; object-fit:contain; vertical-align:middle;"></button>` : ''}
+            ${(panelOpen && (isWeekly || isMonthly) && character) ? `<button class="row-add-btn" title="${escapeHtml(character.name)} 보스 추가" onclick="event.stopPropagation(); openBossModal('${cat.id}', null, '${character.id}', ${task.id})">+</button>` : ''}
             <button class="delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})">&times;</button>
           </div>
         </li>`;
@@ -4469,13 +4675,17 @@
 
       const section = document.createElement('div');
       section.className = 'theme-section';
+      const headerAttrs = `onclick="toggleThemeSection('${themeKey}')" style="cursor:pointer;"`;
+      const arrowHtml = `<span class="char-collapse-arrow theme-collapse-arrow ${themeCollapsed[themeKey] ? '' : 'open'}" id="themeCollapseArrow_${themeKey}">▼</span>`;
+      const gridHtml = `<div class="board-grid" id="grid_${themeKey}" ondragover="onDragOverContainer(event)" ondrop="onDropOnContainer(event, 'board', '${themeKey}')"></div>`;
       section.innerHTML = `
-        <div class="theme-section-header">
+        <div class="theme-section-header" ${headerAttrs}>
           <span class="theme-dot" style="background:${meta.color}"></span>
           <h3>${meta.label}</h3>
           ${badgeHtml}
+          ${arrowHtml}
         </div>
-        <div class="board-grid" id="grid_${themeKey}" ondragover="onDragOverContainer(event)" ondrop="onDropOnContainer(event, 'board', '${themeKey}')"></div>
+        <div id="themeBody_${themeKey}" class="${themeCollapsed[themeKey] ? 'hidden' : ''}">${gridHtml}</div>
       `;
       container.appendChild(section);
 
@@ -4517,6 +4727,7 @@
   }
 
   document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('quickItemLogModalTitleIcon').src = ITEM_ADD_ICON_SRC;
 
   loadState();
 </script>
