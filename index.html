@@ -178,6 +178,26 @@
   .rank-c-pct { font-size: 10px; color: var(--muted); }
   .rank-list.rare .rank-c-value { color: var(--rare-color); }
 
+  /* 랭킹 아이콘/아바타 (보스·아이템·캐릭터) */
+  .rank-c-icon {
+    width: 22px; height: 22px; object-fit: contain; border-radius: 5px; flex-shrink: 0;
+  }
+  .rank-avatar-small {
+    width: 22px; height: 22px; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .rank-avatar-small img { width: 100%; height: 100%; object-fit: contain; }
+  .rank-medal-avatar-wrap { position: relative; width: 34px; height: 34px; margin: 0 auto 3px; }
+  .rank-medal-avatar {
+    width: 34px; height: 34px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+  }
+  .rank-medal-avatar img { width: 100%; height: 100%; object-fit: contain; }
+  .rank-medal-badge {
+    position: absolute; bottom: -3px; right: -3px; font-size: 12px;
+    background: var(--surface); border-radius: 50%; line-height: 1; padding: 1px;
+  }
+
   .stats-toggle-card { cursor: pointer; user-select: none; transition: transform 0.15s ease; }
   .stats-toggle-card:hover { transform: translateY(-2px); }
   .stats-toggle-card:active { transform: translateY(0); }
@@ -1490,6 +1510,9 @@
   function currentBossGroups() { return bossModalState.theme === 'monthly' ? MONTHLY_BOSS_GROUPS : BOSS_GROUPS; }
   function currentBossIconsMap() { return bossModalState.theme === 'monthly' ? MONTHLY_BOSS_ICONS : BOSS_ICONS; }
   function iconForBossName(name) { return BOSS_ICONS[name] || MONTHLY_BOSS_ICONS[name] || ''; }
+  function rankAvatarHtml(image, cls) {
+    return `<div class="${cls}">${image ? `<img src="${escapeHtml(image)}" alt="">` : '👤'}</div>`;
+  }
   function isBoardOfTheme(catId, theme) {
     const cat = state.categories.find(c => c.id === catId);
     return !!cat && cat.theme === theme;
@@ -2346,6 +2369,13 @@
       }
     });
 
+    // 물욕템 판매 수익도 캐릭터별 수익 기여도(누적)에 합산합니다.
+    (state.rareItemLog || []).forEach(e => {
+      if (e.price > 0 && e.characterId) {
+        charTotals[e.characterId] = (charTotals[e.characterId] || 0) + (e.price || 0);
+      }
+    });
+
     return { dateStrs, totalTime, totalMoney, bossTotals, charTotals, weekTotals };
   }
 
@@ -2511,7 +2541,7 @@
     const charList = Object.entries(agg.charTotals)
       .map(([charId, value]) => {
         const c = state.characters.find(x => x.id === charId);
-        return { name: c ? c.name : '(삭제된 캐릭터)', value };
+        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, value };
       })
       .sort((a, b) => b.value - a.value).slice(0, 8);
     const medals = ['🥇', '🥈', '🥉'];
@@ -2522,7 +2552,10 @@
           const rest = charList.slice(3);
           const topHtml = `<div class="rank-medal-grid">` + top3.map((c, i) => `
             <div class="rank-medal-card ${i === 0 ? 'first' : ''}">
-              <div class="rank-medal-icon">${medals[i]}</div>
+              <div class="rank-medal-avatar-wrap">
+                ${rankAvatarHtml(c.image, 'rank-medal-avatar')}
+                <div class="rank-medal-badge">${medals[i]}</div>
+              </div>
               <div class="rank-medal-name">${escapeHtml(c.name)}</div>
               <div class="rank-medal-value">${formatMesoCompact(c.value)}</div>
             </div>
@@ -2530,6 +2563,7 @@
           const restHtml = rest.length === 0 ? '' : `<div class="rank-plain-list">` + rest.map((c, i) => `
             <div class="rank-plain-row">
               <span class="rank-plain-num">${i + 4}</span>
+              ${rankAvatarHtml(c.image, 'rank-avatar-small')}
               <span class="rank-plain-name">${escapeHtml(c.name)}</span>
               <span class="rank-plain-value">${formatMesoCompact(c.value)}</span>
             </div>
@@ -2545,6 +2579,7 @@
       : `<div class="rank-c-list">` + bossList.map(([name, value], i) => `
           <div class="rank-c-row">
             <span class="rank-c-num">${i + 1}</span>
+            ${iconForBossName(name) ? `<img class="rank-c-icon" src="${iconForBossName(name)}" alt="">` : ''}
             <span class="rank-c-name">${escapeHtml(name)}</span>
             <span class="rank-c-side">
               <div class="rank-c-value">${formatMesoCompact(value)}</div>
@@ -2569,6 +2604,7 @@
           return `
           <div class="rank-c-row">
             <span class="rank-c-num">${i + 1}</span>
+            ${RARE_ITEM_ICONS[name] ? `<img class="rank-c-icon" src="${RARE_ITEM_ICONS[name]}" alt="">` : ''}
             <span class="rank-c-name">${escapeHtml(name)}${meta && meta.rare ? ' ✨' : ''}</span>
             <span class="rank-c-side">
               <div class="rank-c-value">${formatMesoCompact(value)}</div>
@@ -2583,7 +2619,7 @@
     const rareCharList = Object.entries(rareCharTotals)
       .map(([charId, value]) => {
         const c = state.characters.find(x => x.id === charId);
-        return { name: c ? c.name : '(삭제된 캐릭터)', value };
+        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, value };
       })
       .sort((a, b) => b.value - a.value).slice(0, 8);
     const rareCharTotalSum = rareCharList.reduce((s, c) => s + c.value, 0) || 1;
@@ -2592,6 +2628,7 @@
       : `<div class="rank-c-list">` + rareCharList.map((c, i) => `
           <div class="rank-c-row">
             <span class="rank-c-num">${i + 1}</span>
+            ${rankAvatarHtml(c.image, 'rank-avatar-small')}
             <span class="rank-c-name">${escapeHtml(c.name)}</span>
             <span class="rank-c-side">
               <div class="rank-c-value">${formatMesoCompact(c.value)}</div>
