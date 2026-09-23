@@ -92,13 +92,21 @@
     display: flex; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 20px; padding: 0 3px; height: 30px;
   }
-  .main-nav .nav-btn {
+  .main-nav .nav-btn,
+  .header-right .nav-btn {
     border: none; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 700;
     padding: 0 16px; height: 24px; border-radius: 16px; cursor: pointer; font-family: inherit;
     display: flex; align-items: center; justify-content: center;
   }
   .main-nav .nav-btn.active { background: var(--accent); color: #fff; }
   [data-theme="dark"] .main-nav .nav-btn.active { color: #201404; }
+
+  #authStatusLabel { display: flex; align-items: center; height: 30px; margin-right: 4px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  #authLogoutBtn {
+    height: 30px; border: 1px solid var(--border) !important; background: var(--surface);
+    transition: background 0.15s ease;
+  }
+  #authLogoutBtn:hover { background: var(--accent-soft); }
 
   /* --- 캘린더 페이지 --- */
   #calendarPage .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
@@ -1043,7 +1051,7 @@
         <button class="nav-btn active" id="navBtn_scheduler" onclick="switchPage('scheduler')">스케줄러</button>
         <button class="nav-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
       </nav>
-      <span id="authStatusLabel" style="font-size:12px; color:var(--muted); margin-right:6px;"></span>
+      <span id="authStatusLabel"></span>
       <button class="nav-btn" id="authLogoutBtn" onclick="authSignOut()" style="display:none;">로그아웃</button>
       <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
         <span class="knob" id="themeKnob">☀️</span>
@@ -1459,7 +1467,7 @@
     <div class="modal-warning" id="quickItemLogWarning" style="display:none;"></div>
     <div class="modal-field">
       <label>캐릭터</label>
-      <select id="quickItemLogCharacter" onchange="populateQuickItemLogBossOptions(this.value)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;"></select>
+      <select id="quickItemLogCharacter" onchange="onQuickItemLogCharacterChange(this.value)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;"></select>
     </div>
     <div class="modal-field">
       <label>보스 (선택, 등록된 보스 중에서 고를 수 있어요)</label>
@@ -1470,9 +1478,9 @@
       <div class="rare-item-grid" id="quickRareItemGrid"></div>
     </div>
     <div class="modal-field">
-      <label>판매 가격 (메소)</label>
-      <input type="text" inputmode="numeric" id="quickItemLogPriceInput" placeholder="메소" oninput="formatPriceInput(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
-      <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
+      <label>판매 가격 (억 메소)</label>
+      <input type="text" inputmode="decimal" id="quickItemLogPriceInput" placeholder="예: 20.8" oninput="formatPriceInputEok(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+      <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">억 단위로 입력하세요 (예: 20.8억 메소 → 20.8). 거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
     </div>
     <div class="modal-field">
       <label>인원</label>
@@ -2250,7 +2258,10 @@
               ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
               <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)}${e.partySize > 1 ? ' ' + e.partySize + '인' : ''})</span>` : ''}</span>
             </span>
-            <span class="price rare-price">${formatMeso(e.price)}</span>
+            <span class="modal-boss-row-right">
+              <span class="price rare-price">${formatMeso(e.price)}</span>
+              <button class="boss-status-delete-btn" title="삭제" onclick="deleteRareItemLogEntry(${e.id})">&times;</button>
+            </span>
           </div>
         `;
         }).join('') + `
@@ -2337,7 +2348,10 @@
                 ${RARE_ITEM_ICONS[e.itemName] ? `<img class="modal-boss-icon" src="${RARE_ITEM_ICONS[e.itemName]}" alt="">` : ''}
                 <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${escapeHtml(e.itemName)}${e.rare ? ' ✨' : ''}${e.bossName ? ` <span style="opacity:0.6; font-weight:400;">(${e.bossDifficulty ? escapeHtml(e.bossDifficulty) + ' ' : ''}${escapeHtml(e.bossName)}${e.partySize > 1 ? ' ' + e.partySize + '인' : ''})</span>` : ''}</span>
               </span>
-              <span class="price rare-price">${formatMeso(e.price)}</span>
+              <span class="modal-boss-row-right">
+                <span class="price rare-price">${formatMeso(e.price)}</span>
+                <button class="boss-status-delete-btn" title="삭제" onclick="deleteRareItemLogEntry(${e.id})">&times;</button>
+              </span>
             </div>
           `;
           }).join('') + `
@@ -3504,8 +3518,35 @@
   }
 
   // ===== 계정 로그인 / 클라우드 동기화 =====
+  function enterPreviewMode() {
+    // Supabase 서버에 접속할 수 없는 환경(예: Claude 아티팩트 미리보기, 네트워크 제한).
+    // 실제 배포 사이트에서는 정상 접속되므로 로그인 게이트가 그대로 유지됩니다.
+    // 여기서는 디자인/레이아웃 확인이 가능하도록 로그인 없이 앱 화면을 바로 보여줍니다.
+    const gate = document.getElementById('authGateScreen');
+    const app = document.getElementById('appRoot');
+    if (gate) gate.style.display = 'none';
+    if (app) app.style.display = '';
+    const label = document.getElementById('authStatusLabel');
+    if (label) label.textContent = '미리보기 모드 (로그인 불가)';
+  }
+
+  async function canReachSupabase() {
+    if (!SUPABASE_URL) return false;
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1800);
+      await fetch(SUPABASE_URL + '/auth/v1/health', { signal: controller.signal, mode: 'no-cors' });
+      clearTimeout(timer);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async function initAuth() {
-    if (!sb) return;
+    if (!sb) { enterPreviewMode(); return; }
+    const reachable = await canReachSupabase();
+    if (!reachable) { enterPreviewMode(); return; }
     try {
       const { data: { session } } = await sb.auth.getSession();
       currentUser = session ? session.user : null;
@@ -3519,6 +3560,7 @@
       });
     } catch (e) {
       console.error('로그인 상태 확인 실패:', e);
+      enterPreviewMode();
     }
   }
 
@@ -3753,12 +3795,20 @@
     document.getElementById('modalBossParty').value = '1'; // 보스가 바뀌면 인원수도 기본값으로 초기화
   }
 
+  const DEFAULT_DIFFICULTY_BY_BOSS = {
+    '스우': '하드', '데미안': '하드', '루시드': '하드', '윌': '하드', '듄켈': '하드',
+    '진 힐라': '하드', '선택받은 세렌': '하드',
+    '가디언 엔젤 슬라임': '카오스', '더스크': '카오스'
+  };
+
   function updateModalDifficultyOptions() {
     const nameVal = document.getElementById('modalBossName').value;
     const diffSel = document.getElementById('modalBossDifficulty');
     const options = currentBossGroups()[nameVal] || [];
     diffSel.innerHTML = options.map(o => `<option value="${o.difficulty}">${o.difficulty} · ${formatMeso(o.price)}</option>`).join('');
-    diffSel.selectedIndex = 0; // 보스가 바뀌면 이전 난이도가 우연히 겹쳐 남지 않도록 항상 첫 옵션으로 초기화
+    const preferred = DEFAULT_DIFFICULTY_BY_BOSS[nameVal];
+    const preferredIdx = preferred ? options.findIndex(o => o.difficulty === preferred) : -1;
+    diffSel.selectedIndex = preferredIdx !== -1 ? preferredIdx : 0; // 지정된 기본 난이도가 있으면 그걸로, 없으면 첫 옵션
   }
 
   function updateModalCountHint() {
@@ -3804,7 +3854,7 @@
     listEl.innerHTML = bosses.map(b => {
       const dc = DIFFICULTY_COLORS[b.bossDifficulty] || { bg: 'var(--accent)', border: 'var(--accent)', text: '#fff' };
       return `
-      <div class="boss-status-row ${bossModalState.taskId === b.id ? 'editing' : ''} ${b.completed ? 'completed' : ''}">
+      <div class="boss-status-row ${bossModalState.taskId === b.id ? 'editing' : ''} ${b.completed ? 'completed' : ''}" onclick="openBossModal(bossModalState.catId, ${b.id})" style="cursor:pointer;">
         <span class="boss-status-icon-wrap">
           ${iconForBossName(b.bossName) ? `<img src="${iconForBossName(b.bossName)}" alt="">` : ''}
           ${b.completed ? `<span class="boss-status-check-overlay"><span>${BOSS_CHECK_ICON}</span></span>` : ''}
@@ -3812,8 +3862,8 @@
         <span class="boss-status-diff-badge" style="background:${dc.bg}; border:1px solid ${dc.border}; color:${dc.text};">${DIFFICULTY_LABEL_EN[b.bossDifficulty] || b.bossDifficulty}</span>
         <span class="boss-status-name">${escapeHtml(b.bossName)}${b.partySize > 1 ? ` (${b.partySize}인)` : ''}</span>
         <span class="boss-status-price">${formatMesoCompact(b.price)}</span>
-        <button class="boss-status-arrow-btn" title="물욕템 기록" onclick="openItemLogModal(${b.id})"><img src="${ITEM_ADD_ICON_SRC}" alt="" style="width:70%; height:70%; object-fit:contain;"></button>
-        <button class="boss-status-delete-btn" title="삭제" onclick="deleteModalBossEntry(${b.id})">&times;</button>
+        <button class="boss-status-arrow-btn" title="물욕템 기록" onclick="event.stopPropagation(); openItemLogModal(${b.id})"><img src="${ITEM_ADD_ICON_SRC}" alt="" style="width:70%; height:70%; object-fit:contain;"></button>
+        <button class="boss-status-delete-btn" title="삭제" onclick="event.stopPropagation(); deleteModalBossEntry(${b.id})">&times;</button>
       </div>
     `;
     }).join('');
@@ -3843,6 +3893,24 @@
         `).join('')}
       </div>
     `).join('');
+  }
+
+  function deleteRareItemLogEntry(id) {
+    state.rareItemLog = (state.rareItemLog || []).filter(e => e.id !== id);
+    saveState();
+    calRenderWeek(); // 주간/월간 물욕템 내역 갱신
+    const recentListEl = document.getElementById('quickItemLogRecentList');
+    if (recentListEl) renderQuickItemLogRecentList(); // 물욕 추가 팝업이 열려있으면 최근 기록도 갱신
+  }
+
+  function formatPriceInputEok(el) {
+    // 억 단위 입력: 숫자와 소수점 하나만 허용
+    let v = el.value.replace(/[^\d.]/g, '');
+    const firstDot = v.indexOf('.');
+    if (firstDot !== -1) {
+      v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, '');
+    }
+    el.value = v;
   }
 
   function formatPriceInput(el) {
@@ -3984,6 +4052,14 @@
     document.getElementById('quickItemLogModalOverlay').style.display = 'none';
   }
 
+  function onQuickItemLogCharacterChange(characterId) {
+    populateQuickItemLogBossOptions(characterId); // 보스 선택 초기화
+    const partySel = document.getElementById('quickItemLogParty');
+    if (partySel) partySel.value = '1'; // 인원수 기본값으로 초기화
+    const itemGrid = document.getElementById('quickRareItemGrid');
+    if (itemGrid) itemGrid.scrollTop = 0; // 아이템 스크롤 최상단으로
+  }
+
   function populateQuickItemLogBossOptions(characterId) {
     const bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId);
     quickSelectedBossTaskId = null;
@@ -4025,6 +4101,7 @@
             </span>
             <span class="modal-boss-row-right">
               <span class="price rare-price">${formatMeso(e.price)}</span>
+              <button class="boss-status-delete-btn" title="삭제" onclick="deleteRareItemLogEntry(${e.id})">&times;</button>
             </span>
           </div>
         `;
@@ -4036,7 +4113,8 @@
     if (!characterId) { showQuickItemLogWarning('캐릭터를 선택해주세요!'); return; }
     if (!quickSelectedRareItemName) { showQuickItemLogWarning('아이템을 선택해주세요!'); return; }
     const priceInput = document.getElementById('quickItemLogPriceInput');
-    const fullGrossPrice = parseInt(priceInput.value.replace(/,/g, '')) || 0;
+    const eokValue = parseFloat(priceInput.value) || 0;
+    const fullGrossPrice = Math.round(eokValue * 100000000); // 억 단위 입력 → 실제 메소값으로 환산
     if (fullGrossPrice <= 0) { showQuickItemLogWarning('판매 가격을 입력해주세요!'); return; }
     const partySize = parseInt(document.getElementById('quickItemLogParty').value) || 1;
     const grossPrice = Math.floor(fullGrossPrice / partySize);
