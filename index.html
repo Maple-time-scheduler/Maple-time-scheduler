@@ -895,21 +895,98 @@
     color: var(--muted); font-size: 13.5px; font-weight: 700; transition: border-color 0.2s ease, color 0.2s ease;
     align-self: start;
   }
-  .add-board:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .add-board:hover { border-color: var(--accent); color: var(--accent-strong); }  /* ===== 로그인 게이트 화면 ===== */
+  #authGateScreen {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 12% 18%, var(--accent-soft), transparent 40%),
+      radial-gradient(circle at 88% 82%, var(--success-soft), transparent 40%),
+      var(--bg);
+  }
+  #authGateScreen .auth-gate-card {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    max-width: 720px;
+    width: 100%;
+    background: var(--surface);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  #authGateScreen .auth-gate-brand {
+    background: var(--accent);
+    color: #fff;
+    padding: 40px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #authGateScreen .auth-gate-logo { width: 52px; height: 52px; }
+  #authGateScreen .auth-gate-brand h1 { margin: 0; font-size: 21px; }
+  #authGateScreen .auth-gate-tagline { margin: -8px 0 0; font-size: 13px; opacity: 0.92; line-height: 1.5; }
+  #authGateScreen .auth-gate-features { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  #authGateScreen .auth-gate-features li { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+  #authGateScreen .auth-gate-features svg { width: 18px; height: 18px; flex-shrink: 0; }
+  #authGateScreen .auth-gate-note { margin: auto 0 0; font-size: 11.5px; opacity: 0.85; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.28); padding-top: 14px; }
+  #authGateScreen .auth-gate-form { padding: 40px 34px; display: flex; flex-direction: column; }
+  #authGateScreen .auth-gate-form h2 { margin: 0 0 4px; font-size: 17px; color: var(--ink); }
+  #authGateScreen .auth-gate-form-sub { margin: 0 0 18px; font-size: 12.5px; color: var(--muted); }
+  #authGateScreen .auth-gate-form input {
+    width: 100%; box-sizing: border-box; margin-bottom: 9px; padding: 10px 12px;
+    border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-size: 13.5px;
+  }
+  #authGateScreen .auth-gate-form input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  #authGateScreen .auth-gate-actions { display: flex; gap: 8px; margin-top: 2px; }
+  #authGateScreen .auth-gate-actions button {
+    flex: 1; padding: 10px; border-radius: 7px; font-size: 13.5px; cursor: pointer;
+  }
+  #authGateScreen .auth-gate-btn-primary { border: none; background: var(--accent); color: #fff; }
+  #authGateScreen .auth-gate-btn-secondary { border: 1px solid var(--border); background: transparent; color: var(--ink); }
+  #authGateScreen .auth-gate-footer { margin: 18px 0 0; font-size: 11px; color: var(--muted); text-align: center; }
+  @media (max-width: 620px) {
+    #authGateScreen .auth-gate-card { grid-template-columns: 1fr; }
+    #authGateScreen .auth-gate-brand { padding: 30px 26px; }
+    #authGateScreen .auth-gate-form { padding: 30px 26px; }
+  }
 </style>
 </head>
 <body>
 
-<div id="authGateScreen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; background:var(--bg); box-sizing:border-box; padding:24px;">
-  <div style="background:var(--surface); border-radius:14px; padding:32px; width:340px; max-width:100%; box-sizing:border-box; box-shadow:0 4px 18px rgba(0,0,0,0.08);">
-    <h1 style="margin:0 0 4px; font-size:20px; color:var(--ink);">메이플 타임 스케줄러</h1>
-    <p style="font-size:13px; color:var(--muted); margin:0 0 20px;">로그인하면 어느 기기에서든 같은 데이터를 볼 수 있어요.</p>
-    <input type="email" id="authEmailInput" placeholder="이메일" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
-    <input type="password" id="authPasswordInput" placeholder="비밀번호 (6자 이상)" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
-    <div id="authErrorMsg" style="color:#D9534F; font-size:12px; min-height:16px; margin-bottom:8px;"></div>
-    <div style="display:flex; gap:8px;">
-      <button onclick="authSignIn()" style="flex:1; padding:10px; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer;">로그인</button>
-      <button onclick="authSignUp()" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--ink); cursor:pointer;">회원가입</button>
+<div id="authGateScreen">
+  <div class="auth-gate-card">
+    <div class="auth-gate-brand">
+      <svg class="auth-gate-logo" viewBox="0 0 48 48" aria-hidden="true">
+        <ellipse cx="24" cy="34" rx="8" ry="10" fill="#F4D9A5"/>
+        <path d="M6 22 C6 10 42 10 42 22 C42 26 38 28 24 28 C10 28 6 26 6 22 Z" fill="#FFF"/>
+        <ellipse cx="16" cy="18" rx="3" ry="2.4" fill="#FFD9A0"/>
+        <ellipse cx="30" cy="16" rx="2.4" ry="2" fill="#FFD9A0"/>
+        <ellipse cx="24" cy="22" rx="2" ry="1.6" fill="#FFD9A0"/>
+      </svg>
+      <h1>메이플 타임 스케줄러</h1>
+      <p class="auth-gate-tagline">보스 스케줄부터 물욕템 기록까지, 캐릭터별로 한눈에 관리하는 개인용 도구입니다.</p>
+      <ul class="auth-gate-features">
+        <li><svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="24" height="22" rx="3" fill="#ffffff" stroke="#1F1F1F" stroke-width="1.4"/><rect x="4" y="6" width="24" height="6" rx="3" fill="#1F1F1F" opacity="0.25"/><rect x="9" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><rect x="20" y="3" width="3" height="6" rx="1.5" fill="#1F1F1F"/><circle cx="10" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="22" cy="18" r="1.6" fill="#1F1F1F"/><circle cx="10" cy="23" r="1.6" fill="#1F1F1F"/><circle cx="16" cy="23" r="1.6" fill="#1F1F1F"/></svg> 일간·주간·월간 할 일 관리</li>
+        <li><svg class="coin-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#B8860B"/><circle cx="16" cy="16" r="13" fill="#FFD54F"/><path d="M16 3 A13 13 0 0 1 28.3 12 L16 16 Z" fill="#FFE58A" opacity="0.75"/><path d="M16 29 A13 13 0 0 1 3.7 20 L16 16 Z" fill="#C9890A" opacity="0.55"/><circle cx="16" cy="16" r="9.5" fill="none" stroke="#E8B923" stroke-width="1.1" opacity="0.8"/></svg> 보스 수익 자동 집계</li>
+        <li><svg class="potion-icon" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="potionBodyGradGate" cx="38%" cy="32%" r="75%"><stop offset="0%" stop-color="#BFF0EC"/><stop offset="30%" stop-color="#8FDCD4"/><stop offset="65%" stop-color="#5CB8AE"/><stop offset="100%" stop-color="#3FA79E"/></radialGradient></defs><path d="M20 12 Q24 8.5 26.5 11.5 Q28.5 14.5 25 16.5 Q22.5 17.8 23 15" fill="#8FE8E2" stroke="#1F1F1F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="5" width="6.5" height="10.5" rx="3" fill="#7BE0DA" stroke="#1F1F1F" stroke-width="1.3" transform="rotate(-20 9.25 10.25)"/><ellipse cx="7.3" cy="4.8" rx="3.3" ry="3" fill="#8FE8E2" stroke="#1F1F1F" stroke-width="1.3" transform="rotate(-20 7.3 4.8)"/><ellipse cx="9.4" cy="8" rx="2.7" ry="1.1" fill="#E0B23C" stroke="#1F1F1F" stroke-width="0.8" transform="rotate(-20 9.4 8)"/><path d="M8.3 9.2 Q6.8 14 7.4 18" stroke="#D9A400" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M7.4 18 L8.5 19.4 L6.6 20.2 Z" fill="#FFE58A" stroke="#1F1F1F" stroke-width="0.6" stroke-linejoin="round"/><circle cx="17" cy="20.5" r="10.3" fill="url(#potionBodyGradGate)" stroke="#1F1F1F" stroke-width="1.6"/><path d="M9 26 Q17 31.5 25.5 25.5" fill="none" stroke="#3FA79E" stroke-width="1.4" opacity="0.35" stroke-linecap="round"/><circle cx="13.5" cy="17" r="2.1" fill="#ffffff" opacity="0.95"/><circle cx="20.5" cy="15.5" r="0.9" fill="#ffffff" opacity="0.8"/><circle cx="22" cy="25" r="1.2" fill="#ffffff" opacity="0.65"/><circle cx="11" cy="24" r="0.8" fill="#ffffff" opacity="0.6"/></svg> 사냥·재획 기록 관리</li>
+      </ul>
+      <p class="auth-gate-note">계정으로 로그인하면 PC, 모바일 등 어느 기기에서든 이어서 볼 수 있어요.</p>
+    </div>
+    <div class="auth-gate-form">
+      <h2>로그인</h2>
+      <p class="auth-gate-form-sub">계정이 없다면 이메일과 비밀번호로 바로 가입할 수 있어요.</p>
+      <input type="email" id="authEmailInput" placeholder="이메일" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }">
+      <input type="password" id="authPasswordInput" placeholder="비밀번호 (6자 이상)" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }">
+      <div id="authErrorMsg" style="color:#D9534F; font-size:12px; min-height:16px; margin-bottom:2px;"></div>
+      <div class="auth-gate-actions">
+        <button class="auth-gate-btn-primary" onclick="authSignIn()">로그인</button>
+        <button class="auth-gate-btn-secondary" onclick="authSignUp()">회원가입</button>
+      </div>
+      <p class="auth-gate-footer">개인이 만들어 운영 중인 스케줄 관리 도구입니다</p>
     </div>
   </div>
 </div>
