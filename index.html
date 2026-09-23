@@ -921,9 +921,27 @@
         <button class="nav-btn active" id="navBtn_scheduler" onclick="switchPage('scheduler')">스케줄러</button>
         <button class="nav-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
       </nav>
+      <span id="authStatusLabel" style="font-size:12px; color:var(--muted); margin-right:6px;"></span>
+      <button class="nav-btn" id="authLoginBtn" onclick="openAuthModal()">로그인</button>
+      <button class="nav-btn" id="authLogoutBtn" onclick="authSignOut()" style="display:none;">로그아웃</button>
       <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
         <span class="knob" id="themeKnob">☀️</span>
       </button>
+    </div>
+  </div>
+
+  <div id="authModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:var(--surface); border-radius:12px; padding:24px; width:320px; max-width:90vw; box-sizing:border-box;">
+      <h3 style="margin-top:0; margin-bottom:4px;">로그인 / 회원가입</h3>
+      <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">로그인하면 다른 기기에서도 같은 데이터를 볼 수 있어요.</p>
+      <input type="email" id="authEmailInput" placeholder="이메일" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
+      <input type="password" id="authPasswordInput" placeholder="비밀번호 (6자 이상)" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
+      <div id="authErrorMsg" style="color:#D9534F; font-size:12px; min-height:16px; margin-bottom:8px;"></div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="authSignIn()" style="flex:1; padding:8px; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer;">로그인</button>
+        <button onclick="authSignUp()" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--ink); cursor:pointer;">회원가입</button>
+      </div>
+      <button onclick="closeAuthModal()" style="width:100%; margin-top:10px; padding:6px; background:transparent; border:none; color:var(--muted); cursor:pointer;">닫기</button>
     </div>
   </div>
 
@@ -1437,8 +1455,17 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   const STORAGE_KEY = 'scheduler-state-v2';
+
+  // ===== 클라우드 동기화 (Supabase) =====
+  const SUPABASE_URL = 'https://cutloduhaqljnpjrohrm.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1dGxvZHVoYXFsam5wanJvaHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDU5NjMsImV4cCI6MjEwNTY4MTk2M30.XXSwKZL4A5FASgUJ8ai0Si4SLPSGFaycqa9Zk9eZMak';
+  const sb = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+  let currentUser = null; // 로그인된 사용자. null이면 이 기기에만 저장(로그인 전과 동일한 동작)
   const LEGACY_STORAGE_KEYS = ['scheduler-state'];
 
   const THEME_META = {
@@ -3365,6 +3392,125 @@
 
   async function saveState() {
     await persist.set(STORAGE_KEY, JSON.stringify(state));
+    if (currentUser) syncToCloud();
+  }
+
+  // ===== 계정 로그인 / 클라우드 동기화 =====
+  async function initAuth() {
+    if (!sb) return;
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      currentUser = session ? session.user : null;
+      updateAuthUI();
+      sb.auth.onAuthStateChange((_event, session) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+      });
+    } catch (e) {
+      console.error('로그인 상태 확인 실패:', e);
+    }
+  }
+
+  function updateAuthUI() {
+    const label = document.getElementById('authStatusLabel');
+    const loginBtn = document.getElementById('authLoginBtn');
+    const logoutBtn = document.getElementById('authLogoutBtn');
+    if (!label || !loginBtn || !logoutBtn) return;
+    if (currentUser) {
+      label.textContent = currentUser.email;
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = '';
+    } else {
+      label.textContent = '';
+      loginBtn.style.display = '';
+      logoutBtn.style.display = 'none';
+    }
+  }
+
+  function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'flex';
+  }
+  function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.style.display = 'none';
+    document.getElementById('authEmailInput').value = '';
+    document.getElementById('authPasswordInput').value = '';
+    const errEl = document.getElementById('authErrorMsg');
+    errEl.textContent = '';
+    errEl.style.color = '#D9534F';
+  }
+
+  async function authSignUp() {
+    if (!sb) return;
+    const email = document.getElementById('authEmailInput').value.trim();
+    const password = document.getElementById('authPasswordInput').value;
+    const errEl = document.getElementById('authErrorMsg');
+    if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
+    if (password.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) { errEl.textContent = error.message; return; }
+    if (data.user && !data.session) {
+      errEl.style.color = 'var(--ink)';
+      errEl.textContent = '가입 확인 이메일을 보냈어요. 메일함에서 링크를 눌러 인증해주세요.';
+      return;
+    }
+    await handlePostLogin();
+  }
+
+  async function authSignIn() {
+    if (!sb) return;
+    const email = document.getElementById('authEmailInput').value.trim();
+    const password = document.getElementById('authPasswordInput').value;
+    const errEl = document.getElementById('authErrorMsg');
+    if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { errEl.textContent = error.message; return; }
+    await handlePostLogin();
+  }
+
+  async function authSignOut() {
+    if (!sb) return;
+    await sb.auth.signOut();
+    currentUser = null;
+    updateAuthUI();
+  }
+
+  async function handlePostLogin() {
+    closeAuthModal();
+    try {
+      const { data, error } = await sb.from('user_state').select('state').eq('user_id', currentUser.id).maybeSingle();
+      if (error) { console.error('클라우드 데이터 조회 실패:', error); return; }
+      if (data && data.state) {
+        const useCloud = confirm('클라우드에 저장된 데이터가 있어요. 불러올까요?\n(취소를 누르면 지금 이 기기의 데이터를 클라우드에 덮어씁니다)');
+        if (useCloud) {
+          state = { ...state, ...data.state };
+          applyTheme();
+          render();
+          await persist.set(STORAGE_KEY, JSON.stringify(state));
+        } else {
+          await syncToCloud();
+        }
+      } else {
+        await syncToCloud();
+      }
+    } catch (e) {
+      console.error('로그인 후 동기화 실패:', e);
+    }
+  }
+
+  async function syncToCloud() {
+    if (!currentUser || !sb) return;
+    try {
+      const { error } = await sb.from('user_state').upsert({
+        user_id: currentUser.id,
+        state: state,
+        updated_at: new Date().toISOString()
+      });
+      if (error) console.error('클라우드 저장 실패:', error);
+    } catch (e) {
+      console.error('클라우드 저장 실패:', e);
+    }
   }
 
   function applyTheme() {
@@ -4853,6 +4999,7 @@
   document.getElementById('calFixedWeekEAIcon').src = RARE_ITEM_ICONS['에테르넬 방어구 상자(장신망)'];
   document.getElementById('calFixedTotalEAIcon').src = RARE_ITEM_ICONS['에테르넬 방어구 상자(장신망)'];
 
+  initAuth();
   loadState();
 </script>
 
