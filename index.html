@@ -900,7 +900,21 @@
 </head>
 <body>
 
-<div class="app">
+<div id="authGateScreen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; background:var(--bg); box-sizing:border-box; padding:24px;">
+  <div style="background:var(--surface); border-radius:14px; padding:32px; width:340px; max-width:100%; box-sizing:border-box; box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+    <h1 style="margin:0 0 4px; font-size:20px; color:var(--ink);">메이플 타임 스케줄러</h1>
+    <p style="font-size:13px; color:var(--muted); margin:0 0 20px;">로그인하면 어느 기기에서든 같은 데이터를 볼 수 있어요.</p>
+    <input type="email" id="authEmailInput" placeholder="이메일" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
+    <input type="password" id="authPasswordInput" placeholder="비밀번호 (6자 이상)" onkeydown="if(event.key==='Enter'){ event.preventDefault(); authSignIn(); }" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
+    <div id="authErrorMsg" style="color:#D9534F; font-size:12px; min-height:16px; margin-bottom:8px;"></div>
+    <div style="display:flex; gap:8px;">
+      <button onclick="authSignIn()" style="flex:1; padding:10px; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer;">로그인</button>
+      <button onclick="authSignUp()" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--ink); cursor:pointer;">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none;">
   <div class="header">
     <div class="header-title">
       <span class="icon">
@@ -922,26 +936,10 @@
         <button class="nav-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
       </nav>
       <span id="authStatusLabel" style="font-size:12px; color:var(--muted); margin-right:6px;"></span>
-      <button class="nav-btn" id="authLoginBtn" onclick="openAuthModal()">로그인</button>
       <button class="nav-btn" id="authLogoutBtn" onclick="authSignOut()" style="display:none;">로그아웃</button>
       <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
         <span class="knob" id="themeKnob">☀️</span>
       </button>
-    </div>
-  </div>
-
-  <div id="authModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:var(--surface); border-radius:12px; padding:24px; width:320px; max-width:90vw; box-sizing:border-box;">
-      <h3 style="margin-top:0; margin-bottom:4px;">로그인 / 회원가입</h3>
-      <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">로그인하면 다른 기기에서도 같은 데이터를 볼 수 있어요.</p>
-      <input type="email" id="authEmailInput" placeholder="이메일" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
-      <input type="password" id="authPasswordInput" placeholder="비밀번호 (6자 이상)" style="width:100%; box-sizing:border-box; margin-bottom:8px; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--ink);">
-      <div id="authErrorMsg" style="color:#D9534F; font-size:12px; min-height:16px; margin-bottom:8px;"></div>
-      <div style="display:flex; gap:8px;">
-        <button onclick="authSignIn()" style="flex:1; padding:8px; border-radius:6px; border:none; background:var(--accent); color:#fff; cursor:pointer;">로그인</button>
-        <button onclick="authSignUp()" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--ink); cursor:pointer;">회원가입</button>
-      </div>
-      <button onclick="closeAuthModal()" style="width:100%; margin-top:10px; padding:6px; background:transparent; border:none; color:var(--muted); cursor:pointer;">닫기</button>
     </div>
   </div>
 
@@ -3418,27 +3416,24 @@
 
   function updateAuthUI() {
     const label = document.getElementById('authStatusLabel');
-    const loginBtn = document.getElementById('authLoginBtn');
     const logoutBtn = document.getElementById('authLogoutBtn');
-    if (!label || !loginBtn || !logoutBtn) return;
+    const gate = document.getElementById('authGateScreen');
+    const app = document.getElementById('appRoot');
+    if (gate && app) {
+      if (currentUser) { gate.style.display = 'none'; app.style.display = ''; }
+      else { gate.style.display = 'flex'; app.style.display = 'none'; }
+    }
+    if (!label || !logoutBtn) return;
     if (currentUser) {
       label.textContent = currentUser.email;
-      loginBtn.style.display = 'none';
       logoutBtn.style.display = '';
     } else {
       label.textContent = '';
-      loginBtn.style.display = '';
       logoutBtn.style.display = 'none';
     }
   }
 
-  function openAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.style.display = 'flex';
-  }
   function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.style.display = 'none';
     document.getElementById('authEmailInput').value = '';
     document.getElementById('authPasswordInput').value = '';
     const errEl = document.getElementById('authErrorMsg');
@@ -3446,11 +3441,12 @@
     errEl.style.color = '#D9534F';
   }
 
+
   async function authSignUp() {
-    if (!sb) return;
+    const errEl = document.getElementById('authErrorMsg');
+    if (!sb) { errEl.textContent = '로그인 기능을 불러오지 못했어요. 새로고침 해주세요.'; return; }
     const email = document.getElementById('authEmailInput').value.trim();
     const password = document.getElementById('authPasswordInput').value;
-    const errEl = document.getElementById('authErrorMsg');
     if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
     if (password.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
     const { data, error } = await sb.auth.signUp({ email, password });
@@ -3464,10 +3460,10 @@
   }
 
   async function authSignIn() {
-    if (!sb) return;
+    const errEl = document.getElementById('authErrorMsg');
+    if (!sb) { errEl.textContent = '로그인 기능을 불러오지 못했어요. 새로고침 해주세요.'; return; }
     const email = document.getElementById('authEmailInput').value.trim();
     const password = document.getElementById('authPasswordInput').value;
-    const errEl = document.getElementById('authErrorMsg');
     if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
     const { error } = await sb.auth.signInWithPassword({ email, password });
     if (error) { errEl.textContent = error.message; return; }
