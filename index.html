@@ -1745,8 +1745,8 @@
     { difficulty: '노멀', boss: '감시자 칼로스', price: 479000000 },
     { difficulty: '노멀', boss: '최초의 대적자', price: 532000000 },
     { difficulty: '익스트림', boss: '스우', price: 545000000 },
-    { difficulty: '노멀', boss: '카링', price: 576000000 },
-    { difficulty: '노멀', boss: '찬란한 흉성', price: 593000000 },
+    { difficulty: '노멀', boss: '카링', price: 593000000 },
+    { difficulty: '노멀', boss: '찬란한 흉성', price: 576000000 },
     { difficulty: '노멀', boss: '벨로나', price: 824000000 },
     { difficulty: '노멀', boss: '림보', price: 995000000 },
     { difficulty: '카오스', boss: '감시자 칼로스', price: 1230000000 },
@@ -4744,15 +4744,32 @@
       const { data, error } = await sb.functions.invoke('nexon-character', { body: { characterName: name } });
       if (error) { statusEl.textContent = '연동 실패: 잠시 후 다시 시도해주세요.'; return; }
       if (data && data.error) { statusEl.textContent = data.error; return; }
-      charEditState.pendingImage = data.characterImage;
       charEditState.nexonWorld = data.worldName;
       charEditState.nexonClass = data.characterClass;
       charEditState.nexonLevel = data.characterLevel;
-      renderCharEditAvatarPreview(data.characterImage);
-      statusEl.textContent = `연동 완료: ${data.worldName} · ${data.characterClass} · Lv.${data.characterLevel}`;
+      statusEl.textContent = '캐릭터 이미지 다듬는 중...';
+      loadNexonImageAndProcess(data.characterImage, (finalImage) => {
+        charEditState.pendingImage = finalImage;
+        renderCharEditAvatarPreview(finalImage);
+        statusEl.textContent = `연동 완료: ${data.worldName} · ${data.characterClass} · Lv.${data.characterLevel}`;
+      });
     } catch (e) {
       statusEl.textContent = '연동 중 오류가 발생했어요.';
     }
+  }
+
+  function loadNexonImageAndProcess(url, callback) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // 캔버스에서 픽셀을 읽어 배경 제거/크롭하려면 필요
+    img.onload = () => {
+      try {
+        autoProcessCharAvatar(img, 96, callback);
+      } catch (e) {
+        callback(url); // 캔버스 처리가 막히는 환경이면 원본 이미지 URL을 그대로 사용
+      }
+    };
+    img.onerror = () => callback(url);
+    img.src = url;
   }
 
   function renderCharEditAvatarPreview(image) {
