@@ -3595,27 +3595,15 @@
     try {
       const { data, error } = await sb.from('user_state').select('state').eq('user_id', currentUser.id).maybeSingle();
       if (error) { console.error('클라우드 데이터 조회 실패:', error); return; }
-      const localIsUntouched = JSON.stringify(state) === INITIAL_STATE_JSON; // 이 기기가 초기 상태인지(=평소 로그인 흐름)
       if (data && data.state) {
-        if (localIsUntouched) {
-          // 평상시 로그인: 이 기기는 초기 상태이므로 확인 없이 조용히 클라우드 데이터를 불러옵니다.
-          state = { ...state, ...data.state };
-          applyTheme();
-          render();
-          await persist.set(STORAGE_KEY, JSON.stringify(state));
-        } else {
-          // 드문 경우: 이 기기에 클라우드와 다를 수 있는 데이터가 남아있을 때만 확인창을 띄웁니다.
-          const useCloud = confirm('클라우드에 저장된 데이터와 이 기기의 데이터가 달라요. 클라우드 데이터를 불러올까요?\n(취소를 누르면 이 기기의 데이터를 클라우드에 덮어씁니다)');
-          if (useCloud) {
-            state = { ...state, ...data.state };
-            applyTheme();
-            render();
-            await persist.set(STORAGE_KEY, JSON.stringify(state));
-          } else {
-            await syncToCloud();
-          }
-        }
+        // 클라우드에 데이터가 있으면 로그인 시 항상 안전하게 "불러오기"만 합니다.
+        // 절대로 이 기기 데이터로 클라우드를 자동 덮어쓰지 않습니다(데이터 유실 방지).
+        state = { ...state, ...data.state };
+        applyTheme();
+        render();
+        await persist.set(STORAGE_KEY, JSON.stringify(state));
       } else {
+        // 클라우드에 데이터가 없는 계정(최초 로그인)일 때만 이 기기 데이터를 올립니다.
         await syncToCloud();
       }
     } catch (e) {
