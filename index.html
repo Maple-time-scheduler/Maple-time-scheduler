@@ -2976,6 +2976,7 @@
       { id: 5, text: '이벤트 링 기억해두기', time: 0, completed: false, categoryId: 'memo1', characterId: null }
     ]
   };
+  const INITIAL_STATE_JSON = JSON.stringify(state); // 로그아웃 시 이 기본 상태로 초기화
 
   const openBossPanels = new Set();
 
@@ -3478,6 +3479,11 @@
     await sb.auth.signOut();
     currentUser = null;
     updateAuthUI();
+    // 공용 PC 등을 고려해, 로그아웃 시 이 기기에 남아있던 데이터도 초기 상태로 지웁니다.
+    state = JSON.parse(INITIAL_STATE_JSON);
+    await persist.set(STORAGE_KEY, INITIAL_STATE_JSON);
+    applyTheme();
+    render();
   }
 
   async function handlePostLogin() {
