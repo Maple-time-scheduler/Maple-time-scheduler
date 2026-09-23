@@ -1562,6 +1562,14 @@
         <input type="file" id="charEditImageInput" accept="image/*" style="display:none;" onchange="handleCharEditImageChange(event)">
       </div>
     </div>
+    <div class="modal-field">
+      <label>넥슨 캐릭터 연동 (실제 게임 닉네임)</label>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="charEditNexonNameInput" placeholder="예: 630번지" style="flex:1; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+        <button class="modal-cancel-btn" onclick="fetchNexonCharacter()">불러오기</button>
+      </div>
+      <div style="font-size:10.5px; color:var(--muted); margin-top:4px;" id="charEditNexonStatus"></div>
+    </div>
     <div class="modal-actions">
       <button class="modal-cancel-btn" onclick="closeCharEditModal()">취소</button>
       <button class="modal-save-btn" onclick="saveCharEdit()">저장</button>
@@ -4507,6 +4515,7 @@
           <span class="char-number-badge">${idx + 1}</span>
         </div>
         <div class="char-grid-name">${escapeHtml(c.name)}</div>
+        ${c.nexonWorld ? `<div class="char-grid-nexon-info" style="font-size:10px; color:var(--muted); text-align:center; margin-top:-2px; margin-bottom:2px;">Lv.${c.nexonLevel || '?'} · ${escapeHtml(c.nexonClass || '')} · ${escapeHtml(c.nexonWorld)}</div>` : ''}
         <div class="char-grid-bottom">
           <span class="char-time-chip">⏱ ${formatHM(timeDone)} / ${formatHM(timeTotal)}</span>
           ${potential > 0 ? `<span class="task-boss-total"><img src="${BOSS_ADD_ICON_SRC}" alt="" style="width:1em; height:1em; vertical-align:-0.15em; object-fit:contain;"> ${formatMesoCompact(earned)} / ${formatMesoCompact(potential)}</span>` : ''}
@@ -4717,9 +4726,35 @@
     charEditState = { id: charId, pendingImage: undefined };
     document.getElementById('charEditNameInput').value = c.name;
     renderCharEditAvatarPreview(c.image || null);
+    document.getElementById('charEditNexonNameInput').value = c.nexonName || '';
+    document.getElementById('charEditNexonStatus').textContent = c.nexonWorld
+      ? `연동됨: ${c.nexonWorld} · ${c.nexonClass || ''} · Lv.${c.nexonLevel || ''}`
+      : '';
     document.getElementById('charEditModalOverlay').style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
+  async function fetchNexonCharacter() {
+    const nameInput = document.getElementById('charEditNexonNameInput');
+    const statusEl = document.getElementById('charEditNexonStatus');
+    const name = nameInput.value.trim();
+    if (!name) { statusEl.textContent = '넥슨 캐릭터명을 입력해주세요.'; return; }
+    if (!sb) { statusEl.textContent = '이 화면(미리보기 모드)에서는 넥슨 연동을 사용할 수 없어요. 실제 사이트에서 시도해주세요.'; return; }
+    statusEl.textContent = '불러오는 중...';
+    try {
+      const { data, error } = await sb.functions.invoke('nexon-character', { body: { characterName: name } });
+      if (error) { statusEl.textContent = '연동 실패: 잠시 후 다시 시도해주세요.'; return; }
+      if (data && data.error) { statusEl.textContent = data.error; return; }
+      charEditState.pendingImage = data.characterImage;
+      charEditState.nexonWorld = data.worldName;
+      charEditState.nexonClass = data.characterClass;
+      charEditState.nexonLevel = data.characterLevel;
+      renderCharEditAvatarPreview(data.characterImage);
+      statusEl.textContent = `연동 완료: ${data.worldName} · ${data.characterClass} · Lv.${data.characterLevel}`;
+    } catch (e) {
+      statusEl.textContent = '연동 중 오류가 발생했어요.';
+    }
+  }
+
   function renderCharEditAvatarPreview(image) {
     document.getElementById('charEditAvatarPreview').innerHTML = image ? `<img src="${image}" alt="">` : '👤';
   }
@@ -4864,6 +4899,13 @@
     const name = document.getElementById('charEditNameInput').value.trim();
     if (name) c.name = name;
     if (charEditState.pendingImage !== undefined) c.image = charEditState.pendingImage; // null이면 이미지 제거
+    const nexonName = document.getElementById('charEditNexonNameInput').value.trim();
+    c.nexonName = nexonName || null;
+    if (charEditState.nexonWorld !== undefined) {
+      c.nexonWorld = charEditState.nexonWorld;
+      c.nexonClass = charEditState.nexonClass;
+      c.nexonLevel = charEditState.nexonLevel;
+    }
     closeCharEditModal();
     render(); saveState();
   }
