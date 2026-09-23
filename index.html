@@ -1466,6 +1466,7 @@
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
   let currentUser = null; // 로그인된 사용자. null이면 이 기기에만 저장(로그인 전과 동일한 동작)
+  const isMagicLinkLoad = /access_token=/.test(location.hash); // 이메일 확인 링크로 막 들어온 경우
   const LEGACY_STORAGE_KEYS = ['scheduler-state'];
 
   const THEME_META = {
@@ -3402,6 +3403,9 @@
       const { data: { session } } = await sb.auth.getSession();
       currentUser = session ? session.user : null;
       updateAuthUI();
+      if (currentUser && isMagicLinkLoad) {
+        await handlePostLogin(); // 이메일 확인 링크로 로그인된 경우, 클라우드 데이터 확인/동기화를 누락 없이 실행
+      }
       sb.auth.onAuthStateChange((_event, session) => {
         currentUser = session ? session.user : null;
         updateAuthUI();
