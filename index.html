@@ -216,7 +216,7 @@
     display: flex; align-items: center; justify-content: center; font-size: 42px;
   }
   .rank-medal-avatar img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.95); transform-origin: 49% 56%; }
-  .rank-medal-avatar.nexon-zoom img { transform: scale(3.4125); transform-origin: 49% 56%; }
+  .rank-medal-avatar.nexon-zoom img { transform: scale(3); transform-origin: 49% 56%; }
   .rank-medal-badge {
     position: absolute; bottom: -2px; right: -2px; font-size: 21px;
     background: var(--surface); border-radius: 50%; line-height: 1; padding: 1px;
@@ -1013,10 +1013,7 @@
 
   /* ===== 로그인 게이트: 기능 미리보기(실제 화면 캡처) ===== */
   .gate-preview { max-width: 720px; width: 100%; margin: 14px auto 0; }
-  .gate-preview-title { text-align: center; font-size: 37.5px; font-weight: 700; color: var(--ink); line-height: 1.35; margin: 0 0 10px; max-width: 640px; margin-left: auto; margin-right: auto; }
-  @media (max-width: 620px) {
-    .gate-preview-title { font-size: 24px; }
-  }
+  .gate-preview-title { text-align: center; font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.35; margin: 0 0 10px; max-width: 640px; margin-left: auto; margin-right: auto; }
   .gate-preview-stack { display: flex; flex-direction: column; gap: 14px; }
   .gate-preview-card { border-radius: 14px; overflow: hidden; box-shadow: 0 10px 24px rgba(74,53,32,0.10); }
   [data-theme="dark"] .gate-preview-card { box-shadow: 0 10px 24px rgba(0,0,0,0.4); }
