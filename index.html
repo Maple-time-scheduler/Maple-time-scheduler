@@ -210,15 +210,15 @@
   }
   .rank-avatar-small img { width: 100%; height: 100%; object-fit: contain; }
   .rank-avatar-small.nexon-zoom img { transform: scale(1.75); transform-origin: 49% 56%; }
-  .rank-medal-avatar-wrap { position: relative; width: 188px; height: 188px; margin: 0 auto 10px; }
+  .rank-medal-avatar-wrap { position: relative; width: 94px; height: 94px; margin: 0 auto 8px; }
   .rank-medal-avatar {
-    width: 188px; height: 188px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center; font-size: 85px;
+    width: 94px; height: 94px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; font-size: 42px;
   }
   .rank-medal-avatar img { width: 100%; height: 100%; object-fit: contain; }
   .rank-medal-avatar.nexon-zoom img { transform: scale(1.75); transform-origin: 49% 56%; }
   .rank-medal-badge {
-    position: absolute; bottom: -3px; right: -3px; font-size: 43px;
+    position: absolute; bottom: -2px; right: -2px; font-size: 21px;
     background: var(--surface); border-radius: 50%; line-height: 1; padding: 1px;
   }
 
@@ -1698,6 +1698,34 @@
     if (!gate || !sectionEl) return;
     gate.scrollTo({ top: sectionEl.offsetTop, behavior: 'smooth' });
   }
+
+  // 마우스 휠/트랙패드 스크롤도 화살표 버튼과 완전히 동일한 스무스 스크롤 애니메이션을 쓰도록,
+  // 휠 입력을 직접 받아서 한 번에 한 섹션씩 gateScrollToSection으로 이동시킵니다.
+  // (브라우저 기본 휠 스크롤은 scroll-behavior:smooth의 영향을 받지 않아 애니메이션이 보이지 않기 때문)
+  (function() {
+    const gate = document.getElementById('authGateScreen');
+    if (!gate) return;
+    let gateWheelBusy = false;
+    gate.addEventListener('wheel', (e) => {
+      if (gate.style.display === 'none') return;
+      e.preventDefault();
+      if (gateWheelBusy) return;
+      const sections = Array.from(document.querySelectorAll('.gate-snap-section'));
+      if (sections.length === 0) return;
+      let currentIndex = 0;
+      let closestDist = Infinity;
+      sections.forEach((sec, i) => {
+        const dist = Math.abs(sec.offsetTop - gate.scrollTop);
+        if (dist < closestDist) { closestDist = dist; currentIndex = i; }
+      });
+      let targetIndex = currentIndex + (e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0);
+      targetIndex = Math.max(0, Math.min(sections.length - 1, targetIndex));
+      if (targetIndex === currentIndex) return;
+      gateWheelBusy = true;
+      gateScrollToSection(sections[targetIndex]);
+      setTimeout(() => { gateWheelBusy = false; }, 650);
+    }, { passive: false });
+  })();
 
   // ===== 팝업(모달)이 떠 있는 동안 바깥 페이지 스크롤 잠금 =====
   // .modal-overlay / .gate-lightbox-overlay 클래스를 쓰는 모든 팝업에 공통 적용됩니다.
