@@ -209,15 +209,15 @@
   }
   .rank-avatar-small img { width: 100%; height: 100%; object-fit: contain; }
   .rank-avatar-small.nexon-zoom img { transform: scale(3.5); transform-origin: 49% 56%; }
-  .rank-medal-avatar-wrap { position: relative; width: 34px; height: 34px; margin: 0 auto 3px; }
+  .rank-medal-avatar-wrap { position: relative; width: 75px; height: 75px; margin: 0 auto 4px; }
   .rank-medal-avatar {
-    width: 34px; height: 34px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center; font-size: 17px;
+    width: 75px; height: 75px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; font-size: 34px;
   }
   .rank-medal-avatar img { width: 100%; height: 100%; object-fit: contain; }
   .rank-medal-avatar.nexon-zoom img { transform: scale(3.5); transform-origin: 49% 56%; }
   .rank-medal-badge {
-    position: absolute; bottom: -3px; right: -3px; font-size: 12px;
+    position: absolute; bottom: -3px; right: -3px; font-size: 17px;
     background: var(--surface); border-radius: 50%; line-height: 1; padding: 1px;
   }
 
@@ -273,18 +273,18 @@
   #calendarPage .month-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 4px; }
   #calendarPage .month-dow { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; padding-bottom: 4px; }
   #calendarPage .month-cells { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  #calendarPage .month-week-totals {
+  #calStatsView .month-week-totals {
     background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
     padding: 4px 16px; margin-top: 14px; box-shadow: var(--shadow);
   }
-  #calendarPage .week-total-row {
+  #calStatsView .week-total-row {
     display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border);
   }
-  #calendarPage .week-total-row:last-child { border-bottom: none; }
-  #calendarPage .week-total-row .wt-label { font-size: 13px; font-weight: 700; width: 84px; flex-shrink: 0; }
-  #calendarPage .week-total-row .stat { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; }
-  #calendarPage .week-total-row .stat.time { color: var(--time-grad-1); width: 130px; }
-  #calendarPage .week-total-row .stat.money { color: var(--money-grad-1); }
+  #calStatsView .week-total-row:last-child { border-bottom: none; }
+  #calStatsView .week-total-row .wt-label { font-size: 13px; font-weight: 700; width: 84px; flex-shrink: 0; }
+  #calStatsView .week-total-row .stat { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; }
+  #calStatsView .week-total-row .stat.time { color: var(--time-grad-1); width: 130px; }
+  #calStatsView .week-total-row .stat.money { color: var(--money-grad-1); }
   #calendarPage .month-cell {
     position: relative; cursor: pointer;
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -1503,11 +1503,11 @@
 
 <!-- 빠른 물욕템 기록 — 보스를 거치지 않고 바로 캐릭터+아이템만 골라 기록하는 팝업 -->
 <div class="modal-overlay" id="quickItemLogModalOverlay" style="display:none;" onclick="if(event.target===this) closeQuickItemLogModal()">
-  <div class="modal-card modal-card-wide" style="max-height:90vh; overflow-y:auto;">
-    <div class="modal-title"><img id="quickItemLogModalTitleIcon" alt="" style="width:18px; height:18px; object-fit:contain; vertical-align:-3px; margin-right:4px;"> <span id="quickItemLogModalTitleText">물욕 추가</span></div>
-    <div class="modal-warning" id="quickItemLogWarning" style="display:none;"></div>
-    <div class="boss-modal-grid" style="align-items:stretch;">
-      <div style="display:flex; flex-direction:column; height:100%;">
+  <div class="modal-card modal-card-wide" style="max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
+    <div class="modal-title" style="flex:none;"><img id="quickItemLogModalTitleIcon" alt="" style="width:18px; height:18px; object-fit:contain; vertical-align:-3px; margin-right:4px;"> <span id="quickItemLogModalTitleText">물욕 추가</span></div>
+    <div class="modal-warning" id="quickItemLogWarning" style="display:none; flex:none;"></div>
+    <div class="boss-modal-grid" style="align-items:stretch; flex:1; min-height:0;">
+      <div style="display:flex; flex-direction:column; height:100%; min-height:0;">
         <div class="modal-field" style="flex:none;">
           <label>캐릭터</label>
           <select id="quickItemLogCharacter" onchange="onQuickItemLogCharacterChange(this.value)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;"></select>
@@ -1525,7 +1525,7 @@
           <div class="modal-boss-list" id="quickItemLogRecentList" style="flex:1; min-height:0; height:auto; overflow-y:auto;"></div>
         </div>
       </div>
-      <div style="display:flex; flex-direction:column; height:100%;">
+      <div style="display:flex; flex-direction:column; height:100%; min-height:0;">
         <div class="modal-field" style="flex:1; min-height:0; display:flex; flex-direction:column;">
           <label>아이템</label>
           <div class="rare-item-grid" id="quickRareItemGrid" style="flex:1; min-height:0; max-height:none;"></div>
@@ -1537,15 +1537,7 @@
         </div>
       </div>
     </div>
-    <div style="display:none;">
-      <div class="modal-field">
-        <div class="modal-field">
-          <label>최근 기록</label>
-          <div class="modal-boss-list" id="quickItemLogRecentList" style="max-height:132px; overflow-y:auto;"></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-actions">
+    <div class="modal-actions" style="flex:none;">
       <button class="modal-cancel-btn" onclick="closeQuickItemLogModal()">닫기</button>
       <button class="modal-add-btn" id="quickItemLogSubmitBtn" onclick="addQuickItemLogEntry()">추가</button>
     </div>
