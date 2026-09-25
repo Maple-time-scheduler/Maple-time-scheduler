@@ -68,6 +68,7 @@
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { scrollbar-gutter: stable; }
+  html.modal-scroll-lock, body.modal-scroll-lock { overflow: hidden !important; }
   .coin-icon { vertical-align: -0.15em; margin-right: 1px; }
   .clock-icon { vertical-align: -0.15em; margin-right: 1px; }
   body {
@@ -1687,6 +1688,57 @@
     if (e.key === 'Escape') closeGateLightbox();
   });
 
+  // ===== 팝업(모달)이 떠 있는 동안 바깥 페이지 스크롤 잠금 =====
+  // .modal-overlay / .gate-lightbox-overlay 클래스를 쓰는 모든 팝업에 공통 적용됩니다.
+  // 새 팝업을 만들 때도 이 두 클래스 중 하나를 쓰면 별도 코드 없이 자동으로 적용돼요.
+  (function() {
+    const OVERLAY_SELECTOR = '.modal-overlay, .gate-lightbox-overlay';
+    let gateOverflowBackup = null;
+
+    function isOverlayOpen(el) {
+      if (el.classList.contains('gate-lightbox-overlay')) return el.classList.contains('open');
+      return el.style.display !== 'none' && el.style.display !== '';
+    }
+
+    function updateScrollLock() {
+      const anyOpen = Array.from(document.querySelectorAll(OVERLAY_SELECTOR)).some(isOverlayOpen);
+      document.documentElement.classList.toggle('modal-scroll-lock', anyOpen);
+      document.body.classList.toggle('modal-scroll-lock', anyOpen);
+      // 로그인 화면은 body가 아니라 #authGateScreen 자체가 스크롤되므로 별도로 잠급니다.
+      const gate = document.getElementById('authGateScreen');
+      if (gate) {
+        if (anyOpen) {
+          if (gateOverflowBackup === null) gateOverflowBackup = gate.style.overflowY || '';
+          gate.style.overflowY = 'hidden';
+        } else if (gateOverflowBackup !== null) {
+          gate.style.overflowY = gateOverflowBackup;
+          gateOverflowBackup = null;
+        }
+      }
+    }
+
+    const overlayObserver = new MutationObserver(updateScrollLock);
+    function observeOverlays() {
+      document.querySelectorAll(OVERLAY_SELECTOR).forEach(el => {
+        overlayObserver.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+      });
+    }
+    // 나중에 동적으로 추가되는 팝업도 자동으로 감지해서 관찰 대상에 포함시킵니다.
+    const domObserver = new MutationObserver((mutations) => {
+      let needsRescan = false;
+      mutations.forEach(m => {
+        m.addedNodes.forEach(n => {
+          if (n.nodeType === 1 && (n.matches?.(OVERLAY_SELECTOR) || n.querySelector?.(OVERLAY_SELECTOR))) needsRescan = true;
+        });
+      });
+      if (needsRescan) { observeOverlays(); updateScrollLock(); }
+    });
+
+    observeOverlays();
+    domObserver.observe(document.body, { childList: true, subtree: true });
+    updateScrollLock();
+  })();
+
   // ===== 클라우드 동기화 (Supabase) =====
   const SUPABASE_URL = 'https://cutloduhaqljnpjrohrm.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1dGxvZHVoYXFsam5wanJvaHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDU5NjMsImV4cCI6MjEwNTY4MTk2M30.XXSwKZL4A5FASgUJ8ai0Si4SLPSGFaycqa9Zk9eZMak';
@@ -3146,7 +3198,7 @@
     const charList = Object.entries(agg.charTotals)
       .map(([charId, value]) => {
         const c = state.characters.find(x => x.id === charId);
-        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, value };
+        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, imageIsNexon: c ? c.imageIsNexon : false, value };
       })
       .sort((a, b) => b.value - a.value).slice(0, 12);
     const medals = ['🥇', '🥈', '🥉'];
@@ -3224,7 +3276,7 @@
     const rareCharList = Object.entries(rareCharTotals)
       .map(([charId, value]) => {
         const c = state.characters.find(x => x.id === charId);
-        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, value };
+        return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, imageIsNexon: c ? c.imageIsNexon : false, value };
       })
       .sort((a, b) => b.value - a.value).slice(0, 8);
     document.getElementById('calRareItemCharRankList').innerHTML = rareCharList.length === 0
