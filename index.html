@@ -312,7 +312,7 @@
   .donut-picker-wrap { position: relative; margin-bottom: 8px; display: flex; justify-content: center; }
   .donut-picker-label {
     font-size: 12px; font-weight: 700; color: var(--ink); background: none; border: none;
-    padding: 0; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px; white-space: nowrap;
+    padding: 0; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
   }
   .donut-picker-label:hover { color: var(--accent-strong); }
   .donut-picker-list {
@@ -603,6 +603,10 @@
   .hunt-total-row-label { color: var(--muted); font-weight: 400; margin-right: 4px; }
   .hunt-total-row-material { font-size: 10.5px; font-weight: 700; color: var(--muted); }
   .hunt-total-row-material .potion-icon { width: 10px; height: 10px; }
+  .hunt-price-col { display: inline-block; min-width: 78px; text-align: right; }
+  .hunt-material-col {
+    display: inline-flex; min-width: 50px; justify-content: flex-end; align-items: center; gap: 3px; flex-shrink: 0;
+  }
   .char-view-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .char-view-stats { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
   .char-edit-avatar-row { display: flex; align-items: center; gap: 10px; }
@@ -2718,14 +2722,14 @@
           <span class="modal-boss-row-left">
             <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
           </span>
-          <span class="price hunt-price">${formatMeso(g.money)}</span>${g.materialCount > 0 ? `<span class="hunt-total-row-material">${POTION_ICON_SVG} ${g.materialCount}개</span>` : ''}
+          <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
         </div>
       `;
       }).join('');
       return rows + `
         <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
           <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-          <span class="price hunt-price">${formatMeso(weekHuntMoney)}</span>${weekHuntMaterialTotal > 0 ? `<span class="hunt-total-row-material">${POTION_ICON_SVG} ${weekHuntMaterialTotal}개</span>` : ''}
+          <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(weekHuntMoney)}</span><span class="hunt-total-row-material hunt-material-col">${weekHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${weekHuntMaterialTotal}개` : ''}</span></span>
         </div>`;
     })();
   }
@@ -2745,10 +2749,10 @@
       crystalMoney += data.crystalMoney; huntMoney += data.huntMoney;
       rareRaw += calRareItemsOnDate(dateStr).reduce((s, e) => s + (e.price || 0), 0);
     }
-    document.getElementById('calSummaryTimeLabel').textContent = '이번 달 완료 시간';
-    document.getElementById('calSummaryMoneyLabel').textContent = '이번 달 결정석 수익';
-    document.getElementById('calSummaryRareLabel').textContent = '이번 달 물욕템 수익';
-    document.getElementById('calSummaryHuntLabel').textContent = '이번 달 재획 수입';
+    document.getElementById('calSummaryTimeLabel').textContent = '완료 시간';
+    document.getElementById('calSummaryMoneyLabel').textContent = '결정석 수익';
+    document.getElementById('calSummaryRareLabel').textContent = '물욕템 수익';
+    document.getElementById('calSummaryHuntLabel').textContent = '재획 수익';
     document.getElementById('calWeekSummaryTime').textContent = formatHM(timeMin);
     document.getElementById('calWeekSummaryMoney').textContent = formatMesoCompact(crystalMoney);
     document.getElementById('calWeekSummaryRare').textContent = formatMesoCompact(rareRaw);
@@ -2821,14 +2825,14 @@
             <span class="modal-boss-row-left">
               <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
             </span>
-            <span class="price hunt-price">${formatMeso(g.money)}</span>${g.materialCount > 0 ? `<span class="hunt-total-row-material">${POTION_ICON_SVG} ${g.materialCount}개</span>` : ''}
+            <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
           </div>
         `;
         }).join('');
         return rows + `
           <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
             <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-            <span class="price hunt-price">${formatMeso(monthHuntMoneyTotal)}</span>${monthHuntMaterialTotal > 0 ? `<span class="hunt-total-row-material">${POTION_ICON_SVG} ${monthHuntMaterialTotal}개</span>` : ''}
+            <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(monthHuntMoneyTotal)}</span><span class="hunt-total-row-material hunt-material-col">${monthHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${monthHuntMaterialTotal}개` : ''}</span></span>
           </div>`;
       })();
     }
