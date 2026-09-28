@@ -664,6 +664,7 @@
   .theme-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .theme-section-header h3 { font-size: 15px; font-weight: 700; margin: 0; }
   .theme-badge { font-size: 12px; color: var(--muted); margin-left: 2px; }
+  .theme-badge-complete { color: var(--accent-strong); font-weight: 700; }
 
   .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   @media (max-width: 900px) { .board-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -4234,6 +4235,7 @@
   function markAllComplete(catId) {
     state.tasks.forEach(t => { if (t.categoryId === catId && !t.completed) logTaskCompletion(t, true); });
     state.tasks = state.tasks.map(t => t.categoryId === catId ? { ...t, completed: true } : t);
+    checkDailyAutoCollapse();
     render(); saveState();
   }
   function addDivider(catId) {
@@ -4955,13 +4957,18 @@
 
   // 일간 탭: 일간 목록에 항목이 하나 이상 있고 전부 체크 완료된 상태면 자동으로 접습니다.
   // (체크를 해제해도 억지로 다시 펼치지는 않음 — 하루가 지나 초기화될 때만 다시 펼쳐짐)
+  // 구분선(isDivider)은 체크 여부가 없는 항목이라 완료 판정에서 제외합니다.
+  function isDailyAllComplete() {
+    const dailyBoardIds = state.categories.filter(c => c.theme === 'daily').map(c => c.id);
+    if (dailyBoardIds.length === 0) return false;
+    const dailyTasks = state.tasks.filter(t => dailyBoardIds.includes(t.categoryId) && !t.isDivider);
+    if (dailyTasks.length === 0) return false;
+    return dailyTasks.every(t => t.completed);
+  }
+
   function checkDailyAutoCollapse() {
     if (state.dailyCollapsed) return;
-    const dailyBoardIds = state.categories.filter(c => c.theme === 'daily').map(c => c.id);
-    if (dailyBoardIds.length === 0) return;
-    const dailyTasks = state.tasks.filter(t => dailyBoardIds.includes(t.categoryId));
-    if (dailyTasks.length === 0) return;
-    if (dailyTasks.every(t => t.completed)) {
+    if (isDailyAllComplete()) {
       state.dailyCollapsed = true;
       themeCollapsed.daily = true;
     }
@@ -5654,7 +5661,11 @@
       let badgeHtml = '';
       if (themeKey === 'daily' || themeKey === 'monthly') {
         const { total, done } = themeTotals(themeKey);
-        badgeHtml = `<span class="theme-badge">완료 ${formatHM(done)} / ${formatHM(total)}</span>`;
+        if (themeKey === 'daily' && isDailyAllComplete()) {
+          badgeHtml = `<span class="theme-badge theme-badge-complete">오늘의 일일 퀘스트를 모두 완료했습니다!</span>`;
+        } else {
+          badgeHtml = `<span class="theme-badge">완료 ${formatHM(done)} / ${formatHM(total)}</span>`;
+        }
       }
 
       const section = document.createElement('div');
