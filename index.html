@@ -569,6 +569,38 @@
     font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0;
   }
   [data-theme="dark"] .hunt-form-row button { color: #201404; }
+  .hunt-form-row { align-items: flex-end; }
+  .hunt-field-labeled {
+    display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; color: var(--muted); font-weight: 700; min-width: 0;
+  }
+  .hunt-field-labeled .hunt-field-label-text { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+  .hunt-field-labeled .hunt-field-label-text .potion-icon { width: 11px; height: 11px; }
+  .hunt-form-row .hunt-field-labeled select, .hunt-form-row .hunt-field-labeled input {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--bg); color: var(--ink); font-size: 12.5px; font-family: inherit; min-width: 0;
+  }
+  .hunt-field-labeled select { cursor: pointer; }
+  .hunt-field-char { flex: 1.3; min-width: 100px; }
+  .hunt-field-date { flex: 1; min-width: 90px; }
+  .hunt-field-time { flex: 1; min-width: 70px; }
+  .hunt-field-money { flex: 1; min-width: 80px; }
+  .hunt-field-shard { flex: 1; min-width: 80px; }
+  .hunt-field-material { flex: 1; min-width: 90px; }
+  .hunt-grid-list { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .hunt-day-card {
+    background: var(--bg); border-radius: 10px; padding: 10px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .hunt-day-card-label { font-size: 11px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+  .hunt-day-card-value { font-size: 12.5px; font-weight: 700; color: var(--money-grad-1); white-space: nowrap; }
+  .hunt-day-card.today { background: var(--accent-soft); border: 1.5px solid var(--accent); padding: 9px 7px; }
+  .hunt-day-card.today .hunt-day-card-label { color: var(--accent-strong); }
+  .hunt-day-card.empty { opacity: 0.45; cursor: default; }
+  .hunt-day-card.empty .hunt-day-card-value { color: var(--muted); }
+  .hunt-total-row { display: flex; justify-content: flex-end; align-items: baseline; margin-top: 6px; font-size: 11.5px; font-weight: 700; gap: 4px; }
+  .hunt-total-row-label { color: var(--muted); font-weight: 400; margin-right: 4px; }
+  .hunt-total-row-material { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+  .hunt-total-row-material .potion-icon { width: 10px; height: 10px; }
   .char-view-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .char-view-stats { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
   .char-edit-avatar-row { display: flex; align-items: center; gap: 10px; }
@@ -1159,44 +1191,65 @@
   </div>
 
   <div class="card hunt-card">
-    <div class="char-card-title" onclick="toggleHuntCard()" style="cursor:pointer; justify-content:space-between; margin-bottom:0;">
+    <div class="char-card-title" onclick="toggleHuntCard()" style="cursor:pointer; justify-content:space-between; margin-bottom:0; flex-wrap:wrap; gap:8px;">
       <span><svg class="potion-icon" viewBox="0 0 32 32" width="1em" height="1em" style="vertical-align:-0.15em;" aria-hidden="true"><defs><radialGradient id="potionBodyGrad1" cx="38%" cy="32%" r="75%"><stop offset="0%" stop-color="#BFF0EC"/><stop offset="30%" stop-color="#8FDCD4"/><stop offset="65%" stop-color="#5CB8AE"/><stop offset="100%" stop-color="#3FA79E"/></radialGradient></defs><path d="M20 12 Q24 8.5 26.5 11.5 Q28.5 14.5 25 16.5 Q22.5 17.8 23 15" fill="#8FE8E2" stroke="#1F1F1F" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="5" width="6.5" height="10.5" rx="3" fill="#7BE0DA" stroke="#1F1F1F" stroke-width="1.3" transform="rotate(-20 9.25 10.25)"/><ellipse cx="7.3" cy="4.8" rx="3.3" ry="3" fill="#8FE8E2" stroke="#1F1F1F" stroke-width="1.3" transform="rotate(-20 7.3 4.8)"/><ellipse cx="9.4" cy="8" rx="2.7" ry="1.1" fill="#E0B23C" stroke="#1F1F1F" stroke-width="0.8" transform="rotate(-20 9.4 8)"/><path d="M8.3 9.2 Q6.8 14 7.4 18" stroke="#D9A400" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M7.4 18 L8.5 19.4 L6.6 20.2 Z" fill="#FFE58A" stroke="#1F1F1F" stroke-width="0.6" stroke-linejoin="round"/><circle cx="17" cy="20.5" r="10.3" fill="url(#potionBodyGrad1)" stroke="#1F1F1F" stroke-width="1.6"/><path d="M9 26 Q17 31.5 25.5 25.5" fill="none" stroke="#3FA79E" stroke-width="1.4" opacity="0.35" stroke-linecap="round"/><circle cx="13.5" cy="17" r="2.1" fill="#ffffff" opacity="0.95"/><circle cx="20.5" cy="15.5" r="0.9" fill="#ffffff" opacity="0.8"/><circle cx="22" cy="25" r="1.2" fill="#ffffff" opacity="0.65"/><circle cx="11" cy="24" r="0.8" fill="#ffffff" opacity="0.6"/></svg> 재획 기록</span>
-      <span style="display:flex; align-items:center; gap:8px;">
-        <button class="hunt-char-manage-btn" onclick="event.stopPropagation(); openHuntCharManageModal()">⚙ 캐릭터 관리</button>
+      <span style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span id="huntHeaderControls" class="hidden" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div class="shard-price-mini" onclick="event.stopPropagation();">
+            <span class="shard-price-mini-label">조각시세</span>
+            <input type="text" inputmode="numeric" id="shardPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+            <span class="shard-price-mini-label">만</span>
+            <button onclick="saveShardPrice()">✓</button>
+          </div>
+          <button class="hunt-char-manage-btn" onclick="event.stopPropagation(); openHuntCharManageModal()">⚙ 캐릭터 관리</button>
+        </span>
         <span class="char-collapse-arrow" id="huntCollapseArrow">▼</span>
       </span>
     </div>
     <div id="huntCardBody" class="hidden" style="margin-top:10px;">
-      <div class="shard-price-mini-row">
-        <div class="shard-price-mini">
-          <span class="shard-price-mini-label">조각시세</span>
-          <input type="text" inputmode="numeric" id="shardPriceInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d]/g, '')">
-          <span class="shard-price-mini-label">만</span>
-          <button onclick="saveShardPrice()">✓</button>
-        </div>
-      </div>
       <div class="hunt-form-row">
-        <select id="huntCharSelect"></select>
-        <input type="date" id="huntDateInput" class="hunt-date-input" onchange="renderHuntList()" onclick="this.showPicker && this.showPicker()">
-        <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="시간" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
-        <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="메소(억)" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
-        <input type="text" inputmode="numeric" id="huntShardInput" placeholder="조각 개수" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+        <label class="hunt-field-labeled hunt-field-char">
+          <span class="hunt-field-label-text">캐릭터</span>
+          <select id="huntCharSelect"></select>
+        </label>
+        <label class="hunt-field-labeled hunt-field-date">
+          <span class="hunt-field-label-text">날짜</span>
+          <input type="date" id="huntDateInput" class="hunt-date-input" onchange="renderHuntList()" onclick="this.showPicker && this.showPicker()">
+        </label>
+        <label class="hunt-field-labeled hunt-field-time">
+          <span class="hunt-field-label-text">⏱ 시간</span>
+          <input type="text" inputmode="decimal" id="huntTimeInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
+        </label>
+        <label class="hunt-field-labeled hunt-field-money">
+          <span class="hunt-field-label-text">💰 메소(억)</span>
+          <input type="text" inputmode="decimal" id="huntMoneyInput" placeholder="0" oninput="this.value = this.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')">
+        </label>
+        <label class="hunt-field-labeled hunt-field-shard">
+          <span class="hunt-field-label-text">◆ 조각 개수</span>
+          <input type="text" inputmode="numeric" id="huntShardInput" placeholder="개" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+        </label>
+        <label class="hunt-field-labeled hunt-field-material">
+          <span class="hunt-field-label-text"><span id="huntFieldMaterialIcon" style="display:inline-flex;"></span> 소재비 개수</span>
+          <input type="text" inputmode="numeric" id="huntMaterialInput" placeholder="개" oninput="this.value = this.value.replace(/[^\d]/g, '')">
+        </label>
         <button id="huntSubmitBtn" onclick="submitHuntEntry()">추가</button>
       </div>
       <div style="font-size:10.5px; color:var(--muted); margin:-4px 0 8px;">메소는 그대로, 조각은 거래 수수료 3%를 제외하고 기록돼요.</div>
       <div class="modal-warning" id="huntWarning" style="display:none;"></div>
-      <div class="modal-boss-list" id="huntList" style="height:auto; max-height:160px;"></div>
+      <div class="hunt-grid-list" id="huntList"></div>
       <div class="hunt-day-popover" id="huntDayPopover" style="display:none;">
         <div class="hunt-day-popover-title" id="huntDayPopoverTitle"></div>
         <div class="hunt-day-popover-list" id="huntDayPopoverList"></div>
       </div>
-      <div style="display:flex; justify-content:flex-end; margin-top:6px; font-size:11.5px; font-weight:700;">
-        <span style="color:var(--muted); font-weight:400; margin-right:4px;">이번 주 합계</span>
+      <div class="hunt-total-row">
+        <span class="hunt-total-row-label">이번 주 합계</span>
         <span id="huntWeekTotalLabel" style="color:var(--money-grad-1);">0억</span>
+        <span class="hunt-total-row-material" id="huntWeekMaterialLabel"></span>
       </div>
-      <div style="display:flex; justify-content:flex-end; margin-top:2px; font-size:11.5px; font-weight:700;">
-        <span style="color:var(--muted); font-weight:400; margin-right:4px;">이번 달 합계</span>
+      <div class="hunt-total-row" style="margin-top:2px;">
+        <span class="hunt-total-row-label">이번 달 합계</span>
         <span id="huntMonthTotalLabel" style="color:var(--money-grad-1);">0억</span>
+        <span class="hunt-total-row-material" id="huntMonthMaterialLabel"></span>
       </div>
     </div>
   </div>
@@ -1588,8 +1641,8 @@
           <div class="rare-item-grid" id="quickRareItemGrid" style="flex:1; min-height:0; max-height:none;"></div>
         </div>
         <div class="modal-field" style="flex:none; margin-bottom:0;">
-          <label>판매 가격 (억 메소)</label>
-          <input type="text" inputmode="decimal" id="quickItemLogPriceInput" oninput="formatPriceInputEok(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
+          <label>판매 가격</label>
+          <input type="text" inputmode="decimal" id="quickItemLogPriceInput" placeholder="메소(억)" oninput="formatPriceInputEok(this)" style="width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--ink); font-size:13px; font-family:inherit; box-sizing:border-box;">
           <div style="font-size:10.5px; color:var(--muted); margin-top:4px;">억 단위로 입력하세요 (예: 20.8억 메소 → 20.8). 거래 수수료 3%를 제외한 금액으로 기록돼요.</div>
         </div>
       </div>
@@ -2103,9 +2156,11 @@
   function toggleHuntCard() {
     const body = document.getElementById('huntCardBody');
     const arrow = document.getElementById('huntCollapseArrow');
+    const headerControls = document.getElementById('huntHeaderControls');
     const willOpen = body.classList.contains('hidden');
     body.classList.toggle('hidden', !willOpen);
     arrow.classList.toggle('open', willOpen);
+    if (headerControls) headerControls.classList.toggle('hidden', !willOpen);
   }
 
   const MAX_HUNT_CHARACTERS = 5;
@@ -2234,6 +2289,7 @@
     const timeInput = document.getElementById('huntTimeInput');
     const moneyInput = document.getElementById('huntMoneyInput');
     const shardInput = document.getElementById('huntShardInput');
+    const materialInput = document.getElementById('huntMaterialInput');
     document.getElementById('huntWarning').style.display = 'none';
 
     const characterId = charSel.value;
@@ -2247,13 +2303,14 @@
     const time = Math.round((parseFloat(timeInput.value) || 0) * 60);
     const meso = Math.round((parseFloat(moneyInput.value) || 0) * 100000000);
     const shardCount = parseInt(shardInput.value) || 0;
+    const materialCount = parseInt(materialInput.value) || 0;
     if (shardCount > 0 && !(state.shardPrice > 0)) {
       showHuntWarning('조각 개수를 입력하려면 먼저 위에서 조각 시세를 설정해주세요!');
       return;
     }
     const shardMoney = applyTradeFee(shardCount * (state.shardPrice || 0));
     const money = meso + shardMoney;
-    if (time <= 0 && money <= 0) { showHuntWarning('소요 시간이나 수입 중 하나는 입력해주세요!'); return; }
+    if (time <= 0 && money <= 0 && materialCount <= 0) { showHuntWarning('소요 시간이나 수입, 소재비 개수 중 하나는 입력해주세요!'); return; }
 
     if (!state.huntLog) state.huntLog = [];
     if (huntEditingId !== null) {
@@ -2263,6 +2320,7 @@
         entry.meso = meso; entry.shardCount = shardCount;
         entry.shardPriceAtEntry = state.shardPrice || 0;
         entry.shardMoney = shardMoney; entry.money = money;
+        entry.materialCount = materialCount;
       }
       cancelHuntEdit();
     } else {
@@ -2271,12 +2329,13 @@
         dateStr,
         characterId, time, meso, shardCount,
         shardPriceAtEntry: state.shardPrice || 0,
-        shardMoney, money
+        shardMoney, money, materialCount
       });
     }
     timeInput.value = '';
     moneyInput.value = '';
     shardInput.value = '';
+    materialInput.value = '';
     render(); saveState();
   }
 
@@ -2289,6 +2348,7 @@
     document.getElementById('huntTimeInput').value = entry.time > 0 ? String(Math.round((entry.time / 60) * 100) / 100) : '';
     document.getElementById('huntMoneyInput').value = entry.meso > 0 ? String(Math.round((entry.meso / 100000000) * 100) / 100) : '';
     document.getElementById('huntShardInput').value = entry.shardCount > 0 ? String(entry.shardCount) : '';
+    document.getElementById('huntMaterialInput').value = entry.materialCount > 0 ? String(entry.materialCount) : '';
     const btn = document.getElementById('huntSubmitBtn');
     btn.textContent = '수정';
     btn.classList.add('editing');
@@ -2337,37 +2397,49 @@
     const byDate = {};
     (state.huntLog || []).forEach(e => {
       if (!weekDateStrs.includes(e.dateStr)) return;
-      byDate[e.dateStr] = (byDate[e.dateStr] || 0) + (e.money || 0);
+      if (!byDate[e.dateStr]) byDate[e.dateStr] = { money: 0, materialCount: 0 };
+      byDate[e.dateStr].money += (e.money || 0);
+      byDate[e.dateStr].materialCount += (e.materialCount || 0);
     });
-    const withData = weekDateStrs.filter(ds => byDate[ds] > 0);
-    el.innerHTML = withData.length === 0
-      ? '<div class="modal-boss-empty">이번 주 등록된 재획 기록이 없어요.</div>'
-      : withData.map(ds => {
-          const [y, mo, d] = ds.split('-').map(Number);
-          const dow = dowNames[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
-          const label = `${String(mo).padStart(2, '0')}${String(d).padStart(2, '0')}${dow}`;
-          return `
-          <div class="modal-boss-row" style="cursor:pointer;" onclick="openHuntDayPopover('${ds}', event)">
-            <span class="modal-boss-row-left"><span>${label}</span></span>
-            <span class="price">${formatMeso(byDate[ds])}</span>
-          </div>
-        `;
-        }).join('');
+    const todayStr = kstDateString(kstNow());
+    el.innerHTML = weekDateStrs.map(ds => {
+      const [y, mo, d] = ds.split('-').map(Number);
+      const dow = dowNames[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+      const label = `${dow} ${String(mo).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+      const data = byDate[ds];
+      const isToday = ds === todayStr;
+      const hasData = !!data;
+      const cls = ['hunt-day-card'];
+      if (isToday) cls.push('today');
+      if (!hasData) cls.push('empty');
+      const valueText = hasData ? formatMeso(data.money) : '-';
+      return `
+        <div class="${cls.join(' ')}" onclick="openHuntDayPopover('${ds}', event)">
+          <span class="hunt-day-card-label">${label}</span>
+          <span class="hunt-day-card-value">${valueText}</span>
+        </div>
+      `;
+    }).join('');
 
-    const weekTotalMoney = Object.values(byDate).reduce((s, v) => s + v, 0);
+    const weekTotalMoney = Object.values(byDate).reduce((s, v) => s + v.money, 0);
+    const weekTotalMaterial = Object.values(byDate).reduce((s, v) => s + v.materialCount, 0);
     const totalLabelEl = document.getElementById('huntWeekTotalLabel');
     if (totalLabelEl) totalLabelEl.textContent = formatMeso(weekTotalMoney);
+    const weekMaterialLabelEl = document.getElementById('huntWeekMaterialLabel');
+    if (weekMaterialLabelEl) weekMaterialLabelEl.innerHTML = weekTotalMaterial > 0 ? `${POTION_ICON_SVG} ${weekTotalMaterial}개` : '';
 
     // 이번 달 합계
     const today = new Date();
-    const monthTotalMoney = (state.huntLog || [])
-      .filter(e => {
-        const [y, mo] = e.dateStr.split('-').map(Number);
-        return y === today.getFullYear() && mo === today.getMonth() + 1;
-      })
-      .reduce((s, e) => s + (e.money || 0), 0);
+    const monthEntries = (state.huntLog || []).filter(e => {
+      const [y, mo] = e.dateStr.split('-').map(Number);
+      return y === today.getFullYear() && mo === today.getMonth() + 1;
+    });
+    const monthTotalMoney = monthEntries.reduce((s, e) => s + (e.money || 0), 0);
+    const monthTotalMaterial = monthEntries.reduce((s, e) => s + (e.materialCount || 0), 0);
     const monthTotalLabelEl = document.getElementById('huntMonthTotalLabel');
     if (monthTotalLabelEl) monthTotalLabelEl.textContent = formatMeso(monthTotalMoney);
+    const monthMaterialLabelEl = document.getElementById('huntMonthMaterialLabel');
+    if (monthMaterialLabelEl) monthMaterialLabelEl.innerHTML = monthTotalMaterial > 0 ? `${POTION_ICON_SVG} ${monthTotalMaterial}개` : '';
   }
 
   // 이번 주(목~수) 재획 시간·수입 합계 — 주간 진행도·주간 수익에 그대로 더해집니다.
@@ -2563,11 +2635,14 @@
     document.getElementById('calWeekHuntDetailList').innerHTML = (() => {
       if (huntEntries.length === 0) return '<div class="modal-boss-empty">이번 주 재획 기록이 없어요.</div>';
       const byChar = {};
+      let weekHuntMaterialTotal = 0;
       huntEntries.forEach(e => {
         const key = e.characterId || 'unknown';
-        if (!byChar[key]) byChar[key] = { time: 0, money: 0, characterId: e.characterId };
+        if (!byChar[key]) byChar[key] = { time: 0, money: 0, materialCount: 0, characterId: e.characterId };
         byChar[key].time += e.time;
         byChar[key].money += e.money;
+        byChar[key].materialCount += e.materialCount || 0;
+        weekHuntMaterialTotal += e.materialCount || 0;
       });
       const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
@@ -2576,14 +2651,14 @@
           <span class="modal-boss-row-left">
             <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
           </span>
-          <span class="price hunt-price">${formatMeso(g.money)}</span>
+          <span class="price hunt-price">${formatMeso(g.money)}${g.materialCount > 0 ? ` <span style="font-size:10px; font-weight:400; opacity:0.75;">(소재비 ${g.materialCount}개)</span>` : ''}</span>
         </div>
       `;
       }).join('');
       return rows + `
         <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
           <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-          <span class="price hunt-price">${formatMeso(weekHuntMoney)}</span>
+          <span class="price hunt-price">${formatMeso(weekHuntMoney)}${weekHuntMaterialTotal > 0 ? ` <span style="font-size:10px; font-weight:400; opacity:0.75;">(소재비 ${weekHuntMaterialTotal}개)</span>` : ''}</span>
         </div>`;
     })();
   }
@@ -2662,12 +2737,15 @@
         if (monthHuntEntries.length === 0) return '<div class="modal-boss-empty">이번 달 재획 기록이 없어요.</div>';
         const byChar = {};
         let monthHuntMoneyTotal = 0;
+        let monthHuntMaterialTotal = 0;
         monthHuntEntries.forEach(e => {
           const key = e.characterId || 'unknown';
-          if (!byChar[key]) byChar[key] = { time: 0, money: 0, characterId: e.characterId };
+          if (!byChar[key]) byChar[key] = { time: 0, money: 0, materialCount: 0, characterId: e.characterId };
           byChar[key].time += e.time;
           byChar[key].money += e.money;
+          byChar[key].materialCount += e.materialCount || 0;
           monthHuntMoneyTotal += e.money || 0;
+          monthHuntMaterialTotal += e.materialCount || 0;
         });
         const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
           const c = state.characters.find(x => x.id === g.characterId);
@@ -2676,14 +2754,14 @@
             <span class="modal-boss-row-left">
               <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
             </span>
-            <span class="price hunt-price">${formatMeso(g.money)}</span>
+            <span class="price hunt-price">${formatMeso(g.money)}${g.materialCount > 0 ? ` <span style="font-size:10px; font-weight:400; opacity:0.75;">(소재비 ${g.materialCount}개)</span>` : ''}</span>
           </div>
         `;
         }).join('');
         return rows + `
           <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
             <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-            <span class="price hunt-price">${formatMeso(monthHuntMoneyTotal)}</span>
+            <span class="price hunt-price">${formatMeso(monthHuntMoneyTotal)}${monthHuntMaterialTotal > 0 ? ` <span style="font-size:10px; font-weight:400; opacity:0.75;">(소재비 ${monthHuntMaterialTotal}개)</span>` : ''}</span>
           </div>`;
       })();
     }
@@ -4944,7 +5022,7 @@
               </span>
             </div>
             <div class="hunt-day-popover-row-top">
-              <span class="hunt-day-popover-sub">메소 ${formatMesoCompact(e.meso)}, 조각 ${e.shardCount}개</span>
+              <span class="hunt-day-popover-sub">메소 ${formatMesoCompact(e.meso)}, 조각 ${e.shardCount}개${e.materialCount > 0 ? `, 소재비 ${e.materialCount}개` : ''}</span>
               <span class="hunt-day-popover-money">${formatMeso(e.money)}</span>
             </div>
           </div>
@@ -5050,11 +5128,12 @@
       const byChar = {};
       huntEntries.forEach(e => {
         const key = e.characterId || 'unknown';
-        if (!byChar[key]) byChar[key] = { time: 0, money: 0, meso: 0, shardCount: 0, characterId: e.characterId };
+        if (!byChar[key]) byChar[key] = { time: 0, money: 0, meso: 0, shardCount: 0, materialCount: 0, characterId: e.characterId };
         byChar[key].time += e.time;
         byChar[key].money += e.money;
         byChar[key].meso += e.meso || 0;
         byChar[key].shardCount += e.shardCount || 0;
+        byChar[key].materialCount += e.materialCount || 0;
       });
       return Object.values(byChar).sort((a, b) => b.money - a.money).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
@@ -5063,7 +5142,7 @@
           <span class="modal-boss-row-left">
             <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
           </span>
-          <span class="price hunt-price">${formatMeso(g.money)} <span style="font-size:10px; font-weight:400; opacity:0.75;">(메소 ${formatMesoCompact(g.meso)}, 조각 ${g.shardCount}개)</span></span>
+          <span class="price hunt-price">${formatMeso(g.money)} <span style="font-size:10px; font-weight:400; opacity:0.75;">(메소 ${formatMesoCompact(g.meso)}, 조각 ${g.shardCount}개${g.materialCount > 0 ? `, 소재비 ${g.materialCount}개` : ''})</span></span>
         </div>
       `;
       }).join('');
@@ -5515,6 +5594,7 @@
   document.getElementById('calFixedTotalEUIcon').src = RARE_ITEM_ICONS['에테르넬 방어구 상자(상하모)'];
   document.getElementById('calFixedWeekEAIcon').src = RARE_ITEM_ICONS['에테르넬 방어구 상자(장신망)'];
   document.getElementById('calFixedTotalEAIcon').src = RARE_ITEM_ICONS['에테르넬 방어구 상자(장신망)'];
+  document.getElementById('huntFieldMaterialIcon').innerHTML = POTION_ICON_SVG;
 
   initAuth();
   loadState();
