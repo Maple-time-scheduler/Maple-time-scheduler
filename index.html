@@ -3477,6 +3477,7 @@
     listTitle: '메이플 타임 스케줄러',
     expTitle: '주간 진행도',
     lastReset: { daily: 0, weekly: 0, monthly: 0 },
+    dailyCollapsed: false, // 일간 탭: 모든 항목 체크 완료 시 자동으로 접히고, 하루가 지나 초기화되면 다시 펼쳐짐
     completionLog: {}, // { 'YYYY-MM-DD'(KST): { taskId: {time, money, isBoss, bossName, characterId, categoryId} } }
     rareItemLog: [], // 물욕템(희귀 드랍) 획득 기록 — 보스 결정석 수익과는 완전히 별도로 관리
     huntLog: [], // 사냥(재획) 기록 — {id, dateStr, characterId, time, meso, shardCount, shardPriceAtEntry, shardMoney, money}. money(=meso+shardMoney)가 주간 진행도/주간 수익에 합산됨
@@ -3514,6 +3515,11 @@
     const arrow = document.getElementById('themeCollapseArrow_' + themeKey);
     if (body) body.classList.toggle('hidden', themeCollapsed[themeKey]);
     if (arrow) arrow.classList.toggle('open', !themeCollapsed[themeKey]);
+    if (themeKey === 'daily') {
+      // 사용자가 수동으로 접거나 펼친 경우, 그 선택을 그대로 저장해서 다음 접속 때도 유지합니다.
+      state.dailyCollapsed = themeCollapsed.daily;
+      saveState();
+    }
   }
 
   // --- 드래그&드롭 (드롭하는 순간에만 한 번 순서를 바꿉니다 — 드래그 중 실시간 재배치 없음) ---
@@ -3792,6 +3798,11 @@
         state.tasks = state.tasks.map(t => boardIds.includes(t.categoryId) ? { ...t, completed: false } : t);
         state.lastReset[themeKey] = boundaries[themeKey];
         changed = true;
+        if (themeKey === 'daily') {
+          // 하루가 지나 일간 항목 체크가 초기화됐으니, 자동으로 접혔던 일간 탭도 다시 펼칩니다.
+          state.dailyCollapsed = false;
+          themeCollapsed.daily = false;
+        }
       }
     });
 
@@ -3847,6 +3858,7 @@
         state.characters = state.characters || [];
         state.tasks = (state.tasks || []).map(t => ({ characterId: null, ...t }));
         state.lastReset = { daily: 0, weekly: 0, monthly: 0, ...(state.lastReset || {}) };
+        state.dailyCollapsed = !!state.dailyCollapsed;
         state.completionLog = state.completionLog || {};
         state.rareItemLog = state.rareItemLog || [];
         state.huntLog = state.huntLog || [];
@@ -3917,6 +3929,7 @@
     } catch (e) {
       console.error('저장된 데이터를 불러오지 못했습니다:', e);
     }
+    themeCollapsed.daily = !!state.dailyCollapsed;
     applyTheme();
     render();
     if (migratedFromLegacy) saveState();
@@ -4844,6 +4857,20 @@
     }
   }
 
+  // 일간 탭: 일간 목록에 항목이 하나 이상 있고 전부 체크 완료된 상태면 자동으로 접습니다.
+  // (체크를 해제해도 억지로 다시 펼치지는 않음 — 하루가 지나 초기화될 때만 다시 펼쳐짐)
+  function checkDailyAutoCollapse() {
+    if (state.dailyCollapsed) return;
+    const dailyBoardIds = state.categories.filter(c => c.theme === 'daily').map(c => c.id);
+    if (dailyBoardIds.length === 0) return;
+    const dailyTasks = state.tasks.filter(t => dailyBoardIds.includes(t.categoryId));
+    if (dailyTasks.length === 0) return;
+    if (dailyTasks.every(t => t.completed)) {
+      state.dailyCollapsed = true;
+      themeCollapsed.daily = true;
+    }
+  }
+
   function toggleTask(id) {
     const target = state.tasks.find(t => t.id === id);
     if (!target) return;
@@ -4857,6 +4884,7 @@
       });
       state.tasks = state.tasks.map(t => (t.isBoss && t.linkedTaskId === id) ? { ...t, completed: newCompleted } : t);
     }
+    if (newCompleted) checkDailyAutoCollapse();
     render(); saveState();
     if (newCompleted) {
       const chip = document.getElementById(`bossChip_${id}`);
