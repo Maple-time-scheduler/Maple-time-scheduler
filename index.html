@@ -3253,8 +3253,8 @@
     const potential = fixedDropPotentialTotals();
     renderExtraDropPriceInputs();
 
-    function setCard(elId, doneVal, totalVal) {
-      document.getElementById(elId).textContent = `${formatDropCount(doneVal)} / ${formatDropCount(totalVal)}`;
+    function setCard(elId, doneVal) {
+      document.getElementById(elId).textContent = formatDropCount(doneVal);
     }
     function setWeekCard(elId, val) {
       document.getElementById(elId).textContent = formatDropCount(val);
@@ -3578,8 +3578,8 @@
     rareItemLog: [], // 물욕템(희귀 드랍) 획득 기록 — 보스 결정석 수익과는 완전히 별도로 관리
     huntLog: [], // 사냥(재획) 기록 — {id, dateStr, characterId, time, meso, shardCount, shardPriceAtEntry, shardMoney, money}. money(=meso+shardMoney)가 주간 진행도/주간 수익에 합산됨
     huntRegisteredCharIds: [], // 재획 기록에 쓸 캐릭터로 등록해둔 캐릭터 id 목록 (최대 5개, 재획 기록 선택은 이 목록 안에서만 가능)
-    shardPrice: 0, // 조각 1개당 시세(메소) — 언제든 수정 가능, 기록 시점의 값이 각 기록에 그대로 저장(고정)됨
-    erionPrice: 0, eternelUpperPrice: 0, eternelAccessoryPrice: 0, // 에리온/에테 1개당 참고 시세(메소) — 변동성이 커서 집계에는 안 쓰고, 예상 금액 참고용으로만
+    shardPrice: 7000000, // 조각 1개당 시세(메소) — 언제든 수정 가능, 기록 시점의 값이 각 기록에 그대로 저장(고정)됨. 미입력 기본값 700만
+    erionPrice: 1000000, eternelUpperPrice: 25000000, eternelAccessoryPrice: 1800000000, // 에리온/에테 1개당 참고 시세(메소) — 변동성이 커서 집계에는 안 쓰고, 예상 금액 참고용으로만. 미입력 기본값: 에리온 100만, 에테(상하모견) 0.25억, 에테(장신망) 18억
     characters: [
       { id: 'char_1', name: '섀도어' },
       { id: 'char_2', name: '나이트로드' }
@@ -3964,10 +3964,10 @@
           state.huntLog.forEach(e => { if (e.characterId && !usedIds.includes(e.characterId)) usedIds.push(e.characterId); });
           state.huntRegisteredCharIds = usedIds.slice(0, MAX_HUNT_CHARACTERS);
         }
-        state.shardPrice = state.shardPrice || 0;
-        state.erionPrice = state.erionPrice || 0;
-        state.eternelUpperPrice = state.eternelUpperPrice || 0;
-        state.eternelAccessoryPrice = state.eternelAccessoryPrice || 0;
+        state.shardPrice = state.shardPrice || 7000000;
+        state.erionPrice = state.erionPrice || 1000000;
+        state.eternelUpperPrice = state.eternelUpperPrice || 25000000;
+        state.eternelAccessoryPrice = state.eternelAccessoryPrice || 1800000000;
 
         // 일회성 마이그레이션: 에테(상하모견/장신망) 집계 단위를 '조각 개수'에서 '완성 아이템 개수'(조각 10개=1개)로
         // 변경하면서, 이미 쌓여있던 과거 완료 기록의 에테 수치도 딱 한 번만 1/10로 보정합니다.
