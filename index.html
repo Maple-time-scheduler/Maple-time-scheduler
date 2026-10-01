@@ -554,6 +554,14 @@
     cursor: pointer; font-family: inherit;
   }
   .hunt-char-manage-btn:hover { border-color: var(--accent); }
+  .hunt-week-nav-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+  .hunt-week-nav-btn {
+    display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; width: 28px; height: 28px; font-size: 12px; font-weight: 700; color: var(--ink);
+    cursor: pointer; font-family: inherit; flex-shrink: 0;
+  }
+  .hunt-week-nav-btn:hover { border-color: var(--accent); }
+  .hunt-week-nav-label { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 92px; text-align: center; }
   .hunt-manage-row { cursor: pointer; }
   .hunt-manage-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
   .hunt-manage-row.disabled { opacity: 0.42; cursor: not-allowed; }
@@ -611,8 +619,15 @@
   .hunt-material-col {
     display: inline-flex; min-width: 50px; justify-content: flex-end; align-items: center; gap: 3px; flex-shrink: 0;
   }
+  /* 소재비 유무와 무관하게 메소 값이 항상 같은 위치에 정렬되도록 고정 폭 그리드로 배치합니다. */
+  .modal-boss-row-right.hunt-row-right {
+    display: grid; grid-template-columns: 74px 170px; column-gap: 6px; align-items: center;
+  }
+  .hunt-row-right .hunt-price-col { width: auto; min-width: 0; white-space: nowrap; text-align: right; }
+  .hunt-row-right .hunt-material-col {
+    width: auto; min-width: 0; white-space: nowrap; justify-content: flex-end;
+  }
   .hunt-yield-sub { font-size: 10.5px; color: var(--muted); text-align: right; margin: -2px 0 6px 0; padding-right: 2px; }
-  .hunt-yield-sub-row { display: flex; justify-content: flex-end; }
   .char-view-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .char-view-stats { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
   .char-edit-avatar-row { display: flex; align-items: center; gap: 10px; }
@@ -1262,18 +1277,23 @@
       </div>
       <div style="font-size:10.5px; color:var(--muted); margin:-4px 0 8px;">메소는 그대로, 조각은 거래 수수료 3%를 제외하고 기록돼요.</div>
       <div class="modal-warning" id="huntWarning" style="display:none;"></div>
+      <div class="hunt-week-nav-row">
+        <button class="hunt-week-nav-btn" onclick="shiftHuntListWeek(-1)">◀</button>
+        <span class="hunt-week-nav-label" id="huntListWeekLabel"></span>
+        <button class="hunt-week-nav-btn" onclick="shiftHuntListWeek(1)">▶</button>
+      </div>
       <div class="hunt-grid-list" id="huntList"></div>
       <div class="hunt-day-popover" id="huntDayPopover" style="display:none;">
         <div class="hunt-day-popover-title" id="huntDayPopoverTitle"></div>
         <div class="hunt-day-popover-list" id="huntDayPopoverList"></div>
       </div>
       <div class="hunt-total-row">
-        <span class="hunt-total-row-label">이번 주 합계</span>
+        <span class="hunt-total-row-label" id="huntWeekTotalRowLabel">이번 주 합계</span>
         <span id="huntWeekTotalLabel" style="color:var(--money-grad-1);">0억</span>
         <span class="hunt-total-row-material" id="huntWeekMaterialLabel"></span>
       </div>
       <div class="hunt-total-row" style="margin-top:2px;">
-        <span class="hunt-total-row-label">이번 달 합계</span>
+        <span class="hunt-total-row-label" id="huntMonthTotalRowLabel">이번 달 합계</span>
         <span id="huntMonthTotalLabel" style="color:var(--money-grad-1);">0억</span>
         <span class="hunt-total-row-material" id="huntMonthMaterialLabel"></span>
       </div>
@@ -2393,6 +2413,7 @@
     moneyInput.value = '';
     shardInput.value = '';
     materialInput.value = '';
+    huntListWeekOffset = calWeekOffsetForKey(dateStr); // 등록/수정한 기록이 보이는 주로 자동 이동
     render(); saveState();
   }
 
@@ -2436,21 +2457,33 @@
     }
   }
 
+  // 재획 기록 카드의 주간 day-grid는 ◀▶ 로 지난 주/다음 주를 열람·수정할 수 있습니다.
+  let huntListWeekOffset = 0;
+  function shiftHuntListWeek(delta) {
+    huntListWeekOffset += delta;
+    renderHuntList();
+  }
+
   function renderHuntList() {
     const el = document.getElementById('huntList');
     if (!el) return;
     const dateInput = document.getElementById('huntDateInput');
     if (dateInput && !dateInput.value) dateInput.value = kstDateString(kstNow()); // 처음엔 오늘 날짜로 기본 설정
 
-    // 이번 주(목~수) 전체를 날짜별로 묶어서 합산 표시합니다.
+    // 열람 중인 주(목~수) 전체를 날짜별로 묶어서 합산 표시합니다. (huntListWeekOffset으로 과거/미래 주 이동)
     const dowNames = ['일', '월', '화', '수', '목', '금', '토'];
     const thursday = calThisWeekThursday(new Date());
+    thursday.setDate(thursday.getDate() + huntListWeekOffset * 7);
     const weekDateStrs = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(thursday);
       d.setDate(thursday.getDate() + i);
       weekDateStrs.push(kstDateString(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))));
     }
+    const weekEnd = new Date(thursday);
+    weekEnd.setDate(thursday.getDate() + 6);
+    const weekLabelEl = document.getElementById('huntListWeekLabel');
+    if (weekLabelEl) weekLabelEl.textContent = `${thursday.getMonth() + 1}/${thursday.getDate()} ~ ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
     const byDate = {};
     (state.huntLog || []).forEach(e => {
       if (!weekDateStrs.includes(e.dateStr)) return;
@@ -2484,12 +2517,13 @@
     if (totalLabelEl) totalLabelEl.textContent = formatMeso(weekTotalMoney);
     const weekMaterialLabelEl = document.getElementById('huntWeekMaterialLabel');
     if (weekMaterialLabelEl) weekMaterialLabelEl.innerHTML = weekTotalMaterial > 0 ? `${POTION_ICON_SVG} ${weekTotalMaterial}개` : '';
+    const weekTotalRowLabelEl = document.getElementById('huntWeekTotalRowLabel');
+    if (weekTotalRowLabelEl) weekTotalRowLabelEl.textContent = huntListWeekOffset === 0 ? '이번 주 합계' : `${thursday.getMonth() + 1}/${thursday.getDate()}~${weekEnd.getMonth() + 1}/${weekEnd.getDate()} 합계`;
 
-    // 이번 달 합계
-    const today = new Date();
+    // 열람 중인 주가 속한 달 기준 합계 (주가 달을 걸치면 목요일이 속한 달 기준)
     const monthEntries = (state.huntLog || []).filter(e => {
       const [y, mo] = e.dateStr.split('-').map(Number);
-      return y === today.getFullYear() && mo === today.getMonth() + 1;
+      return y === thursday.getFullYear() && mo === thursday.getMonth() + 1;
     });
     const monthTotalMoney = monthEntries.reduce((s, e) => s + (e.money || 0), 0);
     const monthTotalMaterial = monthEntries.reduce((s, e) => s + (e.materialCount || 0), 0);
@@ -2497,6 +2531,8 @@
     if (monthTotalLabelEl) monthTotalLabelEl.textContent = formatMeso(monthTotalMoney);
     const monthMaterialLabelEl = document.getElementById('huntMonthMaterialLabel');
     if (monthMaterialLabelEl) monthMaterialLabelEl.innerHTML = monthTotalMaterial > 0 ? `${POTION_ICON_SVG} ${monthTotalMaterial}개` : '';
+    const monthTotalRowLabelEl = document.getElementById('huntMonthTotalRowLabel');
+    if (monthTotalRowLabelEl) monthTotalRowLabelEl.textContent = huntListWeekOffset === 0 ? '이번 달 합계' : `${thursday.getMonth() + 1}월 합계`;
   }
 
   // 이번 주(목~수) 재획 시간·수입 합계 — 주간 진행도·주간 수익에 그대로 더해집니다.
@@ -2689,9 +2725,15 @@
     });
     return byChar;
   }
-  function huntYieldLabel(avgMeso, avgShard) {
+  function huntYieldCore(avgMeso, avgShard) {
     const shardStr = (Math.round(avgShard * 10) / 10).toString();
-    return `소재비 1개당 평균 메소 ${formatMesoCompact(Math.round(avgMeso))} · 조각 ${shardStr}개`;
+    return `${formatMesoCompact(Math.round(avgMeso))}, ${shardStr}개`;
+  }
+  function huntYieldLabel(avgMeso, avgShard) {
+    return `평균 ${huntYieldCore(avgMeso, avgShard)}`;
+  }
+  function huntYieldParen(avgMeso, avgShard) {
+    return `(${huntYieldLabel(avgMeso, avgShard)})`;
   }
 
   function calRenderWeek() {
@@ -2784,25 +2826,23 @@
       const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
         const y = yieldByChar[g.characterId || 'unknown'];
-        const yieldLine = (y && y.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(y.avgMeso, y.avgShard)}</span></div>` : '';
+        const yieldSuffix = (y && y.avgMeso !== null) ? ` ${huntYieldParen(y.avgMeso, y.avgShard)}` : '';
         return `
         <div class="modal-boss-row">
           <span class="modal-boss-row-left">
             <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
           </span>
-          <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
+          <span class="modal-boss-row-right hunt-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개${yieldSuffix}` : ''}</span></span>
         </div>
-        ${yieldLine}
       `;
       }).join('');
       const totalYield = huntMaterialYieldByCharacter(huntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
-      const totalYieldLine = (totalYield && totalYield.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(totalYield.avgMeso, totalYield.avgShard)}</span></div>` : '';
+      const totalYieldSuffix = (totalYield && totalYield.avgMeso !== null) ? ` ${huntYieldParen(totalYield.avgMeso, totalYield.avgShard)}` : '';
       return rows + `
         <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
           <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-          <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(weekHuntMoney)}</span><span class="hunt-total-row-material hunt-material-col">${weekHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${weekHuntMaterialTotal}개` : ''}</span></span>
-        </div>
-        ${totalYieldLine}`;
+          <span class="modal-boss-row-right hunt-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(weekHuntMoney)}</span><span class="hunt-total-row-material hunt-material-col">${weekHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${weekHuntMaterialTotal}개${totalYieldSuffix}` : ''}</span></span>
+        </div>`;
     })();
   }
 
@@ -2894,25 +2934,23 @@
         const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
           const c = state.characters.find(x => x.id === g.characterId);
           const y = yieldByChar[g.characterId || 'unknown'];
-          const yieldLine = (y && y.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(y.avgMeso, y.avgShard)}</span></div>` : '';
+          const yieldSuffix = (y && y.avgMeso !== null) ? ` ${huntYieldParen(y.avgMeso, y.avgShard)}` : '';
           return `
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
               <span>${escapeHtml(c ? c.name : '(삭제된 캐릭터)')} · ${formatHM(g.time)}</span>
             </span>
-            <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
+            <span class="modal-boss-row-right hunt-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개${yieldSuffix}` : ''}</span></span>
           </div>
-          ${yieldLine}
         `;
         }).join('');
         const totalYield = huntMaterialYieldByCharacter(monthHuntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
-        const totalYieldLine = (totalYield && totalYield.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(totalYield.avgMeso, totalYield.avgShard)}</span></div>` : '';
+        const totalYieldSuffix = (totalYield && totalYield.avgMeso !== null) ? ` ${huntYieldParen(totalYield.avgMeso, totalYield.avgShard)}` : '';
         return rows + `
           <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
             <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
-            <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(monthHuntMoneyTotal)}</span><span class="hunt-total-row-material hunt-material-col">${monthHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${monthHuntMaterialTotal}개` : ''}</span></span>
-          </div>
-          ${totalYieldLine}`;
+            <span class="modal-boss-row-right hunt-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(monthHuntMoneyTotal)}</span><span class="hunt-total-row-material hunt-material-col">${monthHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${monthHuntMaterialTotal}개${totalYieldSuffix}` : ''}</span></span>
+          </div>`;
       })();
     }
   }
