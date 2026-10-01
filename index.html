@@ -92,26 +92,56 @@
   .header-title .icon { flex-shrink: 0; }
   .header-title h1 { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.01em; min-width: 60px; }
 
-  .header-right { display: flex; align-items: center; gap: 10px; }
-  .main-nav {
-    display: flex; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 0 3px; height: 30px;
+  .header-right { display: flex; align-items: center; gap: 18px; }
+
+  /* 탭 메뉴 — 밑줄 강조 스타일 */
+  .main-nav-underline { display: flex; align-items: center; gap: 22px; }
+  .main-nav-underline .tab-btn {
+    border: none; background: transparent; color: var(--muted); font-size: 14px; font-weight: 700;
+    padding: 4px 0; cursor: pointer; font-family: inherit; position: relative;
   }
-  .main-nav .nav-btn,
-  .header-right .nav-btn {
-    border: none; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 700;
-    padding: 0 16px; height: 24px; border-radius: 16px; cursor: pointer; font-family: inherit;
+  .main-nav-underline .tab-btn.active { color: var(--accent-strong); }
+  .main-nav-underline .tab-btn.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -9px; height: 2px;
+    border-radius: 2px; background: var(--accent);
+  }
+
+  /* 다크모드 토글 / 계정 버튼 — 동일 크기의 동그란 버튼 */
+  .theme-toggle-round,
+  .account-round-btn {
+    width: 32px; height: 32px; min-width: 32px; min-height: 32px; box-sizing: border-box;
+    border-radius: 50%; flex-shrink: 0; cursor: pointer; padding: 0;
     display: flex; align-items: center; justify-content: center;
   }
-  .main-nav .nav-btn.active { background: var(--accent); color: #fff; }
-  [data-theme="dark"] .main-nav .nav-btn.active { color: #201404; }
-
-  #authStatusLabel { display: flex; align-items: center; height: 30px; margin-right: 4px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
-  #authLogoutBtn {
-    height: 30px; border: 1px solid var(--border) !important; background: var(--surface);
+  .theme-toggle-round {
+    border: 1px solid var(--border); background: var(--surface); font-size: 15px;
     transition: background 0.15s ease;
   }
-  #authLogoutBtn:hover { background: var(--accent-soft); }
+  .theme-toggle-round:hover { background: var(--accent-soft); }
+
+  /* 계정 메뉴 (사람 아이콘 버튼 + 로그아웃/내보내기/가져오기 통합) */
+  .account-menu-wrap { position: relative; flex-shrink: 0; }
+  .account-round-btn {
+    border: none; background: var(--accent); color: #fff; font-family: inherit; overflow: hidden;
+  }
+  .account-round-btn svg { display: block; }
+  [data-theme="dark"] .account-round-btn { color: #201404; }
+  .account-dropdown {
+    position: absolute; top: 40px; right: 0; min-width: 180px; z-index: 20;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: var(--shadow); padding: 6px;
+  }
+  .account-dropdown-who {
+    font-size: 12px; font-weight: 700; color: var(--muted); padding: 6px 10px 8px;
+    max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .account-dropdown button {
+    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; font-weight: 600; color: var(--ink); padding: 9px 10px; border-radius: 7px;
+  }
+  .account-dropdown button:hover { background: var(--accent-soft); }
+  .account-dropdown hr { border: none; border-top: 1px solid var(--border); margin: 4px 2px; }
 
   /* --- 캘린더 페이지 --- */
   #calendarPage .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
@@ -436,17 +466,6 @@
     border-radius: 0;
     padding: 0;
   }
-
-  .theme-toggle {
-    position: relative; width: 56px; height: 30px; border-radius: 999px;
-    background: var(--track); border: 2px solid var(--border); cursor: pointer; flex-shrink: 0;
-  }
-  .theme-toggle .knob {
-    position: absolute; top: 1px; left: 1px; width: 22px; height: 22px; border-radius: 50%;
-    background: var(--accent); display: flex; align-items: center; justify-content: center;
-    font-size: 12px; transition: transform 0.25s ease, background 0.25s ease;
-  }
-  [data-theme="dark"] .theme-toggle .knob { transform: translateX(26px); }
 
   .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 
@@ -1202,16 +1221,31 @@
       </div>
     </div>
     <div class="header-right">
-      <nav class="main-nav">
-        <button class="nav-btn active" id="navBtn_scheduler" onclick="switchPage('scheduler')">스케줄러</button>
-        <button class="nav-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
-        <button class="nav-btn" id="navBtn_stats" onclick="switchPage('stats')">통계</button>
+      <nav class="main-nav-underline">
+        <button class="tab-btn active" id="navBtn_scheduler" onclick="switchPage('scheduler')">스케줄러</button>
+        <button class="tab-btn" id="navBtn_calendar" onclick="switchPage('calendar')">캘린더</button>
+        <button class="tab-btn" id="navBtn_stats" onclick="switchPage('stats')">통계</button>
       </nav>
-      <span id="authStatusLabel"></span>
-      <button class="nav-btn" id="authLogoutBtn" onclick="authSignOut()" style="display:none;">로그아웃</button>
-      <button class="theme-toggle" id="themeToggle" aria-label="다크모드 전환">
-        <span class="knob" id="themeKnob">☀️</span>
+      <button class="theme-toggle-round" id="themeToggle" aria-label="다크모드 전환">
+        <span id="themeKnob">☀️</span>
       </button>
+      <div class="account-menu-wrap" id="accountMenuWrap">
+        <button class="account-round-btn" id="accountChipBtn" onclick="toggleAccountMenu(event)" aria-label="계정 메뉴">
+          <svg viewBox="0 0 32 32" width="17" height="17" aria-hidden="true">
+            <circle cx="16" cy="11" r="6" fill="currentColor"/>
+            <circle cx="16" cy="31" r="12" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="account-dropdown" id="accountDropdown" style="display:none;">
+          <div class="account-dropdown-who" id="authStatusLabel"></div>
+          <hr>
+          <button onclick="exportBackup()">⬇ 내보내기</button>
+          <button onclick="document.getElementById('importFileInput').click()">⬆ 가져오기</button>
+          <hr id="accountMenuDivider" style="display:none;">
+          <button id="authLogoutBtn" onclick="authSignOut()" style="display:none;">↪ 로그아웃</button>
+        </div>
+      </div>
+      <input type="file" id="importFileInput" accept="application/json,.json" style="display:none;" onchange="handleImportFile(event)">
     </div>
   </div>
 
@@ -4214,14 +4248,88 @@
       if (currentUser) { gate.style.display = 'none'; app.style.display = ''; }
       else { gate.style.display = 'block'; app.style.display = 'none'; }
     }
+    const divider = document.getElementById('accountMenuDivider');
     if (!label || !logoutBtn) return;
     if (currentUser) {
       label.textContent = currentUser.email;
       logoutBtn.style.display = '';
+      if (divider) divider.style.display = '';
     } else {
       label.textContent = '';
       logoutBtn.style.display = 'none';
+      if (divider) divider.style.display = 'none';
     }
+  }
+
+  // ===== 계정 메뉴 드롭다운 =====
+  function toggleAccountMenu(ev) {
+    if (ev) ev.stopPropagation();
+    const menu = document.getElementById('accountDropdown');
+    if (!menu) return;
+    const isOpen = menu.style.display !== 'none';
+    menu.style.display = isOpen ? 'none' : '';
+  }
+  document.addEventListener('click', function (ev) {
+    const wrap = document.getElementById('accountMenuWrap');
+    const menu = document.getElementById('accountDropdown');
+    if (!wrap || !menu || menu.style.display === 'none') return;
+    if (!wrap.contains(ev.target)) menu.style.display = 'none';
+  });
+
+  // ===== 백업 내보내기 / 가져오기 =====
+  function exportBackup() {
+    const menu = document.getElementById('accountDropdown');
+    if (menu) menu.style.display = 'none';
+    try {
+      const json = JSON.stringify(state, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+      a.href = url;
+      a.download = `메이플스케줄러_백업_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('백업 내보내기 실패:', e);
+      alert('백업 파일을 만드는 중 문제가 생겼어요.');
+    }
+  }
+
+  function handleImportFile(ev) {
+    const menu = document.getElementById('accountDropdown');
+    if (menu) menu.style.display = 'none';
+    const file = ev.target.files && ev.target.files[0];
+    ev.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      let parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch (e) {
+        alert('올바른 백업 파일(JSON)이 아니에요.');
+        return;
+      }
+      if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.characters) || !Array.isArray(parsed.tasks)) {
+        alert('이 파일은 메이플 스케줄러 백업 형식이 아니에요.');
+        return;
+      }
+      if (!confirm('지금 가져오는 백업으로 현재 데이터를 모두 덮어쓸까요? 되돌릴 수 없어요.')) return;
+      state = parsed;
+      applyTheme();
+      render();
+      saveState();
+      alert('백업을 불러왔어요.');
+    };
+    reader.onerror = function () {
+      alert('파일을 읽는 중 문제가 생겼어요.');
+    };
+    reader.readAsText(file);
   }
 
   function closeAuthModal() {
