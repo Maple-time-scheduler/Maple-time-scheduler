@@ -1656,13 +1656,13 @@
         </div>
         <div class="modal-field" style="flex:none;">
           <label>캐릭터</label>
-          <select id="modalBossChar" onchange="updateModalCountHint()" disabled style="opacity:1; cursor:default; background:var(--bg); color:var(--ink);"></select>
+          <select id="modalBossChar" onchange="updateModalCountHint()" disabled style="opacity:1; cursor:default; background:var(--bg); color:var(--ink); appearance:none; -webkit-appearance:none; -moz-appearance:none;"></select>
         </div>
         <div class="modal-hint" id="modalBossHint" style="flex:none;"></div>
       </div>
       <div class="boss-modal-right">
         <div class="modal-boss-status boss-modal-status-right">
-          <div class="modal-boss-status-title" id="modalBossStatusTitle">이 캐릭터의 보스 현황</div>
+          <div class="modal-boss-status-title" id="modalBossStatusTitle">이 항목에 등록한 보스</div>
           <div class="modal-boss-list boss-modal-list-right" id="modalBossList"></div>
         </div>
       </div>
@@ -4620,8 +4620,8 @@
     const listEl = document.getElementById('modalBossList');
     const titleEl = document.getElementById('modalBossStatusTitle');
     if (!characterId) { listEl.innerHTML = ''; return; }
-    let bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId && isBoardOfTheme(t.categoryId, bossModalState.theme));
-    if (titleEl) titleEl.textContent = bossModalState.theme === 'monthly' ? '이 캐릭터의 월간 보스 현황' : '이 캐릭터의 보스 현황';
+    let bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId && t.categoryId === bossModalState.catId);
+    if (titleEl) titleEl.textContent = '이 항목에 등록한 보스';
     bosses = bosses.slice().sort((a, b) => bossSortIndex(a.bossName, a.bossDifficulty) - bossSortIndex(b.bossName, b.bossDifficulty));
     if (bosses.length === 0) {
       listEl.innerHTML = '<div class="modal-boss-empty">등록된 보스가 없어요.</div>';
