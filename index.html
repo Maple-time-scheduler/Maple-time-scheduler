@@ -2260,7 +2260,7 @@
       if (registeredChars.length === 0) {
         registeredListEl.innerHTML = '<div class="modal-boss-empty">등록된 캐릭터가 없어요. 아래에서 캐릭터를 선택하세요.</div>';
       } else {
-        const yieldByChar = huntMaterialYieldByCharacter(state.huntLog || []);
+        const yieldByChar = huntMaterialYieldByCharacter((state.huntLog || []).filter(e => e.dateStr >= HUNT_YIELD_CUTOFF_DATE));
         registeredListEl.innerHTML = registeredChars.map(c => {
           const y = yieldByChar[c.id];
           const yieldText = (y && y.avgMeso !== null) ? huntYieldLabel(y.avgMeso, y.avgShard) : '재획 기록 없음';
@@ -2707,6 +2707,9 @@
     if (!ev.target.closest('#calWeekNavPickerList, #calMonthNavPickerList, [onclick^="toggleCalNavPicker"]')) closeCalNavPickers();
   });
 
+  // 캐릭터 관리 팝업의 '누적' 소재비 평균은 이 날짜 이후 기록만 집계합니다. (그 이전 기록은 집계에서 제외)
+  const HUNT_YIELD_CUTOFF_DATE = '2026-09-23';
+
   // 재획 기록을 캐릭터별로 묶어 '소재비 1개당 평균 획득량'을 계산합니다.
   // 메소/조각은 조각을 메소로 환산하지 않고 입력된 그대로(raw) 값을 사용합니다.
   // materialCount가 0인 캐릭터는 avgMeso/avgShard가 null로 나옵니다(나눌 수 없음).
@@ -2822,7 +2825,8 @@
         byChar[key].materialCount += e.materialCount || 0;
         weekHuntMaterialTotal += e.materialCount || 0;
       });
-      const yieldByChar = huntMaterialYieldByCharacter(huntEntries);
+      const huntEntriesForYield = huntEntries.filter(e => e.dateStr >= HUNT_YIELD_CUTOFF_DATE);
+      const yieldByChar = huntMaterialYieldByCharacter(huntEntriesForYield);
       const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
         const y = yieldByChar[g.characterId || 'unknown'];
@@ -2836,7 +2840,7 @@
         </div>
       `;
       }).join('');
-      const totalYield = huntMaterialYieldByCharacter(huntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
+      const totalYield = huntMaterialYieldByCharacter(huntEntriesForYield.map(e => ({ ...e, characterId: 'all' })))['all'];
       const totalYieldSuffix = (totalYield && totalYield.avgMeso !== null) ? ` ${huntYieldParen(totalYield.avgMeso, totalYield.avgShard)}` : '';
       return rows + `
         <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
@@ -2930,7 +2934,8 @@
           monthHuntMoneyTotal += e.money || 0;
           monthHuntMaterialTotal += e.materialCount || 0;
         });
-        const yieldByChar = huntMaterialYieldByCharacter(monthHuntEntries);
+        const monthHuntEntriesForYield = monthHuntEntries.filter(e => e.dateStr >= HUNT_YIELD_CUTOFF_DATE);
+        const yieldByChar = huntMaterialYieldByCharacter(monthHuntEntriesForYield);
         const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
           const c = state.characters.find(x => x.id === g.characterId);
           const y = yieldByChar[g.characterId || 'unknown'];
@@ -2944,7 +2949,7 @@
           </div>
         `;
         }).join('');
-        const totalYield = huntMaterialYieldByCharacter(monthHuntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
+        const totalYield = huntMaterialYieldByCharacter(monthHuntEntriesForYield.map(e => ({ ...e, characterId: 'all' })))['all'];
         const totalYieldSuffix = (totalYield && totalYield.avgMeso !== null) ? ` ${huntYieldParen(totalYield.avgMeso, totalYield.avgShard)}` : '';
         return rows + `
           <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
