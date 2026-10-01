@@ -2440,12 +2440,14 @@
   }
 
   function deleteHuntEntry(id) {
+    if (!confirm('이 재획 기록을 삭제할까요?')) return;
     state.huntLog = (state.huntLog || []).filter(e => e.id !== id);
     render(); saveState();
   }
 
   function deleteHuntEntryFromPopover(id, dateStr, ev) {
     if (ev) ev.stopPropagation();
+    if (!confirm('이 재획 기록을 삭제할까요?')) return;
     state.huntLog = (state.huntLog || []).filter(e => e.id !== id);
     if (huntEditingId === id) cancelHuntEdit();
     render(); saveState();
@@ -4325,6 +4327,9 @@
     render(); saveState();
   }
   function deleteCharacter(id) {
+    const c = state.characters.find(x => x.id === id);
+    const name = c ? c.name : '이 캐릭터';
+    if (!confirm(`'${name}' 캐릭터를 삭제할까요? 재획 등록 정보도 함께 해제되고, 되돌릴 수 없어요.`)) return;
     state.characters = state.characters.filter(c => c.id !== id);
     state.tasks = state.tasks.map(t => t.characterId === id ? { ...t, characterId: null } : t);
     state.huntRegisteredCharIds = (state.huntRegisteredCharIds || []).filter(cid => cid !== id);
@@ -4541,6 +4546,7 @@
   }
 
   function deleteRareItemLogEntry(id) {
+    if (!confirm('이 물욕템 기록을 삭제할까요?')) return;
     state.rareItemLog = (state.rareItemLog || []).filter(e => e.id !== id);
     saveState();
     calRenderWeek(); calRenderMonth(); calRenderStats(); // 주간/월간/통계 전부 갱신
@@ -5151,6 +5157,9 @@
   }
 
   function deleteTask(id) {
+    const target = state.tasks.find(t => t.id === id);
+    // 구분선은 데이터가 아니라 구조용 UI 요소라 확인창 없이 바로 삭제합니다.
+    if (target && !target.isDivider && !confirm('이 항목을 삭제할까요?')) return;
     // 이 항목에 연동해서 등록해둔 보스들도 함께 삭제 (그 캐릭터에 대한 등록 정보만)
     state.tasks = state.tasks.filter(t => t.id !== id && !(t.isBoss && t.linkedTaskId === id));
     render(); saveState();
