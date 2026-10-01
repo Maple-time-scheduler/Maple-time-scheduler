@@ -1443,12 +1443,12 @@
       <div id="calMonthGrid"></div>
 
       <div class="stat-section" style="margin-top:44px;">
-        <h2 style="display:flex; align-items:center; gap:5px;"><span id="calMonthItemDetailIcon"></span> 이번 달 물욕템 내역</h2>
+        <h2 style="display:flex; align-items:center; gap:5px;"><span id="calMonthItemDetailIcon"></span> <span id="calMonthItemDetailLabel">이번 달 물욕템 내역</span></h2>
         <div class="modal-boss-list rare" id="calMonthItemDetailList" style="height:auto; max-height:280px; overflow-y:auto;"></div>
         <div id="calMonthItemDetailTotal"></div>
       </div>
       <div class="stat-section" style="margin-top:44px;">
-        <h2 style="display:flex; align-items:center; gap:5px;"><span id="calMonthHuntDetailIcon"></span> 이번 달 재획 내역</h2>
+        <h2 style="display:flex; align-items:center; gap:5px;"><span id="calMonthHuntDetailIcon"></span> <span id="calMonthHuntDetailLabel">이번 달 재획 내역</span></h2>
         <div class="modal-boss-list" id="calMonthHuntDetailList" style="height:auto; max-height:none; overflow:visible;"></div>
       </div>
     </div>
@@ -2690,7 +2690,7 @@
   let calWeekOffset = 0;
   let calMonthOffset = 0;
   function calShiftWeek(delta) { calWeekOffset += delta; calRenderWeek(); }
-  function calShiftMonth(delta) { calMonthOffset += delta; calRenderMonth(); }
+  function calShiftMonth(delta) { calMonthOffset += delta; calRenderMonth(); calRenderCurrentMonthSummary(); }
 
   // 상단 날짜 라벨을 눌러 원하는 주/달로 바로 이동할 수 있는 드롭다운
   function calWeekKeyForOffset(offset) {
@@ -2742,7 +2742,7 @@
   function selectCalNavPeriod(kind, key) {
     closeCalNavPickers();
     if (kind === 'week') { calWeekOffset = calWeekOffsetForKey(key); calRenderWeek(); }
-    else { calMonthOffset = calMonthOffsetForKey(key); calRenderMonth(); }
+    else { calMonthOffset = calMonthOffsetForKey(key); calRenderMonth(); calRenderCurrentMonthSummary(); }
   }
   document.addEventListener('click', (ev) => {
     if (!ev.target.closest('#calWeekNavPickerList, #calMonthNavPickerList, [onclick^="toggleCalNavPicker"]')) closeCalNavPickers();
@@ -2896,7 +2896,8 @@
   // 월간 뷰에서는 상단 요약을 '이번 달' 기준(모든 컨텐츠 포함, 월간 보스도 포함)으로 보여줍니다.
   function calRenderCurrentMonthSummary() {
     const today = new Date();
-    const year = today.getFullYear(), month = today.getMonth();
+    const viewDate = new Date(today.getFullYear(), today.getMonth() + calMonthOffset, 1);
+    const year = viewDate.getFullYear(), month = viewDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     let timeMin = 0, moneyRaw = 0, rareRaw = 0, crystalMoney = 0, huntMoney = 0;
     for (let d = 1; d <= daysInMonth; d++) {
@@ -2923,6 +2924,12 @@
     const monthItemEntries = (state.rareItemLog || []).filter(e => monthDateStrs.includes(e.dateStr));
     const monthHuntEntries = (state.huntLog || []).filter(e => monthDateStrs.includes(e.dateStr));
 
+    const monthLabelText = calMonthOffset === 0 ? '이번 달' : `${month + 1}월`;
+    const itemLabelEl = document.getElementById('calMonthItemDetailLabel');
+    if (itemLabelEl) itemLabelEl.textContent = `${monthLabelText} 물욕템 내역`;
+    const huntLabelEl = document.getElementById('calMonthHuntDetailLabel');
+    if (huntLabelEl) huntLabelEl.textContent = `${monthLabelText} 재획 내역`;
+
     const itemIconEl = document.getElementById('calMonthItemDetailIcon');
     if (itemIconEl) itemIconEl.innerHTML = `<img src="${ITEM_ADD_ICON_SRC}" alt="" style="width:16px; height:16px; vertical-align:-3px; object-fit:contain;">`;
     const huntIconEl = document.getElementById('calMonthHuntDetailIcon');
@@ -2932,7 +2939,7 @@
     if (monthItemListEl) {
       const monthItemMoney = monthItemEntries.reduce((s, e) => s + (e.price || 0), 0);
       monthItemListEl.innerHTML = monthItemEntries.length === 0
-        ? '<div class="modal-boss-empty">이번 달 물욕템 기록이 없어요.</div>'
+        ? `<div class="modal-boss-empty">${monthLabelText} 물욕템 기록이 없어요.</div>`
         : monthItemEntries.slice().sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(e => {
             const c = state.characters.find(x => x.id === e.characterId);
             return `
@@ -2962,7 +2969,7 @@
     const monthHuntListEl = document.getElementById('calMonthHuntDetailList');
     if (monthHuntListEl) {
       monthHuntListEl.innerHTML = (() => {
-        if (monthHuntEntries.length === 0) return '<div class="modal-boss-empty">이번 달 재획 기록이 없어요.</div>';
+        if (monthHuntEntries.length === 0) return `<div class="modal-boss-empty">${monthLabelText} 재획 기록이 없어요.</div>`;
         const byChar = {};
         let monthHuntMoneyTotal = 0;
         let monthHuntMaterialTotal = 0;
