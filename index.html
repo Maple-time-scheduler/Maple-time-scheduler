@@ -611,6 +611,8 @@
   .hunt-material-col {
     display: inline-flex; min-width: 50px; justify-content: flex-end; align-items: center; gap: 3px; flex-shrink: 0;
   }
+  .hunt-yield-sub { font-size: 10.5px; color: var(--muted); text-align: right; margin: -2px 0 6px 0; padding-right: 2px; }
+  .hunt-yield-sub-row { display: flex; justify-content: flex-end; }
   .char-view-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .char-view-stats { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
   .char-edit-avatar-row { display: flex; align-items: center; gap: 10px; }
@@ -665,6 +667,19 @@
   .theme-section-header h3 { font-size: 15px; font-weight: 700; margin: 0; }
   .theme-badge { font-size: 12px; color: var(--muted); margin-left: 2px; }
   .theme-badge-complete { color: var(--accent-strong); font-weight: 700; }
+  .theme-badge-complete.badge-sparkle { animation: badgeSparkle 0.9s ease; display: inline-block; }
+  @keyframes badgeSparkle {
+    0% { transform: scale(0.9); text-shadow: 0 0 0 transparent; }
+    35% { transform: scale(1.1); text-shadow: 0 0 10px var(--accent-glow); }
+    65% { transform: scale(1); text-shadow: 0 0 16px var(--accent-glow); }
+    100% { transform: scale(1); text-shadow: 0 0 0 transparent; }
+  }
+  .theme-body-collapse {
+    display: grid; grid-template-rows: 1fr; opacity: 1;
+    transition: grid-template-rows 0.4s ease, opacity 0.35s ease;
+  }
+  .theme-body-collapse.collapsed { grid-template-rows: 0fr; opacity: 0; }
+  .theme-body-collapse-inner { overflow: hidden; min-height: 0; }
 
   .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   @media (max-width: 900px) { .board-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -1746,9 +1761,12 @@
 <div class="modal-overlay" id="huntCharManageModalOverlay" style="display:none;" onclick="if(event.target===this) closeHuntCharManageModal()">
   <div class="modal-card">
     <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between;">
-      <span>재획 캐릭터 선택</span>
+      <span>등록된 캐릭터</span>
       <span id="huntCharManageCount" style="font-size:12px; font-weight:700; color:var(--accent-strong);"></span>
     </div>
+    <div class="modal-hint" style="margin-bottom:10px;">재획 기록에서 사용 중인 캐릭터와 소재비 1개당 평균 획득량이에요.</div>
+    <div class="modal-boss-list" id="huntCharManageRegisteredList" style="height:auto; max-height:200px; overflow-y:auto; margin-bottom:16px;"></div>
+    <div class="modal-title" style="margin-top:4px;">재획 캐릭터 선택</div>
     <div class="modal-hint" style="margin-bottom:10px;">재획 기록에서 고를 수 있는 캐릭터를 최대 5개까지 선택하세요.</div>
     <div class="modal-boss-list" id="huntCharManageList" style="height:auto; max-height:280px; overflow-y:auto;"></div>
     <div class="modal-actions">
@@ -2214,8 +2232,27 @@
   function renderHuntCharManageModal() {
     const listEl = document.getElementById('huntCharManageList');
     const countEl = document.getElementById('huntCharManageCount');
+    const registeredListEl = document.getElementById('huntCharManageRegisteredList');
     if (!listEl) return;
     if (countEl) countEl.textContent = `${huntCharManageDraft.length}/${MAX_HUNT_CHARACTERS}`;
+    if (registeredListEl) {
+      const registeredChars = huntCharManageDraft.map(id => state.characters.find(c => c.id === id)).filter(Boolean);
+      if (registeredChars.length === 0) {
+        registeredListEl.innerHTML = '<div class="modal-boss-empty">등록된 캐릭터가 없어요. 아래에서 캐릭터를 선택하세요.</div>';
+      } else {
+        const yieldByChar = huntMaterialYieldByCharacter(state.huntLog || []);
+        registeredListEl.innerHTML = registeredChars.map(c => {
+          const y = yieldByChar[c.id];
+          const yieldText = (y && y.avgMeso !== null) ? huntYieldLabel(y.avgMeso, y.avgShard) : '재획 기록 없음';
+          return `
+            <div class="modal-boss-row">
+              <span class="modal-boss-row-left"><span>${escapeHtml(c.name)}</span></span>
+              <span class="modal-boss-row-right"><span class="hunt-yield-sub" style="margin:0;">${yieldText}</span></span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
     if (state.characters.length === 0) {
       listEl.innerHTML = '<div class="modal-boss-empty">등록된 캐릭터가 없어요. 먼저 위에서 캐릭터를 추가해주세요.</div>';
       return;
@@ -2634,6 +2671,29 @@
     if (!ev.target.closest('#calWeekNavPickerList, #calMonthNavPickerList, [onclick^="toggleCalNavPicker"]')) closeCalNavPickers();
   });
 
+  // 재획 기록을 캐릭터별로 묶어 '소재비 1개당 평균 획득량'을 계산합니다.
+  // 메소/조각은 조각을 메소로 환산하지 않고 입력된 그대로(raw) 값을 사용합니다.
+  // materialCount가 0인 캐릭터는 avgMeso/avgShard가 null로 나옵니다(나눌 수 없음).
+  function huntMaterialYieldByCharacter(entries) {
+    const byChar = {};
+    (entries || []).forEach(e => {
+      const key = e.characterId || 'unknown';
+      if (!byChar[key]) byChar[key] = { characterId: e.characterId, meso: 0, shardCount: 0, materialCount: 0 };
+      byChar[key].meso += e.meso || 0;
+      byChar[key].shardCount += e.shardCount || 0;
+      byChar[key].materialCount += e.materialCount || 0;
+    });
+    Object.values(byChar).forEach(g => {
+      g.avgMeso = g.materialCount > 0 ? g.meso / g.materialCount : null;
+      g.avgShard = g.materialCount > 0 ? g.shardCount / g.materialCount : null;
+    });
+    return byChar;
+  }
+  function huntYieldLabel(avgMeso, avgShard) {
+    const shardStr = (Math.round(avgShard * 10) / 10).toString();
+    return `소재비 1개당 평균 메소 ${formatMesoCompact(Math.round(avgMeso))} · 조각 ${shardStr}개`;
+  }
+
   function calRenderWeek() {
     const today = new Date();
     const grid = document.getElementById('calWeekGrid');
@@ -2720,8 +2780,11 @@
         byChar[key].materialCount += e.materialCount || 0;
         weekHuntMaterialTotal += e.materialCount || 0;
       });
+      const yieldByChar = huntMaterialYieldByCharacter(huntEntries);
       const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
         const c = state.characters.find(x => x.id === g.characterId);
+        const y = yieldByChar[g.characterId || 'unknown'];
+        const yieldLine = (y && y.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(y.avgMeso, y.avgShard)}</span></div>` : '';
         return `
         <div class="modal-boss-row">
           <span class="modal-boss-row-left">
@@ -2729,13 +2792,17 @@
           </span>
           <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
         </div>
+        ${yieldLine}
       `;
       }).join('');
+      const totalYield = huntMaterialYieldByCharacter(huntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
+      const totalYieldLine = (totalYield && totalYield.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(totalYield.avgMeso, totalYield.avgShard)}</span></div>` : '';
       return rows + `
         <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
           <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
           <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(weekHuntMoney)}</span><span class="hunt-total-row-material hunt-material-col">${weekHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${weekHuntMaterialTotal}개` : ''}</span></span>
-        </div>`;
+        </div>
+        ${totalYieldLine}`;
     })();
   }
 
@@ -2823,8 +2890,11 @@
           monthHuntMoneyTotal += e.money || 0;
           monthHuntMaterialTotal += e.materialCount || 0;
         });
+        const yieldByChar = huntMaterialYieldByCharacter(monthHuntEntries);
         const rows = Object.values(byChar).sort((a, b) => characterOrderIndex(a.characterId) - characterOrderIndex(b.characterId)).map(g => {
           const c = state.characters.find(x => x.id === g.characterId);
+          const y = yieldByChar[g.characterId || 'unknown'];
+          const yieldLine = (y && y.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(y.avgMeso, y.avgShard)}</span></div>` : '';
           return `
           <div class="modal-boss-row">
             <span class="modal-boss-row-left">
@@ -2832,13 +2902,17 @@
             </span>
             <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(g.money)}</span><span class="hunt-total-row-material hunt-material-col">${g.materialCount > 0 ? `${POTION_ICON_SVG} ${g.materialCount}개` : ''}</span></span>
           </div>
+          ${yieldLine}
         `;
         }).join('');
+        const totalYield = huntMaterialYieldByCharacter(monthHuntEntries.map(e => ({ ...e, characterId: 'all' })))['all'];
+        const totalYieldLine = (totalYield && totalYield.avgMeso !== null) ? `<div class="hunt-yield-sub-row"><span class="hunt-yield-sub">${huntYieldLabel(totalYield.avgMeso, totalYield.avgShard)}</span></div>` : '';
         return rows + `
           <div class="modal-boss-row" style="border-top:1px solid var(--border); margin-top:4px; padding-top:8px;">
             <span class="modal-boss-row-left"><span style="font-weight:700;">합계</span></span>
             <span class="modal-boss-row-right"><span class="price hunt-price hunt-price-col">${formatMeso(monthHuntMoneyTotal)}</span><span class="hunt-total-row-material hunt-material-col">${monthHuntMaterialTotal > 0 ? `${POTION_ICON_SVG} ${monthHuntMaterialTotal}개` : ''}</span></span>
-          </div>`;
+          </div>
+          ${totalYieldLine}`;
       })();
     }
   }
@@ -3610,7 +3684,7 @@
     themeCollapsed[themeKey] = !themeCollapsed[themeKey];
     const body = document.getElementById('themeBody_' + themeKey);
     const arrow = document.getElementById('themeCollapseArrow_' + themeKey);
-    if (body) body.classList.toggle('hidden', themeCollapsed[themeKey]);
+    if (body) body.classList.toggle('collapsed', themeCollapsed[themeKey]);
     if (arrow) arrow.classList.toggle('open', !themeCollapsed[themeKey]);
     if (themeKey === 'daily') {
       // 사용자가 수동으로 접거나 펼친 경우, 그 선택을 그대로 저장해서 다음 접속 때도 유지합니다.
@@ -4235,8 +4309,9 @@
   function markAllComplete(catId) {
     state.tasks.forEach(t => { if (t.categoryId === catId && !t.completed) logTaskCompletion(t, true); });
     state.tasks = state.tasks.map(t => t.categoryId === catId ? { ...t, completed: true } : t);
-    checkDailyAutoCollapse();
+    const justCompletedAllDaily = checkDailyAutoCollapse();
     render(); saveState();
+    if (justCompletedAllDaily) animateDailyAllComplete();
   }
   function addDivider(catId) {
     state.tasks.push({ id: Date.now(), isDivider: true, categoryId: catId });
@@ -4730,6 +4805,10 @@
     priceInput.value = '';
     document.getElementById('quickRareItemGrid').innerHTML = rareItemGridHtml('', 'selectQuickRareItem');
     document.getElementById('quickItemLogWarning').style.display = 'none';
+    // 다음 기록을 바로 이어서 등록할 수 있도록 인원/보스/아이템 선택을 모두 초기화합니다. (캐릭터는 유지)
+    populateQuickItemLogBossOptions(characterId);
+    const partySelAfterAdd = document.getElementById('quickItemLogParty');
+    if (partySelAfterAdd) partySelAfterAdd.value = '1';
     renderQuickItemLogRecentList();
   }
 
@@ -4966,12 +5045,34 @@
     return dailyTasks.every(t => t.completed);
   }
 
+  // 반환값: 방금 이 호출로 '처음' 전부 완료 상태가 됐으면 true (애니메이션 트리거용).
+  // state.dailyCollapsed는 바로 true로 저장하되, 화면상 접히는 연출(themeCollapsed.daily)은
+  // animateDailyAllComplete()에서 완료 문구를 잠깐 보여준 뒤 지연 적용합니다.
   function checkDailyAutoCollapse() {
-    if (state.dailyCollapsed) return;
+    if (state.dailyCollapsed) return false;
     if (isDailyAllComplete()) {
       state.dailyCollapsed = true;
-      themeCollapsed.daily = true;
+      return true;
     }
+    return false;
+  }
+
+  // 일간 항목을 모두 완료한 순간: 완료 문구를 반짝이며 보여준 뒤, 카드를 애니메이션과 함께 접습니다.
+  function animateDailyAllComplete() {
+    const badge = document.getElementById('dailyCompleteBadge');
+    if (badge) {
+      badge.classList.remove('badge-sparkle');
+      void badge.offsetWidth; // 리플로우 강제 — 같은 애니메이션을 다시 재생시키기 위함
+      badge.classList.add('badge-sparkle');
+      setTimeout(() => badge.classList.remove('badge-sparkle'), 900);
+    }
+    setTimeout(() => {
+      themeCollapsed.daily = true;
+      const body = document.getElementById('themeBody_daily');
+      const arrow = document.getElementById('themeCollapseArrow_daily');
+      if (body) body.classList.add('collapsed');
+      if (arrow) arrow.classList.remove('open');
+    }, 900);
   }
 
   function toggleTask(id) {
@@ -4987,7 +5088,7 @@
       });
       state.tasks = state.tasks.map(t => (t.isBoss && t.linkedTaskId === id) ? { ...t, completed: newCompleted } : t);
     }
-    if (newCompleted) checkDailyAutoCollapse();
+    const justCompletedAllDaily = newCompleted ? checkDailyAutoCollapse() : false;
     render(); saveState();
     if (newCompleted) {
       const chip = document.getElementById(`bossChip_${id}`);
@@ -4996,6 +5097,7 @@
         setTimeout(() => chip.classList.remove('chip-glow'), 700);
       }
     }
+    if (justCompletedAllDaily) animateDailyAllComplete();
   }
   function duplicateTask(id) {
     const idx = state.tasks.findIndex(t => t.id === id);
@@ -5662,7 +5764,7 @@
       if (themeKey === 'daily' || themeKey === 'monthly') {
         const { total, done } = themeTotals(themeKey);
         if (themeKey === 'daily' && isDailyAllComplete()) {
-          badgeHtml = `<span class="theme-badge theme-badge-complete">오늘의 일일 퀘스트를 모두 완료했습니다!</span>`;
+          badgeHtml = `<span class="theme-badge theme-badge-complete" id="dailyCompleteBadge">오늘의 일일 퀘스트를 모두 완료했습니다!</span>`;
         } else {
           badgeHtml = `<span class="theme-badge">완료 ${formatHM(done)} / ${formatHM(total)}</span>`;
         }
@@ -5680,7 +5782,7 @@
           ${badgeHtml}
           ${arrowHtml}
         </div>
-        <div id="themeBody_${themeKey}" class="${themeCollapsed[themeKey] ? 'hidden' : ''}">${gridHtml}</div>
+        <div id="themeBody_${themeKey}" class="theme-body-collapse ${themeCollapsed[themeKey] ? 'collapsed' : ''}"><div class="theme-body-collapse-inner">${gridHtml}</div></div>
       `;
       container.appendChild(section);
 
