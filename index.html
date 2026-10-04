@@ -1571,6 +1571,11 @@
         </div>
       </div>
 
+      <div class="stat-section">
+        <h2>보스별 물욕템 판매 수익 (누적 · 난이도 합산)</h2>
+        <div class="rank-list rare" id="calRareItemBossRankList"></div>
+      </div>
+
       <div class="stat-group-title">💎 고정 리워드 (에리온의 조각 · 에테르넬 조각 · 메멘토 큐브)</div>
       <div class="stat-section">
         <div class="shard-price-mini-row" style="flex-wrap:wrap; gap:6px;">
@@ -3669,6 +3674,33 @@
           </div>
         `;
         }).join('') + `</div>`;
+
+    // 보스별 물욕템 수익 — 난이도 구분 없이 보스 이름 기준으로 합산 (보스 미지정 기록은 제외)
+    const rareBossTotals = {};
+    rareLog.forEach(e => {
+      let bossName = e.bossName;
+      if (!bossName && e.bossTaskId) {
+        const t = state.tasks.find(x => x.id === e.bossTaskId);
+        if (t) bossName = t.bossName;
+      }
+      if (!bossName) return;
+      rareBossTotals[bossName] = (rareBossTotals[bossName] || 0) + (e.price || 0);
+    });
+    const rareBossList = Object.entries(rareBossTotals).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    const rareBossTotalSum = rareBossList.reduce((s, b) => s + b[1], 0) || 1;
+    document.getElementById('calRareItemBossRankList').innerHTML = rareBossList.length === 0
+      ? '<div class="empty-state">보스를 지정한 물욕템 기록이 아직 없어요.</div>'
+      : `<div class="rank-c-list">` + rareBossList.map(([name, value], i) => `
+          <div class="rank-c-row">
+            <span class="rank-c-num">${i + 1}</span>
+            ${iconForBossName(name) ? `<img class="rank-c-icon" src="${iconForBossName(name)}" alt="">` : ''}
+            <span class="rank-c-name">${escapeHtml(name)}</span>
+            <span class="rank-c-side">
+              <div class="rank-c-value">${formatMesoCompact(value)}</div>
+              <div class="rank-c-pct">${Math.round(value / rareBossTotalSum * 100)}%</div>
+            </span>
+          </div>
+        `).join('') + `</div>`;
 
     const rareCharTotals = {};
     rareLog.forEach(e => { if (e.characterId) rareCharTotals[e.characterId] = (rareCharTotals[e.characterId] || 0) + (e.price || 0); });
