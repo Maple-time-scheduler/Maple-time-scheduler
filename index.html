@@ -467,6 +467,32 @@
     padding: 0;
   }
 
+  /* ===== 통계 탭 순위 목록 공통 축소 (결정석/물욕템 순위 5개) ===== */
+  #calStatsView .rank-medal-grid { gap: 7px; margin-bottom: 7px; }
+  #calStatsView .rank-medal-card { padding: 13px 6px; }
+  #calStatsView .rank-medal-avatar-wrap { width: 80px; height: 80px; margin-bottom: 6px; }
+  #calStatsView .rank-medal-avatar { width: 80px; height: 80px; font-size: 36px; }
+  #calStatsView .rank-medal-badge { font-size: 18px; }
+  #calStatsView .rank-medal-name { font-size: 11.5px; }
+  #calStatsView .rank-medal-value { font-size: 12px; }
+  #calStatsView .rank-plain-row { gap: 10px; }
+  #calStatsView .rank-plain-row .rank-avatar-small { width: 46px; height: 46px; }
+  #calStatsView .rank-plain-num { font-size: 12px; }
+  #calStatsView .rank-plain-name { font-size: 13px; }
+  #calStatsView .rank-plain-value { font-size: 12.5px; }
+  #calStatsView .rank-c-row { gap: 10px; padding: 10px 0; }
+  #calStatsView .rank-c-num { font-size: 19px; width: 21px; }
+  #calStatsView .rank-c-icon { width: 23px; height: 23px; }
+  #calStatsView .rank-c-name { font-size: 13.5px; }
+  #calStatsView .rank-c-value { font-size: 13.5px; }
+  #calStatsView .rank-c-pct { font-size: 11px; }
+  /* 보스별 물욕템 판매 수익 — 이름 아래 난이도별 금액 줄 */
+  #calStatsView .rank-c-main { flex: 1; min-width: 0; }
+  #calStatsView .rank-c-main .rank-c-name { display: block; }
+  #calStatsView .rank-c-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 3px; font-size: 11px; color: var(--muted); }
+  #calStatsView .rank-c-sub-item { display: inline-flex; align-items: center; gap: 4px; }
+  #calStatsView .rank-c-sub .difficulty-badge { font-size: 9.5px; padding: 1px 5px; }
+
   .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 
   /* 빠른 물욕템 기록 플로팅 버튼 */
@@ -1572,7 +1598,7 @@
       </div>
 
       <div class="stat-section">
-        <h2>보스별 물욕템 판매 수익 (누적 · 난이도 합산)</h2>
+        <h2>보스별 물욕템 판매 수익 (누적)</h2>
         <div class="rank-list rare" id="calRareItemBossRankList"></div>
       </div>
 
@@ -3605,7 +3631,7 @@
         const c = state.characters.find(x => x.id === charId);
         return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, imageIsNexon: c ? c.imageIsNexon : false, value };
       })
-      .sort((a, b) => b.value - a.value).slice(0, 12);
+      .sort((a, b) => b.value - a.value).slice(0, 10);
     const medals = ['🥇', '🥈', '🥉'];
     document.getElementById('calCharRankList').innerHTML = charList.length === 0
       ? '<div class="empty-state">아직 결정석 기록이 없어요.</div>'
@@ -3634,7 +3660,7 @@
         })();
 
     // 보스별 순위 (C안: 큰 숫자 + 이름 + 금액/비중)
-    const bossList = Object.entries(agg.bossTotals).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    const bossList = Object.entries(agg.bossTotals).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const bossTotalSum = bossList.reduce((s, b) => s + b[1], 0) || 1;
     document.getElementById('calBossRankList').innerHTML = bossList.length === 0
       ? '<div class="empty-state">아직 클리어한 보스 기록이 없어요.</div>'
@@ -3675,26 +3701,43 @@
         `;
         }).join('') + `</div>`;
 
-    // 보스별 물욕템 수익 — 난이도 구분 없이 보스 이름 기준으로 합산 (보스 미지정 기록은 제외)
+    // 보스별 물욕템 수익 — 보스 이름 기준으로 합산하고, 줄 아래에 난이도별 금액을 함께 표시 (보스 미지정 기록은 제외)
     const rareBossTotals = {};
+    const rareBossDiffTotals = {}; // bossName -> { difficulty -> money }
     rareLog.forEach(e => {
       let bossName = e.bossName;
-      if (!bossName && e.bossTaskId) {
+      let difficulty = e.bossDifficulty;
+      if ((!bossName || !difficulty) && e.bossTaskId) {
         const t = state.tasks.find(x => x.id === e.bossTaskId);
-        if (t) bossName = t.bossName;
+        if (t) { bossName = bossName || t.bossName; difficulty = difficulty || t.bossDifficulty; }
       }
       if (!bossName) return;
       rareBossTotals[bossName] = (rareBossTotals[bossName] || 0) + (e.price || 0);
+      if (difficulty) {
+        if (!rareBossDiffTotals[bossName]) rareBossDiffTotals[bossName] = {};
+        rareBossDiffTotals[bossName][difficulty] = (rareBossDiffTotals[bossName][difficulty] || 0) + (e.price || 0);
+      }
     });
-    const rareBossList = Object.entries(rareBossTotals).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    const rareBossList = Object.entries(rareBossTotals).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const rareBossTotalSum = rareBossList.reduce((s, b) => s + b[1], 0) || 1;
+    const rareBossDiffHtml = (name) => {
+      const diffs = Object.entries(rareBossDiffTotals[name] || {}).sort((a, b) => b[1] - a[1]);
+      if (diffs.length === 0) return '';
+      return `<div class="rank-c-sub">` + diffs.map(([d, v]) => {
+        const c = DIFFICULTY_COLORS[d] || { bg: '#888', border: '#888', text: '#fff' };
+        return `<span class="rank-c-sub-item"><span class="difficulty-badge" style="background:${c.bg}; border:1px solid ${c.border}; color:${c.text};">${escapeHtml(d)}</span>${formatMesoCompact(v)}</span>`;
+      }).join('<span class="rank-c-sub-sep">·</span>') + `</div>`;
+    };
     document.getElementById('calRareItemBossRankList').innerHTML = rareBossList.length === 0
       ? '<div class="empty-state">보스를 지정한 물욕템 기록이 아직 없어요.</div>'
       : `<div class="rank-c-list">` + rareBossList.map(([name, value], i) => `
           <div class="rank-c-row">
             <span class="rank-c-num">${i + 1}</span>
             ${iconForBossName(name) ? `<img class="rank-c-icon" src="${iconForBossName(name)}" alt="">` : ''}
-            <span class="rank-c-name">${escapeHtml(name)}</span>
+            <div class="rank-c-main">
+              <div class="rank-c-name">${escapeHtml(name)}</div>
+              ${rareBossDiffHtml(name)}
+            </div>
             <span class="rank-c-side">
               <div class="rank-c-value">${formatMesoCompact(value)}</div>
               <div class="rank-c-pct">${Math.round(value / rareBossTotalSum * 100)}%</div>
@@ -3709,7 +3752,7 @@
         const c = state.characters.find(x => x.id === charId);
         return { name: c ? c.name : '(삭제된 캐릭터)', image: c ? c.image : null, imageIsNexon: c ? c.imageIsNexon : false, value };
       })
-      .sort((a, b) => b.value - a.value).slice(0, 8);
+      .sort((a, b) => b.value - a.value).slice(0, 10);
     document.getElementById('calRareItemCharRankList').innerHTML = rareCharList.length === 0
       ? '<div class="empty-state">아직 획득한 물욕템이 없어요.</div>'
       : (() => {
