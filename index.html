@@ -467,29 +467,33 @@
     padding: 0;
   }
 
-  /* ===== 통계 탭 순위 목록 공통 축소 (결정석/물욕템 순위 5개) ===== */
-  #calStatsView .rank-medal-grid { gap: 7px; margin-bottom: 7px; }
-  #calStatsView .rank-medal-card { padding: 13px 6px; }
-  #calStatsView .rank-medal-avatar-wrap { width: 80px; height: 80px; margin-bottom: 6px; }
-  #calStatsView .rank-medal-avatar { width: 80px; height: 80px; font-size: 36px; }
-  #calStatsView .rank-medal-badge { font-size: 18px; }
-  #calStatsView .rank-medal-name { font-size: 11.5px; }
-  #calStatsView .rank-medal-value { font-size: 12px; }
-  #calStatsView .rank-plain-row { gap: 10px; }
-  #calStatsView .rank-plain-row .rank-avatar-small { width: 46px; height: 46px; }
-  #calStatsView .rank-plain-num { font-size: 12px; }
-  #calStatsView .rank-plain-name { font-size: 13px; }
-  #calStatsView .rank-plain-value { font-size: 12.5px; }
-  #calStatsView .rank-c-row { gap: 10px; padding: 10px 0; }
-  #calStatsView .rank-c-num { font-size: 19px; width: 21px; }
-  #calStatsView .rank-c-icon { width: 23px; height: 23px; }
+  /* ===== 통계 탭 순위 목록 5개(캐릭터별 결정석·보스별 결정석·캐릭터별 물욕템·아이템별·보스별 물욕템) — 행 높이/열 위치/글자 크기 통일 ===== */
+  #calStatsView { --rank-row-h: 54px; }
+  #calStatsView .rank-c-row { box-sizing: border-box; height: var(--rank-row-h); gap: 10px; padding: 0; }
+  #calStatsView .rank-c-num { font-size: 19px; width: 22px; text-align: center; }
+  #calStatsView .rank-c-icon,
+  #calStatsView .rank-c-avatar { width: 34px; height: 34px; flex-shrink: 0; }
+  #calStatsView .rank-c-avatar {
+    overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  #calStatsView .rank-c-avatar img { width: 100%; height: 100%; object-fit: contain; }
+  #calStatsView .rank-c-avatar.nexon-zoom img { transform: scale(1.75); transform-origin: 49% 56%; }
   #calStatsView .rank-c-name { font-size: 13.5px; }
+  #calStatsView .rank-c-side { width: 64px; }
   #calStatsView .rank-c-value { font-size: 13.5px; }
   #calStatsView .rank-c-pct { font-size: 11px; }
-  /* 보스별 물욕템 판매 수익 — 이름 아래 난이도별 금액 줄 */
+  /* 1~3등 메달 카드: 옆 목록 1~3번 행 높이(3행)와 똑같이 맞추고, 4등부터 행이 나란히 이어지게 함 */
+  #calStatsView .rank-medal-grid { box-sizing: border-box; height: calc(var(--rank-row-h) * 3); gap: 7px; margin: 0; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  #calStatsView .rank-medal-card { box-sizing: border-box; height: 100%; padding: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #calStatsView .rank-medal-avatar-wrap { width: 82px; height: 82px; margin: 0 auto 4px; flex-shrink: 0; }
+  #calStatsView .rank-medal-avatar { width: 82px; height: 82px; font-size: 36px; }
+  #calStatsView .rank-medal-badge { font-size: 18px; }
+  #calStatsView .rank-medal-name { font-size: 12px; max-width: 100%; }
+  #calStatsView .rank-medal-value { font-size: 12.5px; }
+  /* 보스별 물욕템 판매 수익 — 이름 아래 난이도별 금액 줄 (행 높이 안에 들어가게) */
   #calStatsView .rank-c-main { flex: 1; min-width: 0; }
   #calStatsView .rank-c-main .rank-c-name { display: block; }
-  #calStatsView .rank-c-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 3px; font-size: 11px; color: var(--muted); }
+  #calStatsView .rank-c-sub { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; margin-top: 2px; font-size: 11px; color: var(--muted); overflow: hidden; white-space: nowrap; }
   #calStatsView .rank-c-sub-item { display: inline-flex; align-items: center; gap: 4px; }
   #calStatsView .rank-c-sub .difficulty-badge { font-size: 9.5px; padding: 1px 5px; }
 
@@ -1597,9 +1601,12 @@
         </div>
       </div>
 
-      <div class="stat-section">
-        <h2>보스별 물욕템 판매 수익 (누적)</h2>
-        <div class="rank-list rare" id="calRareItemBossRankList"></div>
+      <div class="two-col">
+        <div class="stat-section">
+          <h2>보스별 물욕템 판매 수익 (누적)</h2>
+          <div class="rank-list rare" id="calRareItemBossRankList"></div>
+        </div>
+        <div></div>
       </div>
 
       <div class="stat-group-title">💎 고정 리워드 (에리온의 조각 · 에테르넬 조각 · 메멘토 큐브)</div>
@@ -3648,12 +3655,17 @@
               <div class="rank-medal-value">${formatMesoCompact(c.value)}</div>
             </div>
           `).join('') + `</div>`;
-          const restHtml = rest.length === 0 ? '' : `<div class="rank-plain-list">` + rest.map((c, i) => `
-            <div class="rank-plain-row">
-              <span class="rank-plain-num">${i + 4}</span>
-              ${rankAvatarHtml(c.image, 'rank-avatar-small', c.imageIsNexon)}
-              <span class="rank-plain-name">${escapeHtml(c.name)}</span>
-              <span class="rank-plain-value">${formatMesoCompact(c.value)}</span>
+          // 4등부터는 옆 목록(보스별·아이템별)과 같은 행 구조(rank-c-row)로 맞춤
+          const listSum = top3.concat(rest).reduce((s, c) => s + c.value, 0) || 1;
+          const restHtml = rest.length === 0 ? '' : `<div class="rank-c-list">` + rest.map((c, i) => `
+            <div class="rank-c-row">
+              <span class="rank-c-num">${i + 4}</span>
+              ${rankAvatarHtml(c.image, 'rank-c-avatar', c.imageIsNexon)}
+              <span class="rank-c-name">${escapeHtml(c.name)}</span>
+              <span class="rank-c-side">
+                <div class="rank-c-value">${formatMesoCompact(c.value)}</div>
+                <div class="rank-c-pct">${Math.round(c.value / listSum * 100)}%</div>
+              </span>
             </div>
           `).join('') + `</div>`;
           return topHtml + restHtml;
@@ -3768,12 +3780,17 @@
               <div class="rank-medal-value">${formatMesoCompact(c.value)}</div>
             </div>
           `).join('') + `</div>`;
-          const restHtml = rest.length === 0 ? '' : `<div class="rank-plain-list">` + rest.map((c, i) => `
-            <div class="rank-plain-row">
-              <span class="rank-plain-num">${i + 4}</span>
-              ${rankAvatarHtml(c.image, 'rank-avatar-small', c.imageIsNexon)}
-              <span class="rank-plain-name">${escapeHtml(c.name)}</span>
-              <span class="rank-plain-value">${formatMesoCompact(c.value)}</span>
+          // 4등부터는 옆 목록(보스별·아이템별)과 같은 행 구조(rank-c-row)로 맞춤
+          const listSum = top3.concat(rest).reduce((s, c) => s + c.value, 0) || 1;
+          const restHtml = rest.length === 0 ? '' : `<div class="rank-c-list">` + rest.map((c, i) => `
+            <div class="rank-c-row">
+              <span class="rank-c-num">${i + 4}</span>
+              ${rankAvatarHtml(c.image, 'rank-c-avatar', c.imageIsNexon)}
+              <span class="rank-c-name">${escapeHtml(c.name)}</span>
+              <span class="rank-c-side">
+                <div class="rank-c-value">${formatMesoCompact(c.value)}</div>
+                <div class="rank-c-pct">${Math.round(c.value / listSum * 100)}%</div>
+              </span>
             </div>
           `).join('') + `</div>`;
           return topHtml + restHtml;
