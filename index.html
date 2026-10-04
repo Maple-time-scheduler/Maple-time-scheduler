@@ -477,7 +477,8 @@
     overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 16px;
   }
   #calStatsView .rank-c-avatar img { width: 100%; height: 100%; object-fit: contain; }
-  #calStatsView .rank-c-avatar.nexon-zoom img { transform: scale(1.75); transform-origin: 49% 56%; }
+  /* 넥슨 캐릭터 이미지는 300x300 중 캐릭터가 가운데 작게 있어서, 보스 아이콘과 비슷한 크기가 되도록 확대 */
+  #calStatsView .rank-c-avatar.nexon-zoom img { transform: scale(3.3); transform-origin: 49% 55%; }
   #calStatsView .rank-c-name { font-size: 13.5px; }
   #calStatsView .rank-c-side { width: 64px; }
   #calStatsView .rank-c-value { font-size: 13.5px; }
