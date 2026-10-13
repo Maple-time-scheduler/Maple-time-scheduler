@@ -5035,7 +5035,9 @@
   }
 
   function populateQuickItemLogBossOptions(characterId) {
-    const bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId);
+    // 보스 현황·캐릭터 상세와 같은 순서(bossSortIndex: 주간 보스 목록 순 → 난이도 순, 월간 보스는 뒤)로 정렬
+    const bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId)
+      .sort((a, b) => bossSortIndex(a.bossName, a.bossDifficulty) - bossSortIndex(b.bossName, b.bossDifficulty));
     quickSelectedBossTaskId = null;
     const grid = document.getElementById('quickItemLogBossGrid');
     grid.innerHTML = bosses.map(t => `
