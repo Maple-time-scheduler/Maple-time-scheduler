@@ -3475,9 +3475,11 @@
     return mode === 'week' ? '주평균' : mode === 'month' ? '월평균' : '누적';
   }
   function renderStatsToggleCard(opts) {
-    const { key, cardId, badgeId, dotsId, valueId, cumulativeValue, weekCount, monthCount, formatter } = opts;
+    const { key, cardId, badgeId, dotsId, valueId, cumulativeValue, avgBaseValue, weekCount, monthCount, formatter } = opts;
     const mode = statsCardMode[key];
-    const rawValue = mode === 'week' ? cumulativeValue / weekCount : mode === 'month' ? cumulativeValue / monthCount : cumulativeValue;
+    // 주평균/월평균은 진행 중인 이번 주를 뺀 값(avgBaseValue)으로 계산합니다. 누적은 이번 주 포함.
+    const avgBase = (avgBaseValue !== undefined) ? avgBaseValue : cumulativeValue;
+    const rawValue = mode === 'week' ? avgBase / weekCount : mode === 'month' ? avgBase / monthCount : cumulativeValue;
 
     document.getElementById(cardId).setAttribute('data-mode', mode);
     document.getElementById(badgeId).textContent = statsModeBadgeText(mode);
@@ -3601,35 +3603,56 @@
     renderDonutCumulative();
     renderFixedDropStats();
 
-    // 주차/월 개수 (주평균·월평균 계산용)
-    const weekKeySet = new Set(Object.keys(agg.weekTotals));
+    // 주평균·월평균에서는 아직 진행 중인 이번 주(목요일~)를 제외합니다. (진행 중인 주가 끼면 평균이 튀기 때문)
+    const avgCutoff = currentWeekKey(); // 이번 주 목요일 'YYYY-MM-DD' — 이 날짜 이전 기록만 평균에 사용
+    const isPast = ds => ds < avgCutoff;
+    const past = { time: 0, money: 0, crystal: 0, item: 0, hunt: 0 };
+    Object.keys(state.completionLog || {}).forEach(ds => {
+      if (!isPast(ds)) return;
+      Object.values(state.completionLog[ds]).forEach(e => {
+        past.time += (e.time || 0); past.money += (e.money || 0);
+        if (e.isBoss) past.crystal += (e.money || 0);
+      });
+    });
+    (state.huntLog || []).forEach(e => {
+      if (!isPast(e.dateStr)) return;
+      past.time += (e.time || 0); past.money += (e.money || 0); past.hunt += (e.money || 0);
+    });
+    (state.rareItemLog || []).forEach(e => {
+      if (!isPast(e.dateStr)) return;
+      past.money += (e.price || 0); past.item += (e.price || 0);
+    });
+
+    // 주차/월 개수 (주평균·월평균 계산용, 이번 주 제외)
+    const weekKeySet = new Set(Object.keys(agg.weekTotals).filter(isPast));
     const monthKeySet = new Set();
-    Object.keys(state.completionLog || {}).forEach(ds => monthKeySet.add(ds.slice(0, 7)));
-    (state.rareItemLog || []).forEach(e => monthKeySet.add(e.dateStr.slice(0, 7)));
-    (state.huntLog || []).forEach(e => monthKeySet.add(e.dateStr.slice(0, 7)));
+    Object.keys(state.completionLog || {}).filter(isPast).forEach(ds => monthKeySet.add(ds.slice(0, 7)));
+    (state.rareItemLog || []).forEach(e => { if (isPast(e.dateStr)) monthKeySet.add(e.dateStr.slice(0, 7)); });
+    (state.huntLog || []).forEach(e => { if (isPast(e.dateStr)) monthKeySet.add(e.dateStr.slice(0, 7)); });
     const weekCount = weekKeySet.size || 1;
     const monthCount = monthKeySet.size || 1;
 
     renderStatsToggleCard({
       key: 'time', cardId: 'calStatsTimeCard', badgeId: 'calStatsTimeModeBadge', dotsId: 'calStatsTimeDots',
-      valueId: 'calStatsTotalTime', cumulativeValue: agg.totalTime, weekCount, monthCount, formatter: formatHM
+      valueId: 'calStatsTotalTime', cumulativeValue: agg.totalTime, avgBaseValue: past.time, weekCount, monthCount, formatter: formatHM
     });
     renderStatsToggleCard({
       key: 'crystal', cardId: 'calStatsCrystalCard', badgeId: 'calStatsCrystalModeBadge', dotsId: 'calStatsCrystalDots',
-      valueId: 'calStatsTotalMoney', cumulativeValue: catTotals.cumulative.crystal, weekCount, monthCount, formatter: formatMeso
+      valueId: 'calStatsTotalMoney', cumulativeValue: catTotals.cumulative.crystal, avgBaseValue: past.crystal, weekCount, monthCount, formatter: formatMeso
     });
     renderStatsToggleCard({
       key: 'item', cardId: 'calStatsItemCard', badgeId: 'calStatsItemModeBadge', dotsId: 'calStatsItemDots',
-      valueId: 'calStatsRareTotal', cumulativeValue: catTotals.cumulative.item, weekCount, monthCount, formatter: formatMeso
+      valueId: 'calStatsRareTotal', cumulativeValue: catTotals.cumulative.item, avgBaseValue: past.item, weekCount, monthCount, formatter: formatMeso
     });
     renderStatsToggleCard({
       key: 'hunt', cardId: 'calStatsHuntCard', badgeId: 'calStatsHuntModeBadge', dotsId: 'calStatsHuntDots',
-      valueId: 'calStatsHuntTotal', cumulativeValue: catTotals.cumulative.hunt, weekCount, monthCount, formatter: formatMeso
+      valueId: 'calStatsHuntTotal', cumulativeValue: catTotals.cumulative.hunt, avgBaseValue: past.hunt, weekCount, monthCount, formatter: formatMeso
     });
 
     const weekKeys = Object.keys(agg.weekTotals).sort();
-    const weekAvg = weekKeys.length > 0 ? agg.totalMoney / weekKeys.length : 0;
-    document.getElementById('calStatsWeekAvg').textContent = weekKeys.length > 0 ? formatMeso(weekAvg) : '기록 없음';
+    const pastWeekCount = weekKeySet.size; // 이번 주 제외
+    const weekAvg = pastWeekCount > 0 ? past.money / pastWeekCount : 0;
+    document.getElementById('calStatsWeekAvg').textContent = pastWeekCount > 0 ? formatMeso(weekAvg) : '기록 없음';
 
     // 주차별 기록 (최근 주차부터)
     const weekListEl = document.getElementById('calStatsWeekList');
