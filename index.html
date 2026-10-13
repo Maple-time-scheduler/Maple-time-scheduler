@@ -480,6 +480,21 @@
   /* 넥슨 캐릭터 이미지는 300x300 중 캐릭터가 가운데 작게 있어서, 보스 아이콘과 비슷한 크기가 되도록 확대 */
   #calStatsView .rank-c-avatar.nexon-zoom img { transform: scale(3.3); transform-origin: 49% 55%; }
   #calStatsView .rank-c-name { font-size: 13.5px; }
+  /* 재획 캐릭터 관리 팝업 — 등록된 캐릭터는 캐릭터별 카드(이미지 + 평균 획득량)로 나란히 표시 */
+  #huntCharManageRegisteredList { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; } /* 최대 5명 → 한 줄에 5칸 */
+  #huntCharManageRegisteredList .modal-boss-empty { grid-column: 1 / -1; }
+  #huntCharManageRegisteredList .hunt-manage-card {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 4px; border-radius: 8px; background: var(--bg); min-width: 0; text-align: center;
+  }
+  #huntCharManageRegisteredList .hunt-manage-card-name { font-size: 12px; font-weight: 700; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #huntCharManageRegisteredList .hunt-manage-card-yield { font-size: 10.5px; color: var(--muted); line-height: 1.35; }
+  #huntCharManageRegisteredList .hunt-manage-avatar {
+    width: 48px; height: 48px; flex-shrink: 0; overflow: hidden; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  #huntCharManageRegisteredList .hunt-manage-avatar img { width: 100%; height: 100%; object-fit: contain; }
+  #huntCharManageRegisteredList .hunt-manage-avatar.nexon-zoom img { transform: scale(3.3); transform-origin: 49% 55%; }
   #calStatsView .rank-c-side { width: 64px; }
   #calStatsView .rank-c-value { font-size: 13.5px; }
   #calStatsView .rank-c-pct { font-size: 11px; }
@@ -1321,7 +1336,7 @@
       <div class="hunt-form-row">
         <label class="hunt-field-labeled hunt-field-char">
           <span class="hunt-field-label-text">캐릭터</span>
-          <select id="huntCharSelect"></select>
+          <select id="huntCharSelect" onchange="onHuntCharChange()"></select>
         </label>
         <label class="hunt-field-labeled hunt-field-date">
           <span class="hunt-field-label-text">날짜</span>
@@ -1863,7 +1878,7 @@
       <span id="huntCharManageCount" style="font-size:12px; font-weight:700; color:var(--accent-strong);"></span>
     </div>
     <div class="modal-hint" style="margin-bottom:10px; flex:none;">재획 기록에서 사용 중인 캐릭터와 소재비 1개당 평균 획득량이에요.</div>
-    <div class="modal-boss-list" id="huntCharManageRegisteredList" style="flex:1; min-height:48px; height:auto; max-height:none; overflow-y:auto; margin-bottom:16px;"></div>
+    <div class="modal-boss-list" id="huntCharManageRegisteredList" style="flex:none; min-height:48px; height:auto; max-height:none; overflow:visible; scrollbar-gutter:auto; margin-bottom:16px;"></div>
     <div class="modal-title" style="margin-top:4px; flex:none;">재획 캐릭터 선택</div>
     <div class="modal-hint" style="margin-bottom:10px; flex:none;">재획 기록에서 고를 수 있는 캐릭터를 최대 5개까지 선택하세요.</div>
     <div class="modal-boss-list" id="huntCharManageList" style="flex:1; min-height:48px; height:auto; max-height:none; overflow-y:auto;"></div>
@@ -2341,11 +2356,15 @@
         const yieldByChar = huntMaterialYieldByCharacter((state.huntLog || []).filter(e => e.dateStr >= HUNT_YIELD_CUTOFF_DATE));
         registeredListEl.innerHTML = registeredChars.map(c => {
           const y = yieldByChar[c.id];
-          const yieldText = (y && y.avgMeso !== null) ? huntYieldLabel(y.avgMeso, y.avgShard) : '재획 기록 없음';
+          // 카드가 좁아서 평균 메소 / 평균 조각 개수를 두 줄로 나눠 보여줍니다.
+          const yieldHtml = (y && y.avgMeso !== null)
+            ? `평균 ${formatMesoCompact(Math.round(y.avgMeso))}<br>조각 ${(Math.round(y.avgShard * 10) / 10).toString()}개`
+            : '기록 없음';
           return `
-            <div class="modal-boss-row">
-              <span class="modal-boss-row-left"><span>${escapeHtml(c.name)}</span></span>
-              <span class="modal-boss-row-right"><span class="hunt-yield-sub" style="margin:0;">${yieldText}</span></span>
+            <div class="hunt-manage-card" title="${escapeHtml(c.name)}">
+              ${c.image ? rankAvatarHtml(c.image, 'hunt-manage-avatar', c.imageIsNexon) : ''}
+              <span class="hunt-manage-card-name">${escapeHtml(c.name)}</span>
+              <span class="hunt-manage-card-yield">${yieldHtml}</span>
             </div>
           `;
         }).join('');
@@ -2390,6 +2409,31 @@
     }
     sel.innerHTML = regChars.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
     if (regChars.some(c => c.id === prev)) sel.value = prev;
+  }
+
+  // 캐릭터를 고르면 날짜를 오늘로 맞춥니다. (기록 수정 중일 땐 그 기록의 날짜를 유지)
+  function onHuntCharChange() {
+    if (huntEditingId !== null) return;
+    const dateInput = document.getElementById('huntDateInput');
+    if (!dateInput) return;
+    dateInput.value = kstDateString(kstNow());
+    renderHuntList();
+  }
+
+  // 페이지를 켜둔 채 자정(KST)이 지나면, 날짜 칸이 '어제(=그때의 오늘)'로 남아 있을 경우 새 오늘로 바꿉니다.
+  // 사용자가 직접 다른 날짜를 골라둔 경우와 기록 수정 중일 때는 건드리지 않습니다.
+  let huntLastTodayStr = null;
+  function checkHuntDateRollover() {
+    const todayStr = kstDateString(kstNow());
+    if (huntLastTodayStr === null) { huntLastTodayStr = todayStr; return; }
+    if (todayStr === huntLastTodayStr) return;
+    const prevToday = huntLastTodayStr;
+    huntLastTodayStr = todayStr;
+    const dateInput = document.getElementById('huntDateInput');
+    if (dateInput && huntEditingId === null && (!dateInput.value || dateInput.value === prevToday)) {
+      dateInput.value = todayStr;
+    }
+    renderHuntList(); // '오늘' 강조 표시도 새 날짜로 갱신
   }
 
   function renderShardPriceInput() {
@@ -2742,7 +2786,8 @@
     const curDate = new Date(Date.UTC(curThu.getFullYear(), curThu.getMonth(), curThu.getDate()));
     const [y, mo, d] = key.split('-').map(Number);
     const selDate = new Date(Date.UTC(y, mo - 1, d));
-    return Math.round((selDate - curDate) / (1000 * 60 * 60 * 24 * 7));
+    // 목요일이 아닌 날짜(금~수)도 그 주에 속하도록 내림 처리 (반올림하면 월~수가 다음 주로 넘어감)
+    return Math.floor((selDate - curDate) / (1000 * 60 * 60 * 24 * 7));
   }
   function calMonthKeyForOffset(offset) {
     const today = new Date();
@@ -4296,6 +4341,9 @@
     if (migratedFromLegacy) saveState();
     checkAndApplyResets();
     setInterval(checkAndApplyResets, 60 * 1000);
+    checkHuntDateRollover();
+    setInterval(checkHuntDateRollover, 30 * 1000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkHuntDateRollover(); });
   }
 
   async function saveState() {
