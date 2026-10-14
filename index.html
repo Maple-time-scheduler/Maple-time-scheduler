@@ -313,10 +313,18 @@
     padding: 4px 16px; margin-top: 14px; box-shadow: var(--shadow);
   }
   #calStatsView .week-total-row {
-    display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 12px 0; border-bottom: 1px solid var(--border);
   }
   #calStatsView .week-total-row:last-child { border-bottom: none; }
-  #calStatsView .week-total-row .wt-label { font-size: 13px; font-weight: 700; width: 84px; flex-shrink: 0; }
+  #calStatsView .week-total-row .wt-head { flex: 1 1 150px; display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+  #calStatsView .week-total-row .wt-label { font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  #calStatsView .week-total-row .wt-range { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  #calStatsView .week-total-row .wt-breakdown { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; font-weight: 700; color: var(--ink); }
+  #calStatsView .week-total-row .wt-part { display: inline-flex; align-items: center; gap: 5px; }
+  #calStatsView .week-total-row .wt-part i { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  #calStatsView .week-total-row .wt-part.crystal i { background: var(--money-grad-1); }
+  #calStatsView .week-total-row .wt-part.item i { background: var(--rare-color); }
+  #calStatsView .week-total-row .wt-part.hunt i { background: var(--hunt-color); }
   #calStatsView .week-total-row .stat { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; }
   #calStatsView .week-total-row .stat.time { color: var(--time-grad-1); width: 130px; }
   #calStatsView .week-total-row .stat.money { color: var(--money-grad-1); }
@@ -2607,7 +2615,7 @@
     const weekEnd = new Date(thursday);
     weekEnd.setDate(thursday.getDate() + 6);
     const weekLabelEl = document.getElementById('huntListWeekLabel');
-    if (weekLabelEl) weekLabelEl.textContent = `${thursday.getMonth() + 1}/${thursday.getDate()} ~ ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+    if (weekLabelEl) weekLabelEl.textContent = `${fmtMD(thursday)} ~ ${fmtMD(weekEnd)}`;
     const byDate = {};
     (state.huntLog || []).forEach(e => {
       if (!weekDateStrs.includes(e.dateStr)) return;
@@ -2619,7 +2627,7 @@
     el.innerHTML = weekDateStrs.map(ds => {
       const [y, mo, d] = ds.split('-').map(Number);
       const dow = dowNames[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
-      const label = `${dow} ${String(mo).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+      const label = `${dow} ${String(mo).padStart(2, '0')}.${String(d).padStart(2, '0')}`;
       const data = byDate[ds];
       const isToday = ds === todayStr;
       const hasData = !!data;
@@ -2642,7 +2650,7 @@
     const weekMaterialLabelEl = document.getElementById('huntWeekMaterialLabel');
     if (weekMaterialLabelEl) weekMaterialLabelEl.innerHTML = weekTotalMaterial > 0 ? `${POTION_ICON_SVG} ${weekTotalMaterial}개` : '';
     const weekTotalRowLabelEl = document.getElementById('huntWeekTotalRowLabel');
-    if (weekTotalRowLabelEl) weekTotalRowLabelEl.textContent = huntListWeekOffset === 0 ? '이번 주 합계' : `${thursday.getMonth() + 1}/${thursday.getDate()}~${weekEnd.getMonth() + 1}/${weekEnd.getDate()} 합계`;
+    if (weekTotalRowLabelEl) weekTotalRowLabelEl.textContent = huntListWeekOffset === 0 ? '이번 주 합계' : `${fmtMD(thursday)}~${fmtMD(weekEnd)} 합계`;
 
     // 열람 중인 주가 속한 달 기준 합계 (주가 달을 걸치면 목요일이 속한 달 기준)
     const monthEntries = (state.huntLog || []).filter(e => {
@@ -2740,6 +2748,20 @@
     const firstThuDate = 1 + daysUntilFirstThu; // 그 달의 첫 목요일(일)
     const weekIdx = Math.floor((d - firstThuDate) / 7);
     return `${mo}월 ${weekIdx + 1}주차`;
+  }
+
+  // 날짜 표기 통일: 10.08 형식 (월.일, 두 자리)
+  function fmtMD(dt) {
+    return String(dt.getMonth() + 1).padStart(2, '0') + '.' + String(dt.getDate()).padStart(2, '0');
+  }
+
+  // 메이플 주차(목~수)의 날짜 범위 문자열. 예: '10.08 ~ 10.14'
+  function mapleWeekRange(thuDateStr) {
+    const [y, mo, d] = thuDateStr.split('-').map(Number);
+    const start = new Date(Date.UTC(y, mo - 1, d));
+    const end = new Date(Date.UTC(y, mo - 1, d + 6));
+    const fmt = dt => String(dt.getUTCMonth() + 1).padStart(2, '0') + '.' + String(dt.getUTCDate()).padStart(2, '0');
+    return `${fmt(start)} ~ ${fmt(end)}`;
   }
 
   // --- 실제 완료 기록(state.completionLog)에서 날짜별 합계를 읽어옵니다 ---
@@ -2898,7 +2920,7 @@
     const weekEnd = new Date(thursday);
     weekEnd.setDate(thursday.getDate() + 6);
     document.getElementById('calWeekLabel').textContent =
-      `${thursday.getMonth() + 1}/${thursday.getDate()} ~ ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+      `${fmtMD(thursday)} ~ ${fmtMD(weekEnd)}`;
 
     // 상단 요약: 열람 중인 주 기준으로 표시
     const itemEntries = (state.rareItemLog || []).filter(e => weekDateStrs.includes(e.dateStr));
@@ -2914,7 +2936,7 @@
     document.getElementById('calWeekSummaryHunt').textContent = formatMesoCompact(weekHuntMoney);
 
     // 물욕/재획 상세 내역 (캐릭터별)
-    const weekLabelText = calWeekOffset === 0 ? '이번 주' : `${thursday.getMonth() + 1}/${thursday.getDate()}~${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+    const weekLabelText = calWeekOffset === 0 ? '이번 주' : `${fmtMD(thursday)}~${fmtMD(weekEnd)}`;
     const weekItemLabelEl = document.getElementById('calWeekItemDetailLabel');
     if (weekItemLabelEl) weekItemLabelEl.textContent = `${weekLabelText} 물욕템 내역`;
     const weekHuntLabelEl = document.getElementById('calWeekHuntDetailLabel');
@@ -3402,7 +3424,8 @@
     let totalTime = 0, totalMoney = 0;
     const bossTotals = {}; // bossName -> money
     const charTotals = {}; // characterId -> money
-    const weekTotals = {}; // mapleWeekKey -> { time, money }
+    const weekTotals = {}; // mapleWeekKey -> { time, money, crystal, item, hunt }
+    const newWeek = () => ({ time: 0, money: 0, crystal: 0, item: 0, hunt: 0 });
 
     dateStrs.forEach(dateStr => {
       const [y, mo, d] = dateStr.split('-').map(Number);
@@ -3416,9 +3439,10 @@
         totalTime += (e.time || 0);
         totalMoney += (e.money || 0);
         if (e.theme !== 'monthly') {
-          if (!weekTotals[weekKey]) weekTotals[weekKey] = { time: 0, money: 0 };
+          if (!weekTotals[weekKey]) weekTotals[weekKey] = newWeek();
           weekTotals[weekKey].time += (e.time || 0);
           weekTotals[weekKey].money += (e.money || 0);
+          weekTotals[weekKey].crystal += (e.money || 0);
         }
         if (e.isBoss && e.bossName) {
           bossTotals[e.bossName] = (bossTotals[e.bossName] || 0) + (e.money || 0);
@@ -3440,9 +3464,10 @@
 
       totalTime += (e.time || 0);
       totalMoney += (e.money || 0);
-      if (!weekTotals[weekKey]) weekTotals[weekKey] = { time: 0, money: 0 };
+      if (!weekTotals[weekKey]) weekTotals[weekKey] = newWeek();
       weekTotals[weekKey].time += (e.time || 0);
       weekTotals[weekKey].money += (e.money || 0);
+      weekTotals[weekKey].hunt += (e.money || 0);
     });
 
     // 물욕템 판매 수익도 총 수익/주차별 합계에 반영합니다 (판매엔 소요 시간이 없어 시간 합계에는 반영하지 않음).
@@ -3455,8 +3480,9 @@
       const weekKey = kstDateString(thuDate);
 
       totalMoney += (e.price || 0);
-      if (!weekTotals[weekKey]) weekTotals[weekKey] = { time: 0, money: 0 };
+      if (!weekTotals[weekKey]) weekTotals[weekKey] = newWeek();
       weekTotals[weekKey].money += (e.price || 0);
+      weekTotals[weekKey].item += (e.price || 0);
     });
 
     return { dateStrs, totalTime, totalMoney, bossTotals, charTotals, weekTotals };
@@ -3661,9 +3687,14 @@
       ? '<div class="empty-state">아직 쌓인 기록이 없어요.</div>'
       : weekKeysDesc.map(k => `
         <div class="week-total-row">
-          <span class="wt-label">${mapleWeekLabel(k)}</span>
+          <span class="wt-head"><span class="wt-label">${mapleWeekLabel(k)}</span><span class="wt-range">(${mapleWeekRange(k)})</span></span>
           <span class="stat time">⏱ ${formatHM(agg.weekTotals[k].time)}</span>
           <span class="stat money">${COIN_ICON} ${formatMeso(agg.weekTotals[k].money)}</span>
+          <span class="wt-breakdown">
+            <span class="wt-part crystal"><i></i>결정석 ${formatMeso(agg.weekTotals[k].crystal)}</span>
+            <span class="wt-part item"><i></i>물욕 ${formatMeso(agg.weekTotals[k].item)}</span>
+            <span class="wt-part hunt"><i></i>재획 ${formatMeso(agg.weekTotals[k].hunt)}</span>
+          </span>
         </div>
       `).join('');
 
