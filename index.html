@@ -870,6 +870,8 @@
   .task-item.editable .task-text:not([contenteditable="true"]) { cursor: text; }
   .task-item.editable .task-time:not([contenteditable="true"]) { cursor: text; }
   .task-item.editable .task-char.char-editable { cursor: pointer; }
+  .task-item.editable .task-time.time-empty:not([contenteditable="true"]) { cursor: pointer; opacity: 0.75; }
+  .task-item.editable .task-time.time-empty:not([contenteditable="true"]):hover { opacity: 1; color: var(--ink); }
   .task-item.editable .task-char.char-editable:hover { color: var(--ink); }
   .task-item.editable .task-char.char-empty { background: transparent; border: 1px dashed var(--border); border-left: 3px solid var(--chip-accent, var(--accent)); }
   .task-item.editable .task-char-select {
@@ -1746,7 +1748,7 @@
       </div>
       <div class="boss-modal-right">
         <div class="modal-boss-status boss-modal-status-right">
-          <div class="modal-boss-status-title" id="modalBossStatusTitle">이 항목에 등록한 보스</div>
+          <div class="modal-boss-status-title" id="modalBossStatusTitle">이 카드에 등록된 보스</div>
           <div class="modal-boss-list boss-modal-list-right" id="modalBossList"></div>
         </div>
       </div>
@@ -4840,7 +4842,7 @@
     const titleEl = document.getElementById('modalBossStatusTitle');
     if (!characterId) { listEl.innerHTML = ''; return; }
     let bosses = state.tasks.filter(t => t.isBoss && t.characterId === characterId && t.categoryId === bossModalState.catId);
-    if (titleEl) titleEl.textContent = '이 항목에 등록한 보스';
+    if (titleEl) titleEl.textContent = '이 카드에 등록된 보스';
     bosses = bosses.slice().sort((a, b) => bossSortIndex(a.bossName, a.bossDifficulty) - bossSortIndex(b.bossName, b.bossDifficulty));
     if (bosses.length === 0) {
       listEl.innerHTML = '<div class="modal-boss-empty">등록된 보스가 없어요.</div>';
@@ -6128,7 +6130,9 @@
         const timeChipHtml = !isMemo
           ? (task.time > 0
               ? `<span class="task-time" id="taskTime_${task.id}" onclick="if(this.isContentEditable){event.stopPropagation();}else if(${panelOpen}){startEditTaskTime(event, ${task.id});}">⏱ ${formatHM(task.time)}</span>`
-              : `<span class="task-time chip-placeholder">0분</span>`)
+              : (panelOpen
+                  ? `<span class="task-time time-empty" id="taskTime_${task.id}" title="클릭해서 시간 입력" onclick="if(this.isContentEditable){event.stopPropagation();}else{startEditTaskTime(event, ${task.id});}">⏱ 시간 입력</span>`
+                  : `<span class="task-time chip-placeholder">0분</span>`))
           : '';
         const bossEarnedForChar = taskLinkedBossEarned(task.id);
         const bossPotentialForChar = taskLinkedBossPotential(task.id);
