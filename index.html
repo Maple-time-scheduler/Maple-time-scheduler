@@ -566,6 +566,22 @@
   #calStatsView .drop-boss-tab-text { font-size: 11px; font-weight: 700; color: var(--ink); }
   /* 같은 보스의 난이도를 구분하는 아래쪽 색 띠 */
   #calStatsView .drop-boss-tab i { position: absolute; left: 6px; right: 6px; bottom: 2px; height: 3px; border-radius: 2px; }
+  /* 물욕템 4칸(캐릭터별 수익·아이템별 순위·보스별 수익·보스별 드롭률) — 칸마다 B안 카드형 상자(테두리 없이 그림자만)로 감싸 구분. 안쪽 구분선은 그대로 */
+  #calStatsView .rare-box {
+    background: var(--surface); border: none; border-radius: 22px;
+    box-shadow: 0 12px 28px rgba(74,53,32,0.12);
+    padding: 18px 22px 16px; margin-bottom: 0; min-width: 0;
+  }
+  [data-theme="dark"] #calStatsView .rare-box { box-shadow: 0 12px 28px rgba(0,0,0,0.45); }
+  #calStatsView .rare-box > h2 { margin-top: 0; }
+  #calStatsView .two-col.rare-box-row { margin-bottom: 32px; align-items: start; }
+  /* 흰 상자 안쪽 목록은 목업처럼 살짝 짙은 상자(페이지 배경색 + 얇은 테두리)로 한 번 더 감쌈 */
+  #calStatsView .rare-box .rank-list .rank-c-list,
+  #calStatsView .rare-box #calRareItemCharRankList:has(.rank-medal-grid) {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 2px 14px;
+  }
+  #calStatsView .rare-box #calRareItemCharRankList .rank-c-list { background: transparent; border: none; padding: 0; }
+  #calStatsView .rare-box #calRareItemCharRankList .rank-medal-grid:last-child { border-bottom: none; }
   #calStatsView .drop-rate-note { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
 
   .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
@@ -1671,23 +1687,23 @@
         <div class="trend-chart" id="calItemTrendChart"></div>
       </div>
 
-      <div class="two-col">
-        <div class="stat-section">
+      <div class="two-col rare-box-row">
+        <div class="stat-section rare-box">
           <h2>캐릭터별 물욕템 수익 (누적)</h2>
           <div id="calRareItemCharRankList"></div>
         </div>
-        <div class="stat-section">
+        <div class="stat-section rare-box">
           <h2>아이템별 판매 순위 (누적)</h2>
           <div class="rank-list rare" id="calRareItemRankList"></div>
         </div>
       </div>
 
-      <div class="two-col">
-        <div class="stat-section">
+      <div class="two-col rare-box-row">
+        <div class="stat-section rare-box">
           <h2>보스별 물욕템 판매 수익 (누적)</h2>
           <div class="rank-list rare" id="calRareItemBossRankList"></div>
         </div>
-        <div class="stat-section">
+        <div class="stat-section rare-box">
           <h2>보스별 물욕템 드롭률 (누적)</h2>
           <div class="rank-list rare" id="calRareDropRateList"></div>
           <div class="drop-rate-note" id="calRareDropRateNote"></div>
