@@ -533,12 +533,6 @@
   #calStatsView .rank-medal-badge { font-size: 18px; }
   #calStatsView .rank-medal-name { font-size: 12px; max-width: 100%; }
   #calStatsView .rank-medal-value { font-size: 12.5px; }
-  /* 보스별 물욕템 판매 수익 — 이름 아래 난이도별 금액 줄 (행 높이 안에 들어가게) */
-  #calStatsView .rank-c-main { flex: 1; min-width: 0; }
-  #calStatsView .rank-c-main .rank-c-name { display: block; }
-  #calStatsView .rank-c-sub { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; margin-top: 2px; font-size: 11px; color: var(--muted); overflow: hidden; white-space: nowrap; }
-  #calStatsView .rank-c-sub-item { display: inline-flex; align-items: center; gap: 4px; }
-  #calStatsView .rank-c-sub .difficulty-badge { font-size: 9.5px; padding: 1px 5px; }
   /* 보스별 물욕템 드롭률 — 보스·난이도 줄 + 그 아래 아이템별 막대 (획득 수 / 처치 수) */
   #calStatsView .drop-boss-group { padding: 10px 0 8px; border-bottom: 1px solid var(--border); }
   #calStatsView .drop-boss-group:last-child { border-bottom: none; }
@@ -564,24 +558,43 @@
   #calStatsView .drop-boss-tab.active { opacity: 1; border-color: var(--accent); background: var(--surface); }
   #calStatsView .drop-boss-tab img { width: 28px; height: 28px; object-fit: contain; }
   #calStatsView .drop-boss-tab-text { font-size: 11px; font-weight: 700; color: var(--ink); }
-  /* 같은 보스의 난이도를 구분하는 아래쪽 색 띠 */
-  #calStatsView .drop-boss-tab i { position: absolute; left: 6px; right: 6px; bottom: 2px; height: 3px; border-radius: 2px; }
-  /* 물욕템 4칸(캐릭터별 수익·아이템별 순위·보스별 수익·보스별 드롭률) — 칸마다 B안 카드형 상자(테두리 없이 그림자만)로 감싸 구분. 안쪽 구분선은 그대로 */
-  #calStatsView .rare-box {
-    background: var(--surface); border: none; border-radius: 22px;
-    box-shadow: 0 12px 28px rgba(74,53,32,0.12);
-    padding: 18px 22px 16px; margin-bottom: 0; min-width: 0;
+  /* 통계 탭 UI 통일(2안): 그래프·숫자는 카드, 목록은 상자 없이 구분선형. 두 칸씩 놓인 줄은 위아래 간격 32px로 통일 */
+  #calStatsView .two-col { margin-bottom: 32px; align-items: start; }
+  #calStatsView .two-col > .stat-section { margin-bottom: 0; }
+  #calStatsView .rare-boss-card {
+    background: var(--surface); border-radius: 22px; box-shadow: 0 12px 28px rgba(74,53,32,0.12);
+    padding: 18px 22px 16px; margin-bottom: 32px;
   }
-  [data-theme="dark"] #calStatsView .rare-box { box-shadow: 0 12px 28px rgba(0,0,0,0.45); }
-  #calStatsView .rare-box > h2 { margin-top: 0; }
-  #calStatsView .two-col.rare-box-row { margin-bottom: 32px; align-items: start; }
-  /* 흰 상자 안쪽 목록은 목업처럼 살짝 짙은 상자(페이지 배경색 + 얇은 테두리)로 한 번 더 감쌈 */
-  #calStatsView .rare-box .rank-list .rank-c-list,
-  #calStatsView .rare-box #calRareItemCharRankList:has(.rank-medal-grid) {
-    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 2px 14px;
+  [data-theme="dark"] #calStatsView .rare-boss-card { box-shadow: 0 12px 28px rgba(0,0,0,0.45); }
+  #calStatsView .rare-boss-card > h2 { margin-top: 0; }
+  #calStatsView .rare-boss-card .rank-c-list {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 2px 16px;
   }
-  #calStatsView .rare-box #calRareItemCharRankList .rank-c-list { background: transparent; border: none; padding: 0; }
-  #calStatsView .rare-box #calRareItemCharRankList .rank-medal-grid:last-child { border-bottom: none; }
+  #calStatsView .rare-boss-card .drop-boss-kills { width: 90px; text-align: right; }
+  #calStatsView .rare-boss-card .drop-boss-money { width: 120px; text-align: right; font-size: 13.5px; font-weight: 800; color: var(--rare-color); white-space: nowrap; flex-shrink: 0; }
+  #calStatsView .rare-boss-card .drop-boss-money em { display: block; font-style: normal; font-size: 10.5px; font-weight: 600; color: var(--muted); }
+  #calStatsView .rare-boss-card .drop-item-row { padding-left: 44px; gap: 12px; }
+  #calStatsView .rare-boss-card .drop-item-name { width: 210px; display: flex; align-items: center; gap: 7px; }
+  #calStatsView .rare-boss-card .drop-item-name > span { overflow: hidden; text-overflow: ellipsis; }
+  #calStatsView .rare-boss-card .drop-item-frac { width: 60px; }
+  #calStatsView .rare-boss-card .drop-item-pct { width: 50px; }
+  #calStatsView .rare-boss-card .drop-item-money { width: 120px; text-align: right; font-weight: 800; color: var(--rare-color); white-space: nowrap; flex-shrink: 0; }
+  #calStatsView .rare-boss-card .drop-item-headrow { font-size: 10.5px; font-weight: 700; color: var(--muted); padding-top: 6px; }
+  #calStatsView .rare-boss-card .drop-item-headrow .drop-item-money { color: var(--muted); font-weight: 700; }
+  #calStatsView .rare-boss-card .drop-item-bar-label { flex: 1; min-width: 30px; }
+  @media (max-width: 600px) {
+    #calStatsView .rare-boss-card { padding: 16px 14px 14px; }
+    #calStatsView .rare-boss-card .rank-c-list { padding: 2px 10px; }
+    #calStatsView .rare-boss-card .drop-item-headrow { display: none; }
+    #calStatsView .rare-boss-card .drop-item-row { padding-left: 0; gap: 5px; font-size: 11.5px; }
+    #calStatsView .rare-boss-card .drop-item-name { width: 92px; }
+    #calStatsView .rare-boss-card .drop-item-bar { min-width: 16px; }
+    #calStatsView .rare-boss-card .drop-item-frac { width: 34px; }
+    #calStatsView .rare-boss-card .drop-item-pct { width: 40px; }
+    #calStatsView .rare-boss-card .drop-boss-kills { width: auto; }
+    #calStatsView .rare-boss-card .drop-item-money,
+    #calStatsView .rare-boss-card .drop-boss-money { width: 50px; }
+  }
   #calStatsView .drop-rate-note { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
 
   .card { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
@@ -1687,28 +1700,23 @@
         <div class="trend-chart" id="calItemTrendChart"></div>
       </div>
 
-      <div class="two-col rare-box-row">
-        <div class="stat-section rare-box">
+      <div class="stat-section rare-boss-card">
+        <h2>보스별 물욕템 판매 수익 · 드롭률 (누적)</h2>
+        <div id="calRareBossCombined"></div>
+        <div class="drop-rate-note" id="calRareDropRateNote"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="stat-section">
           <h2>캐릭터별 물욕템 수익 (누적)</h2>
           <div id="calRareItemCharRankList"></div>
         </div>
-        <div class="stat-section rare-box">
+        <div class="stat-section">
           <h2>아이템별 판매 순위 (누적)</h2>
           <div class="rank-list rare" id="calRareItemRankList"></div>
         </div>
       </div>
 
-      <div class="two-col rare-box-row">
-        <div class="stat-section rare-box">
-          <h2>보스별 물욕템 판매 수익 (누적)</h2>
-          <div class="rank-list rare" id="calRareItemBossRankList"></div>
-        </div>
-        <div class="stat-section rare-box">
-          <h2>보스별 물욕템 드롭률 (누적)</h2>
-          <div class="rank-list rare" id="calRareDropRateList"></div>
-          <div class="drop-rate-note" id="calRareDropRateNote"></div>
-        </div>
-      </div>
 
       <div class="stat-group-title">💎 고정 리워드 (에리온의 조각 · 에테르넬 조각 · 메멘토 큐브)</div>
       <div class="stat-section">
@@ -3697,59 +3705,79 @@
     }).join('');
   }
 
-  // 보스별 물욕템 드롭률 카드 — 위쪽 보스 아이콘 중 하나를 골라서 그 보스·난이도의 드롭률만 보여줌 (카드 높이 일정)
-  let calDropRateData = { keys: [], kills: {}, items: {} };
-  let calDropRateSelectedKey = null;
-  function selectCalDropRateBoss(idx) {
-    const key = calDropRateData.keys[idx];
-    if (!key) return;
-    calDropRateSelectedKey = key;
-    renderCalDropRate();
+  // 보스별 물욕템 판매 수익 · 드롭률 통합 카드 — 위쪽 보스 아이콘(보스·난이도별)을 골라서
+  // 그 보스의 아이템별 드롭률(획득 수 / 처치 수)과 판매 수익을 한 줄에 함께 표시
+  let calRareBossRevData = { keys: [], groups: {} };          // 'bossName|difficulty' -> { total, items: { itemName -> { money, count } } }
+  let calDropRateData = { keys: [], kills: {}, items: {} };    // 처치 수 / 아이템별 획득 수
+  let calRareBossSelectedName = null; // 보스 아이콘은 난이도와 상관없이 보스당 1개, 선택하면 난이도별로 나눠서 표시
+  function calRareBossNames() {
+    const names = [];
+    calDropRateData.keys.forEach(k => { const n = k.split('|')[0]; if (!names.includes(n)) names.push(n); }); // keys가 상위 보스부터라 순서 유지
+    return names;
   }
-  function renderCalDropRate() {
-    const el = document.getElementById('calRareDropRateList');
+  function selectCalRareBoss(idx) {
+    const name = calRareBossNames()[idx];
+    if (!name) return;
+    calRareBossSelectedName = name;
+    renderCalRareBossCombined();
+  }
+  function renderCalRareBossCombined() {
+    const el = document.getElementById('calRareBossCombined');
     if (!el) return;
-    const { keys, kills: killsMap, items: itemsMap } = calDropRateData;
-    if (keys.length === 0) {
+    const groups = calRareBossRevData.groups;
+    const names = calRareBossNames();
+    if (names.length === 0) {
       el.innerHTML = '<div class="empty-state">보스를 지정한 물욕템 기록이 아직 없어요.</div>';
       return;
     }
-    if (!keys.includes(calDropRateSelectedKey)) calDropRateSelectedKey = keys[0];
-    const tabsHtml = `<div class="drop-boss-tabs">` + keys.map((key, idx) => {
-      const [name, diff] = key.split('|');
-      const c = DIFFICULTY_COLORS[diff] || { bg: '#888', border: '#888', text: '#fff' };
+    if (!names.includes(calRareBossSelectedName)) calRareBossSelectedName = names[0];
+    const grandTotal = Object.values(groups).reduce((sum, g) => sum + g.total, 0) || 1;
+    const tabsHtml = `<div class="drop-boss-tabs">` + names.map((name, idx) => {
       const icon = iconForBossName(name);
-      return `<button type="button" class="drop-boss-tab${key === calDropRateSelectedKey ? ' active' : ''}" title="${escapeHtml(diff)} ${escapeHtml(name)}" onclick="selectCalDropRateBoss(${idx})">`
+      return `<button type="button" class="drop-boss-tab${name === calRareBossSelectedName ? ' active' : ''}" title="${escapeHtml(name)}" onclick="selectCalRareBoss(${idx})">`
         + (icon ? `<img src="${icon}" alt="">` : `<span class="drop-boss-tab-text">${escapeHtml(name.slice(0, 2))}</span>`)
-        + `<i style="background:${c.bg};"></i></button>`;
+        + `</button>`;
     }).join('') + `</div>`;
-    const key = calDropRateSelectedKey;
-    const [name, diff] = key.split('|');
-    const kills = killsMap[key] || 0;
-    const c = DIFFICULTY_COLORS[diff] || { bg: '#888', border: '#888', text: '#fff' };
-    const items = Object.entries(itemsMap[key] || {})
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    el.innerHTML = tabsHtml + `
-      <div class="rank-c-list">
+    const name = calRareBossSelectedName;
+    const diffKeys = calDropRateData.keys.filter(k => k.split('|')[0] === name); // 높은 난이도부터
+    const groupHtml = (key, withHead) => {
+      const diff = key.split('|')[1];
+      const kills = calDropRateData.kills[key] || 0;
+      const g = groups[key] || { total: 0, items: {} };
+      const c = DIFFICULTY_COLORS[diff] || { bg: '#888', border: '#888', text: '#fff' };
+      const items = Object.entries(calDropRateData.items[key] || {})
+        .map(([itemName, cnt]) => ({ itemName, cnt, money: (g.items[itemName] || {}).money || 0 }))
+        .sort((x, y) => y.money - x.money || y.cnt - x.cnt);
+      return `
         <div class="drop-boss-group">
           <div class="drop-boss-head">
             ${iconForBossName(name) ? `<img class="rank-c-icon" src="${iconForBossName(name)}" alt="">` : ''}
             <span class="drop-boss-name"><span class="difficulty-badge" style="background:${c.bg}; border:1px solid ${c.border}; color:${c.text};">${escapeHtml(diff)}</span>${escapeHtml(name)}</span>
             <span class="drop-boss-kills">${kills > 0 ? `처치 ${kills}회` : '처치 기록 없음'}</span>
+            <span class="drop-boss-money">${formatMesoCompact(g.total)}<em>전체의 ${Math.round(g.total / grandTotal * 100)}%</em></span>
           </div>
-          ${items.map(([itemName, cnt]) => {
+          ${withHead ? `
+          <div class="drop-item-row drop-item-headrow">
+            <span class="drop-item-name">아이템</span>
+            <span class="drop-item-bar-label">드롭률</span>
+            <span class="drop-item-frac">획득/처치</span>
+            <span class="drop-item-pct"></span>
+            <span class="drop-item-money">판매 수익</span>
+          </div>` : ''}
+          ${items.map(({ itemName, cnt, money }) => {
             const rate = kills > 0 ? cnt / kills * 100 : null;
             return `
             <div class="drop-item-row">
-              ${RARE_ITEM_ICONS[itemName] ? `<img class="drop-item-icon" src="${RARE_ITEM_ICONS[itemName]}" alt="">` : ''}
-              <span class="drop-item-name" title="${escapeHtml(itemName)}">${escapeHtml(itemName)}</span>
+              <span class="drop-item-name" title="${escapeHtml(itemName)}">${RARE_ITEM_ICONS[itemName] ? `<img class="drop-item-icon" src="${RARE_ITEM_ICONS[itemName]}" alt="">` : ''}<span>${escapeHtml(itemName)}</span></span>
               <span class="drop-item-bar"><i style="width:${rate === null ? 0 : Math.min(rate, 100).toFixed(1)}%"></i></span>
               <span class="drop-item-frac">${cnt}/${kills}</span>
               <span class="drop-item-pct">${rate === null ? '-' : rate.toFixed(1) + '%'}</span>
+              <span class="drop-item-money">${formatMesoCompact(money)}</span>
             </div>`;
           }).join('')}
-        </div>
-      </div>`;
+        </div>`;
+    };
+    el.innerHTML = tabsHtml + `<div class="rank-c-list">` + diffKeys.map((k, i) => groupHtml(k, i === 0)).join('') + `</div>`;
   }
 
   function calRenderStats() {
@@ -3945,49 +3973,27 @@
         `;
         }).join('') + `</div>`;
 
-    // 보스별 물욕템 수익 — 보스 이름 기준으로 합산하고, 줄 아래에 난이도별 금액을 함께 표시 (보스 미지정 기록은 제외)
-    const rareBossTotals = {};
-    const rareBossDiffTotals = {}; // bossName -> { difficulty -> money }
+    // 보스별 물욕템 판매 수익 — 드롭률 카드와 같은 방식: 위쪽 보스 아이콘(보스·난이도별)을 골라 그 보스의 아이템별 수익을 표시 (보스 미지정 기록은 제외)
+    const rareBossRev = {}; // 'bossName|difficulty' -> { total, items: { itemName -> { money, count } } }
     rareLog.forEach(e => {
-      let bossName = e.bossName;
-      let difficulty = e.bossDifficulty;
+      let bossName = e.bossName, difficulty = e.bossDifficulty;
       if ((!bossName || !difficulty) && e.bossTaskId) {
         const t = state.tasks.find(x => x.id === e.bossTaskId);
         if (t) { bossName = bossName || t.bossName; difficulty = difficulty || t.bossDifficulty; }
       }
-      if (!bossName) return;
-      rareBossTotals[bossName] = (rareBossTotals[bossName] || 0) + (e.price || 0);
-      if (difficulty) {
-        if (!rareBossDiffTotals[bossName]) rareBossDiffTotals[bossName] = {};
-        rareBossDiffTotals[bossName][difficulty] = (rareBossDiffTotals[bossName][difficulty] || 0) + (e.price || 0);
-      }
+      if (!bossName || !difficulty) return;
+      const key = bossName + '|' + difficulty;
+      if (!rareBossRev[key]) rareBossRev[key] = { total: 0, items: {} };
+      const g = rareBossRev[key];
+      g.total += (e.price || 0);
+      if (!g.items[e.itemName]) g.items[e.itemName] = { money: 0, count: 0 };
+      g.items[e.itemName].money += (e.price || 0);
+      g.items[e.itemName].count += 1;
     });
-    const rareBossList = Object.entries(rareBossTotals).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const rareBossTotalSum = rareBossList.reduce((s, b) => s + b[1], 0) || 1;
-    const rareBossDiffHtml = (name) => {
-      const diffs = Object.entries(rareBossDiffTotals[name] || {}).sort((a, b) => b[1] - a[1]);
-      if (diffs.length === 0) return '';
-      return `<div class="rank-c-sub">` + diffs.map(([d, v]) => {
-        const c = DIFFICULTY_COLORS[d] || { bg: '#888', border: '#888', text: '#fff' };
-        return `<span class="rank-c-sub-item"><span class="difficulty-badge" style="background:${c.bg}; border:1px solid ${c.border}; color:${c.text};">${escapeHtml(d)}</span>${formatMesoCompact(v)}</span>`;
-      }).join('<span class="rank-c-sub-sep">·</span>') + `</div>`;
+    calRareBossRevData = {
+      keys: Object.keys(rareBossRev).sort((x, y) => rareBossRev[y].total - rareBossRev[x].total), // 수익 많은 보스부터
+      groups: rareBossRev
     };
-    document.getElementById('calRareItemBossRankList').innerHTML = rareBossList.length === 0
-      ? '<div class="empty-state">보스를 지정한 물욕템 기록이 아직 없어요.</div>'
-      : `<div class="rank-c-list">` + rareBossList.map(([name, value], i) => `
-          <div class="rank-c-row">
-            <span class="rank-c-num">${i + 1}</span>
-            ${iconForBossName(name) ? `<img class="rank-c-icon" src="${iconForBossName(name)}" alt="">` : ''}
-            <div class="rank-c-main">
-              <div class="rank-c-name">${escapeHtml(name)}</div>
-              ${rareBossDiffHtml(name)}
-            </div>
-            <span class="rank-c-side">
-              <div class="rank-c-value">${formatMesoCompact(value)}</div>
-              <div class="rank-c-pct">${Math.round(value / rareBossTotalSum * 100)}%</div>
-            </span>
-          </div>
-        `).join('') + `</div>`;
 
     // 보스별 물욕템 드롭률 — (그 보스·난이도에서 기록한 물욕템 개수) / (같은 보스·난이도 처치 횟수)
     // 처치 횟수는 completionLog의 보스 체크 기록 1건 = 1회. 예전 기록엔 난이도가 저장돼 있지 않아서
@@ -4033,7 +4039,7 @@
       return bossSortIndex(bn, bd) - bossSortIndex(an, ad); // 상위 보스부터
     });
     calDropRateData = { keys: dropKeys, kills: dropKills, items: dropItems };
-    renderCalDropRate();
+    renderCalRareBossCombined();
     const dropNotes = [];
     if (noBossItemCount > 0) dropNotes.push(`보스를 지정하지 않은 물욕 기록 ${noBossItemCount}건은 제외했어요.`);
     if (unknownKillCount > 0) dropNotes.push(`난이도를 알 수 없는 예전 처치 기록 ${unknownKillCount}건은 제외했어요.`);
