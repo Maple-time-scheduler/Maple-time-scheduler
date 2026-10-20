@@ -580,7 +580,8 @@
   #calStatsView .rare-boss-card .drop-item-pct { width: 50px; }
   #calStatsView .rare-boss-card .drop-item-money { width: 120px; text-align: right; font-weight: 800; color: var(--rare-color); white-space: nowrap; flex-shrink: 0; }
   #calStatsView .rare-boss-card .drop-item-headrow { font-size: 10.5px; font-weight: 700; color: var(--muted); padding-top: 6px; }
-  #calStatsView .rare-boss-card .drop-item-headrow .drop-item-money { color: var(--muted); font-weight: 700; }
+  #calStatsView .rare-boss-card .drop-item-headrow .drop-item-money,
+  #calStatsView .rare-boss-card .drop-item-headrow .drop-item-pct { color: var(--muted); font-weight: 700; }
   #calStatsView .rare-boss-card .drop-item-bar-label { flex: 1; min-width: 30px; }
   @media (max-width: 600px) {
     #calStatsView .rare-boss-card { padding: 16px 14px 14px; }
@@ -3759,9 +3760,9 @@
           ${withHead ? `
           <div class="drop-item-row drop-item-headrow">
             <span class="drop-item-name">아이템</span>
-            <span class="drop-item-bar-label">드롭률</span>
+            <span class="drop-item-bar-label"></span>
             <span class="drop-item-frac">획득/처치</span>
-            <span class="drop-item-pct"></span>
+            <span class="drop-item-pct">드롭률</span>
             <span class="drop-item-money">판매 수익</span>
           </div>` : ''}
           ${items.map(({ itemName, cnt, money }) => {
