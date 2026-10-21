@@ -3949,7 +3949,7 @@
 
   // 완료 기록을 주별 시세로 환산해 누적합니다 (전체 + 캐릭터별)
   function fixedCumulativeWithPrices() {
-    const zero = () => ({ erion: 0, eternelUpper: 0, eternelAccessory: 0, money: { erion: 0, eternelUpper: 0, eternelAccessory: 0 } });
+    const zero = () => ({ erion: 0, eternelUpper: 0, eternelAccessory: 0, bronze: 0, silver: 0, gold: 0, money: { erion: 0, eternelUpper: 0, eternelAccessory: 0 } });
     const total = zero();
     const byCharacter = {};
     const priceCache = {};
@@ -3965,6 +3965,16 @@
           if (e.characterId) {
             const c = byCharacter[e.characterId] || (byCharacter[e.characterId] = zero());
             c[k] += cnt; c.money[k] += cnt * price[k];
+          }
+        });
+        // 메멘토 큐브는 시세가 없어 개수만 누적 (큐브 개수를 저장하기 시작한 뒤의 기록만 반영)
+        ['bronze', 'silver', 'gold'].forEach(k => {
+          const cnt = e[k] || 0;
+          if (cnt <= 0) return;
+          total[k] += cnt;
+          if (e.characterId) {
+            const c = byCharacter[e.characterId] || (byCharacter[e.characterId] = zero());
+            c[k] += cnt;
           }
         });
       });
@@ -3992,7 +4002,7 @@
     } else {
       const cum = fixedCumulativeWithPrices();
       counts = cum.total; money = cum.total.money; byChar = cum.byCharacter;
-      document.getElementById('fxHint').textContent = '누적 = 완료 기록을 주마다 그때 시세로 환산';
+      document.getElementById('fxHint').textContent = '누적 = 완료 기록을 주마다 그때 시세로 환산 (메멘토 큐브는 10월 21일 이후 체크분부터)';
     }
     const moneyTotal = FIXED_KINDS.reduce((sum, k) => sum + (money[k] || 0), 0);
     const eternelCount = (counts.eternelUpper || 0) + (counts.eternelAccessory || 0);
@@ -4028,13 +4038,12 @@
   // 캐릭터별 획득 현황 — 6열 카드 (환산 합계 순, 1~3등 메달, 계정 그룹 색 점)
   function renderFixedRewardByCharList(byChar) {
     const el = document.getElementById('calFixedRewardByCharList');
-    const withCube = fixedPeriod === 'week';
     const rows = Object.keys(byChar).map(cid => {
       const p = byChar[cid];
       const c = state.characters.find(ch => ch.id === cid);
       const moneySum = FIXED_KINDS.reduce((sum, k) => sum + (p.money[k] || 0), 0);
       return { cid, c, name: c ? c.name : '(삭제된 캐릭터)', order: characterOrderIndex(cid), p, moneySum };
-    }).filter(r => r.moneySum > 0 || FIXED_KINDS.some(k => r.p[k] > 0) || (withCube && (r.p.bronze > 0 || r.p.silver > 0 || r.p.gold > 0)))
+    }).filter(r => r.moneySum > 0 || FIXED_KINDS.some(k => r.p[k] > 0) || r.p.bronze > 0 || r.p.silver > 0 || r.p.gold > 0)
       .sort((a, b) => b.moneySum - a.moneySum || a.order - b.order);
     if (rows.length === 0) { el.innerHTML = '<div class="empty-state" style="text-align:center; padding:14px 0;">기록이 없어요.</div>'; return; }
     const medals = ['🥇', '🥈', '🥉'];
@@ -4042,8 +4051,8 @@
     el.innerHTML = `<div class="fx-char-grid">` + rows.map((r, i) => {
       const fx = FIXED_KINDS.filter(k => r.p[k] > 0)
         .map(k => `<span title="${FIXED_KIND_LABEL[k]}">${fixedKindIcon(k) ? `<img src="${fixedKindIcon(k)}" alt="">` : ''}${num(r.p[k])}</span>`).join('');
-      const cubes = withCube ? [[MEMENTO_BRONZE_ICON_SRC, r.p.bronze, '브론즈'], [MEMENTO_SILVER_ICON_SRC, r.p.silver, '실버'], [MEMENTO_GOLD_ICON_SRC, r.p.gold, '골드']]
-        .filter(([, n]) => n > 0).map(([src, n, label]) => `<span title="메멘토 큐브(${label})"><img src="${src}" alt="">${num(n)}</span>`).join('') : '';
+      const cubes = [[MEMENTO_BRONZE_ICON_SRC, r.p.bronze, '브론즈'], [MEMENTO_SILVER_ICON_SRC, r.p.silver, '실버'], [MEMENTO_GOLD_ICON_SRC, r.p.gold, '골드']]
+        .filter(([, n]) => n > 0).map(([src, n, label]) => `<span title="메멘토 큐브(${label})"><img src="${src}" alt="">${num(n)}</span>`).join('');
       const acctIdx = accountGroupIndexOf(r.cid);
       const acct = acctIdx === -1 ? null : state.accountGroups[acctIdx];
       return `
@@ -4096,8 +4105,7 @@
     const restT = sumOf(rest);
     if (rest.length > 0 && (restT.money > 0 || restT.bronze > 0 || restT.silver > 0 || restT.gold > 0)) rows.push({ name: '미지정', dot: '<i class="acct-dot" style="background:var(--border)"></i>', count: rest.length, t: restT });
     const num = n => String(Math.round(n * 10) / 10);
-    // 메멘토 큐브는 이번 주(등록된 보스 기준)에만 집계돼요 — 누적 기록에는 큐브가 저장되지 않음
-    const withCube = fixedPeriod === 'week';
+    // 메멘토 큐브 — 이번 주는 등록된 보스 기준, 누적은 큐브 개수를 저장하기 시작한 뒤의 완료 기록 기준
     const cubeHtml = t => [[MEMENTO_BRONZE_ICON_SRC, t.bronze, '브론즈'], [MEMENTO_SILVER_ICON_SRC, t.silver, '실버'], [MEMENTO_GOLD_ICON_SRC, t.gold, '골드']]
       .map(([src, n, label]) => `<span class="fx-acct-part" title="메멘토 큐브(${label})"><img src="${src}" alt="">${num(n)}</span>`).join('');
     el.innerHTML = `<div class="fx-acct-title">계정별 합산</div>` + rows.map(r => `
@@ -4105,7 +4113,7 @@
         <span class="fx-acct-name">${r.dot}${escapeHtml(r.name)} <small>${r.count}명</small></span>
         ${FIXED_KINDS.map(k => `<span class="fx-acct-part" title="${FIXED_KIND_LABEL[k]}">${fixedKindIcon(k) ? `<img src="${fixedKindIcon(k)}" alt="">` : ''}${num(r.t[k])}</span>`).join('')}
         <span class="fx-acct-money">${formatMesoCompact(Math.round(r.t.money))}</span>
-        ${withCube ? `<span class="fx-acct-cubes">${cubeHtml(r.t)}</span>` : ''}
+        <span class="fx-acct-cubes">${cubeHtml(r.t)}</span>
       </div>`).join('');
   }
 
@@ -5857,7 +5865,11 @@
         theme: board ? board.theme : null,
         erion: task.isBoss ? (task.erionAmount || 0) : 0,
         eternelUpper: task.isBoss ? (task.eternelUpperAmount || 0) : 0,
-        eternelAccessory: task.isBoss ? (task.eternelAccessoryAmount || 0) : 0
+        eternelAccessory: task.isBoss ? (task.eternelAccessoryAmount || 0) : 0,
+        // 메멘토 큐브 — 2026-10-21부터 저장 (이전 기록에는 없음)
+        bronze: task.isBoss ? (task.bronzeAmount || 0) : 0,
+        silver: task.isBoss ? (task.silverAmount || 0) : 0,
+        gold: task.isBoss ? (task.goldAmount || 0) : 0
       };
     } else {
       // 체크 해제 시: 그 항목의 리셋 주기(일간=오늘/주간=이번 주/월간=이번 달) 안에 있는
