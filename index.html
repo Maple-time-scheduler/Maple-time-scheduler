@@ -296,12 +296,12 @@
   }
   /* 주차별 기록 — 항목별 표 (구분선형) */
   #calStatsView .wk-row {
-    display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr)) 92px minmax(0, 1fr);
+    display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(5, minmax(0, 1fr));
     align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;
   }
   #calStatsView .wk-row:last-child { border-bottom: none; }
   #calStatsView .wk-row > span:not(:first-child) { text-align: right; white-space: nowrap; }
-  #calStatsView .wk-row.wk-head { font-size: 11px; color: var(--muted); padding: 4px 0 8px; }
+  #calStatsView .wk-row.wk-head { font-size: 12.5px; font-weight: 800; color: var(--ink); padding: 4px 0 8px; }
   #calStatsView .wk-row .wk-week { min-width: 0; }
   #calStatsView .wk-row .wk-label { font-weight: 700; }
   #calStatsView .wk-row .wk-range { font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; }
@@ -309,7 +309,9 @@
   #calStatsView .wk-row .wk-time { color: var(--time-grad-1); }
   #calStatsView .wk-row .wk-total { font-weight: 800; color: var(--money-grad-1); }
   @media (max-width: 560px) {
-    #calStatsView .wk-row { grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)) 52px minmax(0, 1fr); gap: 4px; font-size: 11.5px; }
+    #calStatsView .wk-row { grid-template-columns: minmax(0, 1.1fr) repeat(5, minmax(0, 1fr)); gap: 3px; font-size: 10.5px; }
+    #calStatsView .wk-row.wk-head { font-size: 10.5px; }
+    #calStatsView .wk-row > span.wk-time { white-space: normal; line-height: 1.25; }
     #calStatsView .wk-row .wk-range { display: block; margin-left: 0; font-size: 10px; }
   }
   #calendarPage .month-cell {
@@ -397,12 +399,13 @@
   #calStatsView .fx-toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   /* 계정별 합산 (시세 표 아래) */
   #calStatsView .fx-acct-title { font-size: 11.5px; color: var(--muted); font-weight: 700; margin: 16px 0 4px; }
-  #calStatsView .fx-acct-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  #calStatsView .fx-acct-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
   #calStatsView .fx-acct-row:last-child { border-bottom: none; }
   #calStatsView .fx-acct-name { flex: 1; min-width: 0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #calStatsView .fx-acct-name small { font-weight: 400; color: var(--muted); font-size: 10.5px; }
   #calStatsView .fx-acct-part { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; min-width: 58px; justify-content: flex-end; }
   #calStatsView .fx-acct-part img { width: 15px; height: 15px; object-fit: contain; }
+  #calStatsView .fx-acct-cubes { flex-basis: 100%; display: flex; justify-content: flex-end; gap: 10px; color: var(--muted); font-size: 11.5px; padding-right: 80px; }
   #calStatsView .fx-acct-money { width: 70px; text-align: right; font-weight: 800; color: var(--money-grad-1); white-space: nowrap; }
   #calStatsView .fx-acct-empty { font-size: 11.5px; color: var(--muted); margin-top: 14px; }
   #calStatsView .fx-acct-empty button { background: none; border: none; padding: 0; color: var(--accent-strong); font-weight: 700; cursor: pointer; font-family: inherit; font-size: inherit; }
@@ -456,6 +459,7 @@
     #calStatsView .fx-acct-row { gap: 6px; font-size: 11.5px; }
     #calStatsView .fx-acct-part { min-width: 0; }
     #calStatsView .fx-acct-money { width: 50px; }
+    #calStatsView .fx-acct-cubes { padding-right: 56px; gap: 6px; font-size: 11px; }
   }
   /* 통계 > 개요 — 기간 스위치 + 총 수익 카드 */
   #calStatsView .ov-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -2447,6 +2451,18 @@
   ];
 
   const RARE_ITEM_CATEGORIES = ["칠흑", "소비", "장비", "광휘"];
+  // '선택받은 세렌' 이상 9개 보스는 상자에 들어 있는 칠흑 7종을 따로 보지 않고 '칠흑의 보스 장신구 상자' 하나로 묶어 집계합니다 (통계 > 보스별 판매 수익·드롭률)
+  // 미트라의 분노 선택 상자·창세의 뱃지·컴플리트 언더컨트롤은 상자 구성품이 아니라서 품목 그대로 표시
+  const DARK_BOX_NAME = '칠흑의 보스 장신구 상자';
+  const DARK_BOX_BOSSES = ['선택받은 세렌', '감시자 칼로스', '최초의 대적자', '카링', '찬란한 흉성', '벨로나', '림보', '발드릭스', '유피테르'];
+  const DARK_BOX_ITEMS = ['루즈 컨트롤 머신 마크', '마력이 깃든 안대', '거대한 공포', '몽환의 벨트', '커맨더 포스 이어링', '고통의 근원', '저주받은 마도서 선택 상자'];
+  const DARK_BOX_ICON_SRC = 'data:image/png;base64,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';
+  function rareItemNameForBossStats(itemName, bossName) {
+    return (DARK_BOX_ITEMS.includes(itemName) && DARK_BOX_BOSSES.includes(bossName)) ? DARK_BOX_NAME : itemName;
+  }
+  function rareItemIconSrc(itemName) {
+    return RARE_ITEM_ICONS[itemName] || (itemName === DARK_BOX_NAME ? DARK_BOX_ICON_SRC : '');
+  }
   const RARE_ITEM_BY_NAME = {};
   RARE_ITEM_DATA.forEach(i => { RARE_ITEM_BY_NAME[i.name] = i; });
 
@@ -4062,11 +4078,12 @@
       return;
     }
     const sumOf = cids => {
-      const t = { erion: 0, eternelUpper: 0, eternelAccessory: 0, money: 0 };
+      const t = { erion: 0, eternelUpper: 0, eternelAccessory: 0, money: 0, bronze: 0, silver: 0, gold: 0 };
       cids.forEach(cid => {
         const p = byChar[cid];
         if (!p) return;
         FIXED_KINDS.forEach(k => { t[k] += p[k] || 0; t.money += (p.money && p.money[k]) || 0; });
+        ['bronze', 'silver', 'gold'].forEach(k => { t[k] += p[k] || 0; });
       });
       return t;
     };
@@ -4077,13 +4094,18 @@
     });
     const rest = Object.keys(byChar).filter(cid => !assigned.has(cid));
     const restT = sumOf(rest);
-    if (rest.length > 0 && restT.money > 0) rows.push({ name: '미지정', dot: '<i class="acct-dot" style="background:var(--border)"></i>', count: rest.length, t: restT });
+    if (rest.length > 0 && (restT.money > 0 || restT.bronze > 0 || restT.silver > 0 || restT.gold > 0)) rows.push({ name: '미지정', dot: '<i class="acct-dot" style="background:var(--border)"></i>', count: rest.length, t: restT });
     const num = n => String(Math.round(n * 10) / 10);
+    // 메멘토 큐브는 이번 주(등록된 보스 기준)에만 집계돼요 — 누적 기록에는 큐브가 저장되지 않음
+    const withCube = fixedPeriod === 'week';
+    const cubeHtml = t => [[MEMENTO_BRONZE_ICON_SRC, t.bronze, '브론즈'], [MEMENTO_SILVER_ICON_SRC, t.silver, '실버'], [MEMENTO_GOLD_ICON_SRC, t.gold, '골드']]
+      .map(([src, n, label]) => `<span class="fx-acct-part" title="메멘토 큐브(${label})"><img src="${src}" alt="">${num(n)}</span>`).join('');
     el.innerHTML = `<div class="fx-acct-title">계정별 합산</div>` + rows.map(r => `
       <div class="fx-acct-row">
         <span class="fx-acct-name">${r.dot}${escapeHtml(r.name)} <small>${r.count}명</small></span>
         ${FIXED_KINDS.map(k => `<span class="fx-acct-part" title="${FIXED_KIND_LABEL[k]}">${fixedKindIcon(k) ? `<img src="${fixedKindIcon(k)}" alt="">` : ''}${num(r.t[k])}</span>`).join('')}
         <span class="fx-acct-money">${formatMesoCompact(Math.round(r.t.money))}</span>
+        ${withCube ? `<span class="fx-acct-cubes">${cubeHtml(r.t)}</span>` : ''}
       </div>`).join('');
   }
 
@@ -4208,7 +4230,7 @@
             const rate = kills > 0 ? cnt / kills * 100 : null;
             return `
             <div class="drop-item-row">
-              <span class="drop-item-name" title="${escapeHtml(itemName)}">${RARE_ITEM_ICONS[itemName] ? `<img class="drop-item-icon" src="${RARE_ITEM_ICONS[itemName]}" alt="">` : ''}<span>${escapeHtml(itemName)}</span></span>
+              <span class="drop-item-name" title="${escapeHtml(itemName)}">${rareItemIconSrc(itemName) ? `<img class="drop-item-icon" src="${rareItemIconSrc(itemName)}" alt="">` : ''}<span>${escapeHtml(itemName)}</span></span>
               <span class="drop-item-bar"><i style="width:${rate === null ? 0 : Math.min(rate, 100).toFixed(1)}%"></i></span>
               <span class="drop-item-frac">${cnt}/${kills}</span>
               <span class="drop-item-pct">${rate === null ? '-' : rate.toFixed(1) + '%'}</span>
@@ -4293,9 +4315,10 @@
       if (!rareBossRev[key]) rareBossRev[key] = { total: 0, items: {} };
       const g = rareBossRev[key];
       g.total += (e.price || 0);
-      if (!g.items[e.itemName]) g.items[e.itemName] = { money: 0, count: 0 };
-      g.items[e.itemName].money += (e.price || 0);
-      g.items[e.itemName].count += 1;
+      const itemName = rareItemNameForBossStats(e.itemName, bossName);
+      if (!g.items[itemName]) g.items[itemName] = { money: 0, count: 0 };
+      g.items[itemName].money += (e.price || 0);
+      g.items[itemName].count += 1;
     });
     calRareBossRevData = {
       keys: Object.keys(rareBossRev).sort((x, y) => rareBossRev[y].total - rareBossRev[x].total), // 수익 많은 보스부터
@@ -4339,7 +4362,8 @@
       if (!bossName || !difficulty) { noBossItemCount++; return; }
       const key = bossName + '|' + difficulty;
       if (!dropItems[key]) dropItems[key] = {};
-      dropItems[key][e.itemName] = (dropItems[key][e.itemName] || 0) + 1;
+      const itemName = rareItemNameForBossStats(e.itemName, bossName);
+      dropItems[key][itemName] = (dropItems[key][itemName] || 0) + 1;
     });
     const dropKeys = Object.keys(dropItems).sort((a, b) => {
       const [an, ad] = a.split('|'), [bn, bd] = b.split('|');
