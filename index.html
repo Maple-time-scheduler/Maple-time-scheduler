@@ -256,24 +256,6 @@
     background: var(--surface); border-radius: 50%; line-height: 1; padding: 1px;
   }
 
-  .stats-toggle-card { cursor: pointer; user-select: none; transition: transform 0.15s ease; }
-  .stats-toggle-card:hover { transform: translateY(-2px); }
-  .stats-toggle-card:active { transform: translateY(0); }
-  .stats-toggle-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px; }
-  .mode-badge {
-    font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
-    background: var(--track); color: var(--muted); white-space: nowrap; transition: background 0.2s ease, color 0.2s ease;
-  }
-  .stats-toggle-card[data-mode="week"] .mode-badge { background: var(--theme-weekly); color: #fff; }
-  .stats-toggle-card[data-mode="month"] .mode-badge { background: var(--theme-monthly); color: #fff; }
-  .mode-dots { display: flex; gap: 4px; margin-top: 6px; }
-  .mode-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.2s ease; }
-  .mode-dots span.active { background: var(--accent); transform: scale(1.3); }
-  .stats-toggle-card .value.pulse { animation: statsValuePulse 0.4s ease; }
-  @keyframes statsValuePulse {
-    0% { opacity: 0.25; transform: scale(0.94); }
-    100% { opacity: 1; transform: scale(1); }
-  }
 
   #calendarPage .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
   #calendarPage .day-card {
@@ -312,35 +294,23 @@
     background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
     padding: 4px 16px; margin-top: 14px; box-shadow: var(--shadow);
   }
-  #calStatsView .week-total-row {
-    display: grid; grid-template-columns: minmax(0, 1fr) 104px 118px; align-items: center;
-    gap: 6px 14px; padding: 11px 0; border-bottom: 1px solid var(--border);
+  /* 주차별 기록 — 항목별 표 (구분선형) */
+  #calStatsView .wk-row {
+    display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr)) 92px minmax(0, 1fr);
+    align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;
   }
-  #calStatsView .week-total-row:last-child { border-bottom: none; }
-  #calStatsView .week-total-row .wt-head { display: flex; align-items: baseline; gap: 5px; min-width: 0; flex-wrap: wrap; }
-  #calStatsView .week-total-row .wt-label { font-size: 13px; font-weight: 700; flex-shrink: 0; }
-  #calStatsView .week-total-row .wt-range { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; }
-  #calStatsView .week-total-row .wt-breakdown {
-    grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 160px); align-items: center; gap: 4px 24px;
-    font-size: 11.5px; font-weight: 700; color: var(--ink);
-  }
-  #calStatsView .week-total-row .wt-part { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 6px; min-width: 0; }
-  #calStatsView .week-total-row .wt-part .wt-part-name { color: var(--muted); }
-  #calStatsView .week-total-row .wt-part .wt-part-name { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
-  #calStatsView .week-total-row .wt-part .wt-part-val { text-align: right; white-space: nowrap; }
-  #calStatsView .week-total-row .wt-part i { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  #calStatsView .week-total-row .wt-part.crystal i { background: var(--money-grad-1); }
-  #calStatsView .week-total-row .wt-part.item i { background: var(--rare-color); }
-  #calStatsView .week-total-row .wt-part.hunt i { background: var(--hunt-color); }
-  #calStatsView .week-total-row .stat { display: flex; align-items: center; justify-content: space-between; gap: 5px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-  #calStatsView .week-total-row .stat.time { color: var(--time-grad-1); }
-  #calStatsView .week-total-row .stat.money { color: var(--money-grad-1); }
+  #calStatsView .wk-row:last-child { border-bottom: none; }
+  #calStatsView .wk-row > span:not(:first-child) { text-align: right; white-space: nowrap; }
+  #calStatsView .wk-row.wk-head { font-size: 11px; color: var(--muted); padding: 4px 0 8px; }
+  #calStatsView .wk-row .wk-week { min-width: 0; }
+  #calStatsView .wk-row .wk-label { font-weight: 700; }
+  #calStatsView .wk-row .wk-range { font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+  #calStatsView .wk-row .wk-zero { color: var(--muted); }
+  #calStatsView .wk-row .wk-time { color: var(--time-grad-1); }
+  #calStatsView .wk-row .wk-total { font-weight: 800; color: var(--money-grad-1); }
   @media (max-width: 560px) {
-    #calStatsView .week-total-row { grid-template-columns: minmax(0, 1fr) 92px 116px; gap: 6px 8px; }
-    #calStatsView .week-total-row .wt-part { display: flex; }
-    #calStatsView .week-total-row .stat { font-size: 11.5px; }
-    #calStatsView .week-total-row .wt-breakdown { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 8px; font-size: 10.5px; }
-    #calStatsView .week-total-row .wt-part { flex-direction: column; align-items: flex-start; gap: 1px; }
+    #calStatsView .wk-row { grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)) 52px minmax(0, 1fr); gap: 4px; font-size: 11.5px; }
+    #calStatsView .wk-row .wk-range { display: block; margin-left: 0; font-size: 10px; }
   }
   #calendarPage .month-cell {
     position: relative; cursor: pointer;
@@ -362,7 +332,6 @@
     padding-bottom: 6px; border-bottom: 2px solid var(--border);
   }
   .stat-group-title:first-of-type { margin-top: 50px; }
-  .donut-card .cal-nav-row { gap: 4px; margin-bottom: 8px; }
   .donut-picker-wrap { position: relative; margin-bottom: 8px; display: flex; justify-content: center; }
   .donut-picker-label {
     font-size: 12px; font-weight: 700; color: var(--ink); background: none; border: none;
@@ -382,20 +351,48 @@
   .donut-picker-item.active { background: var(--accent); color: #fff; font-weight: 700; }
   [data-theme="dark"] .donut-picker-item.active { color: #201404; }
 
-  .donut-card .cal-nav-label { min-width: 0; font-size: 12px; white-space: nowrap; }
-  .donut-card .cal-nav-btn { padding: 4px 7px; font-size: 11px; flex-shrink: 0; }
-  .donut-cards-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .donut-card {
-    flex: 1; min-width: 210px; background: var(--surface); border: 2px solid var(--border);
-    border-radius: 14px; padding: 14px; box-shadow: var(--shadow); overflow: hidden; box-sizing: border-box;
+  /* 통계 > 개요 — 기간 스위치 + 총 수익 카드 */
+  #calStatsView .ov-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  #calStatsView .ov-seg { display: inline-flex; background: var(--track); border-radius: 999px; padding: 3px; gap: 2px; }
+  #calStatsView .ov-seg button {
+    font-family: inherit; font-size: 12.5px; font-weight: 700; padding: 6px 16px; border-radius: 999px;
+    border: none; background: none; color: var(--muted); cursor: pointer;
   }
-  .donut-chart-row { display: flex; align-items: center; gap: 10px; justify-content: center; min-width: 0; }
-  .donut-legend { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-  .donut-legend-row { display: flex; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
-  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .donut-legend-label { font-weight: 700; width: 32px; flex-shrink: 0; }
-  .donut-legend-pct { color: var(--muted); width: 32px; flex-shrink: 0; }
-  .donut-legend-value { color: var(--muted); font-size: 10px; }
+  #calStatsView .ov-seg button.active { background: var(--surface); color: var(--ink); box-shadow: 0 2px 6px rgba(74,53,32,0.15); }
+  #calStatsView .ov-nav { margin-bottom: 0; gap: 8px; }
+  #calStatsView .ov-nav .cal-nav-btn { padding: 4px 8px; font-size: 11px; }
+  #calStatsView .ov-nav .donut-picker-label { font-size: 13px; }
+  #calStatsView .ov-nav .ov-range { font-size: 11px; font-weight: 600; color: var(--muted); }
+  #calStatsView .ov-nav.static .cal-nav-btn { visibility: hidden; }
+  #calStatsView .ov-nav.static .donut-picker-label { cursor: default; }
+  #calStatsView .ov-card {
+    display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 34px; align-items: center;
+    background: var(--surface); border-radius: 22px; padding: 26px 30px; box-shadow: 0 12px 28px rgba(74,53,32,0.12);
+  }
+  [data-theme="dark"] #calStatsView .ov-card { box-shadow: 0 12px 28px rgba(0,0,0,0.45); }
+  #calStatsView .ov-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  #calStatsView .ov-total { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+  #calStatsView .ov-total small { font-size: 16px; font-weight: 700; margin-left: 4px; }
+  #calStatsView .ov-delta { font-size: 11.5px; color: var(--muted); margin-top: 4px; min-height: 15px; }
+  #calStatsView .ov-delta .up { color: var(--success); font-weight: 700; }
+  #calStatsView .ov-delta .down { color: var(--danger); font-weight: 700; }
+  #calStatsView .ov-minis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+  #calStatsView .ov-mini { background: var(--bg); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+  #calStatsView .ov-mini-label { font-size: 11.5px; color: var(--muted); margin-bottom: 4px; }
+  #calStatsView .ov-mini-value { font-size: 17px; font-weight: 800; white-space: nowrap; }
+  #calStatsView .ov-mini-value.time { color: var(--time-grad-1); }
+  #calStatsView .ov-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  #calStatsView .ov-row:last-child { border-bottom: none; }
+  #calStatsView .ov-row-name { width: 78px; flex-shrink: 0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+  #calStatsView .ov-row-name i { width: 8px; height: 8px; border-radius: 50%; }
+  #calStatsView .ov-row-bar { flex: 1; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  #calStatsView .ov-row-bar i { display: block; height: 100%; border-radius: 4px; }
+  #calStatsView .ov-row-pct { width: 44px; text-align: right; color: var(--muted); }
+  #calStatsView .ov-row-val { width: 84px; text-align: right; font-weight: 800; white-space: nowrap; }
+  @media (max-width: 600px) {
+    #calStatsView .ov-card { grid-template-columns: 1fr; gap: 14px; padding: 20px; }
+    #calStatsView .ov-total { font-size: 28px; }
+  }
   .stat-section h2 { font-size: 13.5px; margin: 0 0 10px; color: var(--muted); }
   #calStatsView .trend-chart {
     background: var(--surface); border: 2px solid var(--border); border-radius: 14px;
@@ -434,7 +431,6 @@
 
   /* ===== 통계 탭 전용: B안(플로팅 카드형) — 테두리 없이 부드러운 그림자만, 더 큰 라운드와 여백 ===== */
   #calStatsView .summary-card,
-  #calStatsView .donut-card,
   #calStatsView .rank-list,
   #calStatsView .trend-chart,
   #calStatsView .month-week-totals {
@@ -444,14 +440,12 @@
     box-shadow: 0 12px 28px rgba(74,53,32,0.12);
   }
   [data-theme="dark"] #calStatsView .summary-card,
-  [data-theme="dark"] #calStatsView .donut-card,
   [data-theme="dark"] #calStatsView .rank-list,
   [data-theme="dark"] #calStatsView .trend-chart,
   [data-theme="dark"] #calStatsView .month-week-totals {
     box-shadow: 0 12px 28px rgba(0,0,0,0.45);
   }
   #calStatsView .summary-card { padding: 20px 22px; }
-  #calStatsView .donut-card { padding: 22px; }
   #calStatsView .rank-list { padding: 14px 22px; }
   #calStatsView .trend-chart { padding: 22px; }
   #calStatsView .month-week-totals { padding: 8px 22px; }
@@ -461,7 +455,6 @@
     background: transparent; border: none; border-radius: 0; box-shadow: none; padding: 0;
   }
   #calStatsView .summary-bar { gap: 14px; }
-  #calStatsView .donut-cards-row { gap: 14px; }
   #calStatsView .two-col { gap: 48px; }
 
   /* 캐릭터별 수익 기여도 (누적) 1~3등 — B안(플로팅 카드형) 유지 */
@@ -1600,75 +1593,32 @@
 <div id="calStatsView" style="display:none;">
       <div class="stat-group-title">📊 개요</div>
       <div class="stat-section">
-        <h2>수익 구성비 (결정석 · 물욕 · 재획)</h2>
-        <div class="donut-cards-row">
-          <div class="donut-card">
-            <div class="cal-nav-row" style="margin-bottom:8px; justify-content:center; gap:4px;">
-              <button class="cal-nav-btn" onclick="donutShiftWeek(-1)" title="이전 주">◀</button>
-              <div class="donut-picker-wrap" style="margin-bottom:0;">
-                <button class="donut-picker-label" id="donutWeekLabel" onclick="toggleDonutPicker('week')"></button>
-                <div class="donut-picker-list" id="donutWeekPickerList" style="display:none;"></div>
-              </div>
-              <button class="cal-nav-btn" onclick="donutShiftWeek(1)" title="다음 주">▶</button>
+        <div class="ov-toolbar">
+          <div class="ov-seg" id="ovSeg">
+            <button type="button" data-period="week" onclick="setOverviewPeriod('week')">주간</button>
+            <button type="button" data-period="month" onclick="setOverviewPeriod('month')">월간</button>
+            <button type="button" data-period="cumulative" onclick="setOverviewPeriod('cumulative')">누적</button>
+          </div>
+          <div class="cal-nav-row ov-nav" id="ovNav">
+            <button class="cal-nav-btn" onclick="overviewShift(-1)" title="이전">◀</button>
+            <div class="donut-picker-wrap" style="margin-bottom:0;">
+              <button class="donut-picker-label" id="ovPeriodLabel" onclick="toggleOverviewPicker()"></button>
+              <div class="donut-picker-list" id="ovPickerList" style="display:none;"></div>
             </div>
-            <div id="donutWeekChart"></div>
+            <button class="cal-nav-btn" onclick="overviewShift(1)" title="다음">▶</button>
           </div>
-          <div class="donut-card">
-            <div class="cal-nav-row" style="margin-bottom:8px; justify-content:center; gap:4px;">
-              <button class="cal-nav-btn" onclick="donutShiftMonth(-1)" title="이전 달">◀</button>
-              <div class="donut-picker-wrap" style="margin-bottom:0;">
-                <button class="donut-picker-label" id="donutMonthLabel" onclick="toggleDonutPicker('month')"></button>
-                <div class="donut-picker-list" id="donutMonthPickerList" style="display:none;"></div>
-              </div>
-              <button class="cal-nav-btn" onclick="donutShiftMonth(1)" title="다음 달">▶</button>
+        </div>
+        <div class="ov-card">
+          <div class="ov-left">
+            <div class="ov-label">총 수익</div>
+            <div class="ov-total" id="ovTotal">0억</div>
+            <div class="ov-delta" id="ovDelta"></div>
+            <div class="ov-minis">
+              <div class="ov-mini"><div class="ov-mini-label">시간</div><div class="ov-mini-value time" id="ovTime">0분</div></div>
+              <div class="ov-mini"><div class="ov-mini-label">주 평균 수익</div><div class="ov-mini-value" id="calStatsWeekAvg">기록 없음</div></div>
             </div>
-            <div id="donutMonthChart"></div>
           </div>
-          <div class="donut-card">
-            <div class="cal-nav-row" style="margin-bottom:8px; justify-content:center;">
-              <span class="cal-nav-label">누적 전체</span>
-            </div>
-            <div id="donutCumulativeChart"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-bar">
-        <div class="summary-card time stats-toggle-card" id="calStatsTimeCard" onclick="cycleStatsCardMode('time')">
-          <div class="stats-toggle-head">
-            <span class="label" id="calStatsTimeLabel">시간</span>
-            <span class="mode-badge" id="calStatsTimeModeBadge">누적</span>
-          </div>
-          <div class="value" id="calStatsTotalTime">00:00</div>
-          <div class="mode-dots" id="calStatsTimeDots"></div>
-        </div>
-        <div class="summary-card money stats-toggle-card" id="calStatsCrystalCard" onclick="cycleStatsCardMode('crystal')">
-          <div class="stats-toggle-head">
-            <span class="label" id="calStatsCrystalLabel">결정석 수익</span>
-            <span class="mode-badge" id="calStatsCrystalModeBadge">누적</span>
-          </div>
-          <div class="value" id="calStatsTotalMoney">0억</div>
-          <div class="mode-dots" id="calStatsCrystalDots"></div>
-        </div>
-        <div class="summary-card rare stats-toggle-card" id="calStatsItemCard" onclick="cycleStatsCardMode('item')">
-          <div class="stats-toggle-head">
-            <span class="label" id="calStatsItemLabel">물욕 수익</span>
-            <span class="mode-badge" id="calStatsItemModeBadge">누적</span>
-          </div>
-          <div class="value" id="calStatsRareTotal">0억</div>
-          <div class="mode-dots" id="calStatsItemDots"></div>
-        </div>
-        <div class="summary-card hunt stats-toggle-card" id="calStatsHuntCard" onclick="cycleStatsCardMode('hunt')">
-          <div class="stats-toggle-head">
-            <span class="label" id="calStatsHuntLabel">재획 수익</span>
-            <span class="mode-badge" id="calStatsHuntModeBadge">주평균</span>
-          </div>
-          <div class="value" id="calStatsHuntTotal">0억</div>
-          <div class="mode-dots" id="calStatsHuntDots"></div>
-        </div>
-        <div class="summary-card">
-          <div class="label">주 평균 수익</div>
-          <div class="value" id="calStatsWeekAvg">기록 없음</div>
+          <div class="ov-right" id="ovBreakdown"></div>
         </div>
       </div>
 
@@ -2784,9 +2734,8 @@
       calRenderWeek(); calRenderMonth(); calRenderStats();
     }
     if (page === 'stats') {
-      donutSelectedWeekKey = null; donutSelectedMonthKey = null;
+      ovSelectedWeekKey = null; ovSelectedMonthKey = null;
       calRenderStats();
-      renderDonutWeek(); renderDonutMonth(); renderDonutCumulative();
     }
   }
 
@@ -3337,7 +3286,7 @@
 
   // 결정석·물욕·재획 세 카테고리를 주차별/월별/누적으로 따로 집계합니다 (원형 그래프용)
   function calCategoryTotals() {
-    const cumulative = { crystal: 0, item: 0, hunt: 0 };
+    const cumulative = { crystal: 0, item: 0, hunt: 0, time: 0 };
     const byWeek = {};
     const byMonth = {};
 
@@ -3355,10 +3304,10 @@
       if (!amount) return;
       const wk = weekKeyFor(dateStr), mk = monthKeyFor(dateStr);
       if (!(opts && opts.excludeFromWeek)) {
-        if (!byWeek[wk]) byWeek[wk] = { crystal: 0, item: 0, hunt: 0 };
+        if (!byWeek[wk]) byWeek[wk] = { crystal: 0, item: 0, hunt: 0, time: 0 };
         byWeek[wk][cat] += amount;
       }
-      if (!byMonth[mk]) byMonth[mk] = { crystal: 0, item: 0, hunt: 0 };
+      if (!byMonth[mk]) byMonth[mk] = { crystal: 0, item: 0, hunt: 0, time: 0 };
       byMonth[mk][cat] += amount;
       cumulative[cat] += amount;
     }
@@ -3367,56 +3316,19 @@
       Object.values(state.completionLog[dateStr]).forEach(e => {
         // 월간 보스(검은 마법사)의 결정석은 '주간' 집계에서는 제외 (월간/누적에는 그대로 포함)
         if (e.isBoss) addTo(dateStr, 'crystal', e.money || 0, { excludeFromWeek: e.theme === 'monthly' });
+        addTo(dateStr, 'time', e.time || 0);
       });
     });
     (state.rareItemLog || []).forEach(e => addTo(e.dateStr, 'item', e.price || 0));
-    (state.huntLog || []).forEach(e => addTo(e.dateStr, 'hunt', e.money || 0));
+    (state.huntLog || []).forEach(e => { addTo(e.dateStr, 'hunt', e.money || 0); addTo(e.dateStr, 'time', e.time || 0); });
 
     return { cumulative, byWeek, byMonth };
   }
 
-  // 결정석/물욕/재획 구성비를 보여주는 도넛 차트를 그립니다 (외부 라이브러리 없이 순수 SVG)
-  function renderDonutChart(containerId, data) {
-    const container = document.getElementById(containerId);
-    const total = (data.crystal || 0) + (data.item || 0) + (data.hunt || 0);
-    if (total <= 0) {
-      container.innerHTML = '<div class="empty-state" style="text-align:center; padding:20px 0;">기록이 없어요.</div>';
-      return;
-    }
-    const r = 15.9155;
-    const circumference = 2 * Math.PI * r;
-    const segments = [
-      { label: '결정석', value: data.crystal || 0, color: 'var(--money-grad-1)' },
-      { label: '물욕', value: data.item || 0, color: 'var(--rare-color)' },
-      { label: '재획', value: data.hunt || 0, color: 'var(--hunt-color)' },
-    ];
-    let offsetAccum = 0;
-    const circles = segments.map(seg => {
-      if (seg.value <= 0) return '';
-      const dash = (seg.value / total) * circumference;
-      const gap = circumference - dash;
-      const el = `<circle cx="21" cy="21" r="${r}" fill="transparent" stroke="${seg.color}" stroke-width="6" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offsetAccum}" transform="rotate(-90 21 21)"/>`;
-      offsetAccum += dash;
-      return el;
-    }).join('');
-    const legend = segments.filter(s => s.value > 0).map(s => `
-      <div class="donut-legend-row">
-        <span class="donut-dot" style="background:${s.color}"></span>
-        <span class="donut-legend-label">${s.label}</span>
-        <span class="donut-legend-pct">${Math.round(s.value / total * 100)}%</span>
-        <span class="donut-legend-value">${formatMesoCompact(s.value)}</span>
-      </div>
-    `).join('');
-    container.innerHTML = `
-      <div class="donut-chart-row">
-        <svg viewBox="0 0 42 42" width="104" height="104">${circles}</svg>
-        <div class="donut-legend">${legend}</div>
-      </div>
-    `;
-  }
-
-  let donutSelectedWeekKey = null;  // null이면 이번 주
-  let donutSelectedMonthKey = null; // null이면 이번 달
+  // 통계 > 개요: 기간 스위치(주간/월간/누적)로 총 수익 카드 전체를 바꿉니다
+  let ovPeriod = 'week';          // 'week' | 'month' | 'cumulative'
+  let ovSelectedWeekKey = null;   // null이면 이번 주
+  let ovSelectedMonthKey = null;  // null이면 이번 달
 
   function currentWeekKey() {
     const thursday = calThisWeekThursday(new Date());
@@ -3431,77 +3343,129 @@
     return `${y}년 ${mo}월`;
   }
 
-  function closeDonutPickers() {
-    document.getElementById('donutWeekPickerList').style.display = 'none';
-    document.getElementById('donutMonthPickerList').style.display = 'none';
+  function closeOverviewPicker() {
+    const el = document.getElementById('ovPickerList');
+    if (el) el.style.display = 'none';
   }
 
-  function toggleDonutPicker(kind) {
-    const listEl = document.getElementById(kind === 'week' ? 'donutWeekPickerList' : 'donutMonthPickerList');
+  function setOverviewPeriod(p) {
+    ovPeriod = p;
+    closeOverviewPicker();
+    renderOverviewCard();
+  }
+
+  function toggleOverviewPicker() {
+    if (ovPeriod === 'cumulative') return;
+    const listEl = document.getElementById('ovPickerList');
     const willOpen = listEl.style.display === 'none';
-    closeDonutPickers();
+    closeOverviewPicker();
     if (!willOpen) return;
 
+    const kind = ovPeriod;
     const catTotals = calCategoryTotals();
     const curKey = kind === 'week' ? currentWeekKey() : currentMonthKey();
-    const selectedKey = kind === 'week' ? (donutSelectedWeekKey || curKey) : (donutSelectedMonthKey || curKey);
+    const selectedKey = kind === 'week' ? (ovSelectedWeekKey || curKey) : (ovSelectedMonthKey || curKey);
     const dataKeys = Object.keys(kind === 'week' ? catTotals.byWeek : catTotals.byMonth);
     const allKeys = Array.from(new Set([...dataKeys, curKey])).sort().reverse(); // 최신부터, 기록 없어도 이번 주/달은 항상 포함
 
     listEl.innerHTML = allKeys.map(k => {
       const label = kind === 'week' ? mapleWeekLabel(k) : monthKeyLabel(k);
-      return `<button type="button" class="donut-picker-item ${k === selectedKey ? 'active' : ''}" onclick="event.stopPropagation(); selectDonutPeriod('${kind}', '${k}')">${label}</button>`;
+      return `<button type="button" class="donut-picker-item ${k === selectedKey ? 'active' : ''}" onclick="event.stopPropagation(); selectOverviewKey('${k}')">${label}</button>`;
     }).join('');
     listEl.style.display = 'block';
   }
 
-  function selectDonutPeriod(kind, key) {
-    if (kind === 'week') donutSelectedWeekKey = key;
-    else donutSelectedMonthKey = key;
-    closeDonutPickers();
-    if (kind === 'week') renderDonutWeek();
-    else renderDonutMonth();
+  function selectOverviewKey(key) {
+    if (ovPeriod === 'week') ovSelectedWeekKey = key;
+    else ovSelectedMonthKey = key;
+    closeOverviewPicker();
+    renderOverviewCard();
   }
 
   document.addEventListener('click', (ev) => {
-    if (!ev.target.closest('.donut-picker-wrap')) closeDonutPickers();
+    if (!ev.target.closest('#ovNav .donut-picker-wrap')) closeOverviewPicker();
   });
 
-  function renderDonutWeek() {
-    const catTotals = calCategoryTotals();
-    const weekKey = donutSelectedWeekKey || currentWeekKey();
-    document.getElementById('donutWeekLabel').innerHTML = `${mapleWeekLabel(weekKey)}`;
-    renderDonutChart('donutWeekChart', catTotals.byWeek[weekKey] || { crystal: 0, item: 0, hunt: 0 });
-  }
-
-  function renderDonutMonth() {
-    const catTotals = calCategoryTotals();
-    const monthKey = donutSelectedMonthKey || currentMonthKey();
-    document.getElementById('donutMonthLabel').innerHTML = monthKeyLabel(monthKey);
-    renderDonutChart('donutMonthChart', catTotals.byMonth[monthKey] || { crystal: 0, item: 0, hunt: 0 });
-  }
-
-  function donutShiftWeek(dir) {
-    const curKey = donutSelectedWeekKey || currentWeekKey();
-    const [y, m, d] = curKey.split('-').map(Number);
+  function shiftWeekKey(key, dir) {
+    const [y, m, d] = key.split('-').map(Number);
     const dateObj = new Date(Date.UTC(y, m - 1, d));
     dateObj.setUTCDate(dateObj.getUTCDate() + dir * 7);
-    donutSelectedWeekKey = kstDateString(dateObj);
-    renderDonutWeek();
+    return kstDateString(dateObj);
   }
-  function donutShiftMonth(dir) {
-    const curKey = donutSelectedMonthKey || currentMonthKey();
-    let [y, m] = curKey.split('-').map(Number);
+  function shiftMonthKey(key, dir) {
+    let [y, m] = key.split('-').map(Number);
     m += dir;
     if (m < 1) { m = 12; y -= 1; }
     if (m > 12) { m = 1; y += 1; }
-    donutSelectedMonthKey = `${y}-${String(m).padStart(2, '0')}`;
-    renderDonutMonth();
+    return `${y}-${String(m).padStart(2, '0')}`;
   }
 
-  function renderDonutCumulative() {
+  function overviewShift(dir) {
+    if (ovPeriod === 'week') ovSelectedWeekKey = shiftWeekKey(ovSelectedWeekKey || currentWeekKey(), dir);
+    else if (ovPeriod === 'month') ovSelectedMonthKey = shiftMonthKey(ovSelectedMonthKey || currentMonthKey(), dir);
+    renderOverviewCard();
+  }
+
+  function renderOverviewCard() {
     const catTotals = calCategoryTotals();
-    renderDonutChart('donutCumulativeChart', catTotals.cumulative);
+    const empty = { crystal: 0, item: 0, hunt: 0, time: 0 };
+    let data, prev = null, prevLabel = '';
+
+    document.querySelectorAll('#ovSeg button').forEach(b => b.classList.toggle('active', b.dataset.period === ovPeriod));
+    const navEl = document.getElementById('ovNav');
+    const labelEl = document.getElementById('ovPeriodLabel');
+    navEl.classList.toggle('static', ovPeriod === 'cumulative');
+
+    if (ovPeriod === 'week') {
+      const key = ovSelectedWeekKey || currentWeekKey();
+      data = catTotals.byWeek[key] || empty;
+      prev = catTotals.byWeek[shiftWeekKey(key, -1)] || empty;
+      prevLabel = '지난주';
+      labelEl.innerHTML = `${mapleWeekLabel(key)} <span class="ov-range">(${mapleWeekRange(key)})</span>`;
+    } else if (ovPeriod === 'month') {
+      const key = ovSelectedMonthKey || currentMonthKey();
+      data = catTotals.byMonth[key] || empty;
+      prev = catTotals.byMonth[shiftMonthKey(key, -1)] || empty;
+      prevLabel = '지난달';
+      labelEl.innerHTML = monthKeyLabel(key);
+    } else {
+      data = catTotals.cumulative;
+      labelEl.innerHTML = '누적 전체';
+    }
+
+    const total = (data.crystal || 0) + (data.item || 0) + (data.hunt || 0);
+    document.getElementById('ovTotal').innerHTML = `${formatMesoCompact(total)}<small>메소</small>`;
+    document.getElementById('ovTime').textContent = formatHM(data.time || 0);
+
+    const deltaEl = document.getElementById('ovDelta');
+    if (prev) {
+      const prevTotal = (prev.crystal || 0) + (prev.item || 0) + (prev.hunt || 0);
+      const diff = total - prevTotal;
+      if (prevTotal <= 0 && total <= 0) deltaEl.innerHTML = '';
+      else if (diff === 0) deltaEl.innerHTML = `${prevLabel}와 같아요`;
+      else {
+        const pct = prevTotal > 0 ? ` (${diff > 0 ? '+' : '-'}${Math.round(Math.abs(diff) / prevTotal * 100)}%)` : '';
+        deltaEl.innerHTML = `${prevLabel} 대비 <span class="${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '▲' : '▼'} ${formatMesoCompact(Math.abs(diff))}${pct}</span>`;
+      }
+    } else {
+      deltaEl.innerHTML = '';
+    }
+
+    const rows = [
+      { label: '결정석', value: data.crystal || 0, color: 'var(--money-grad-1)' },
+      { label: '물욕', value: data.item || 0, color: 'var(--rare-color)' },
+      { label: '재획', value: data.hunt || 0, color: 'var(--hunt-color)' },
+    ];
+    document.getElementById('ovBreakdown').innerHTML = rows.map(r => {
+      const pct = total > 0 ? r.value / total * 100 : 0;
+      return `
+        <div class="ov-row">
+          <span class="ov-row-name"><i style="background:${r.color}"></i>${r.label}</span>
+          <span class="ov-row-bar"><i style="width:${pct.toFixed(1)}%; background:${r.color}"></i></span>
+          <span class="ov-row-pct">${Math.round(pct)}%</span>
+          <span class="ov-row-val" style="color:${r.color}">${formatMesoCompact(r.value)}</span>
+        </div>`;
+    }).join('');
   }
 
   function calAggregateAll() {
@@ -3572,39 +3536,6 @@
     });
 
     return { dateStrs, totalTime, totalMoney, bossTotals, charTotals, weekTotals };
-  }
-
-  let statsCardMode = { time: 'week', crystal: 'week', item: 'week', hunt: 'week' };
-  let lastClickedStatsCardKey = null;
-  function cycleStatsCardMode(key) {
-    const modes = ['week', 'month', 'cumulative'];
-    const idx = modes.indexOf(statsCardMode[key]);
-    statsCardMode[key] = modes[(idx + 1) % modes.length];
-    lastClickedStatsCardKey = key;
-    calRenderStats();
-  }
-  function statsModeBadgeText(mode) {
-    return mode === 'week' ? '주평균' : mode === 'month' ? '월평균' : '누적';
-  }
-  function renderStatsToggleCard(opts) {
-    const { key, cardId, badgeId, dotsId, valueId, cumulativeValue, avgBaseValue, weekCount, monthCount, formatter } = opts;
-    const mode = statsCardMode[key];
-    // 주평균/월평균은 진행 중인 이번 주를 뺀 값(avgBaseValue)으로 계산합니다. 누적은 이번 주 포함.
-    const avgBase = (avgBaseValue !== undefined) ? avgBaseValue : cumulativeValue;
-    const rawValue = mode === 'week' ? avgBase / weekCount : mode === 'month' ? avgBase / monthCount : cumulativeValue;
-
-    document.getElementById(cardId).setAttribute('data-mode', mode);
-    document.getElementById(badgeId).textContent = statsModeBadgeText(mode);
-    const modes = ['week', 'month', 'cumulative'];
-    document.getElementById(dotsId).innerHTML = modes.map(m => `<span class="${m === mode ? 'active' : ''}"></span>`).join('');
-
-    const valueEl = document.getElementById(valueId);
-    valueEl.textContent = formatter(Math.round(rawValue));
-    if (lastClickedStatsCardKey === key) {
-      valueEl.classList.remove('pulse');
-      void valueEl.offsetWidth; // 리플로우를 강제해서 애니메이션을 매번 새로 재생시킴
-      valueEl.classList.add('pulse');
-    }
   }
 
   // '내 캐릭터'에 등록된 순서(번호) 기준 인덱스를 반환합니다. 없는(삭제된) 캐릭터는 맨 뒤로 보냅니다.
@@ -3785,9 +3716,7 @@
     const agg = calAggregateAll();
     const catTotals = calCategoryTotals();
 
-    renderDonutWeek();
-    renderDonutMonth();
-    renderDonutCumulative();
+    renderOverviewCard();
     renderFixedDropStats();
 
     // 주평균·월평균에서는 아직 진행 중인 이번 주(목요일~)를 제외합니다. (진행 중인 주가 끼면 평균이 튀기 때문)
@@ -3812,52 +3741,31 @@
 
     // 주차/월 개수 (주평균·월평균 계산용, 이번 주 제외)
     const weekKeySet = new Set(Object.keys(agg.weekTotals).filter(isPast));
-    const monthKeySet = new Set();
-    Object.keys(state.completionLog || {}).filter(isPast).forEach(ds => monthKeySet.add(ds.slice(0, 7)));
-    (state.rareItemLog || []).forEach(e => { if (isPast(e.dateStr)) monthKeySet.add(e.dateStr.slice(0, 7)); });
-    (state.huntLog || []).forEach(e => { if (isPast(e.dateStr)) monthKeySet.add(e.dateStr.slice(0, 7)); });
-    const weekCount = weekKeySet.size || 1;
-    const monthCount = monthKeySet.size || 1;
-
-    renderStatsToggleCard({
-      key: 'time', cardId: 'calStatsTimeCard', badgeId: 'calStatsTimeModeBadge', dotsId: 'calStatsTimeDots',
-      valueId: 'calStatsTotalTime', cumulativeValue: agg.totalTime, avgBaseValue: past.time, weekCount, monthCount, formatter: formatHM
-    });
-    renderStatsToggleCard({
-      key: 'crystal', cardId: 'calStatsCrystalCard', badgeId: 'calStatsCrystalModeBadge', dotsId: 'calStatsCrystalDots',
-      valueId: 'calStatsTotalMoney', cumulativeValue: catTotals.cumulative.crystal, avgBaseValue: past.crystal, weekCount, monthCount, formatter: formatMeso
-    });
-    renderStatsToggleCard({
-      key: 'item', cardId: 'calStatsItemCard', badgeId: 'calStatsItemModeBadge', dotsId: 'calStatsItemDots',
-      valueId: 'calStatsRareTotal', cumulativeValue: catTotals.cumulative.item, avgBaseValue: past.item, weekCount, monthCount, formatter: formatMeso
-    });
-    renderStatsToggleCard({
-      key: 'hunt', cardId: 'calStatsHuntCard', badgeId: 'calStatsHuntModeBadge', dotsId: 'calStatsHuntDots',
-      valueId: 'calStatsHuntTotal', cumulativeValue: catTotals.cumulative.hunt, avgBaseValue: past.hunt, weekCount, monthCount, formatter: formatMeso
-    });
 
     const weekKeys = Object.keys(agg.weekTotals).sort();
     const pastWeekCount = weekKeySet.size; // 이번 주 제외
     const weekAvg = pastWeekCount > 0 ? past.money / pastWeekCount : 0;
-    document.getElementById('calStatsWeekAvg').textContent = pastWeekCount > 0 ? formatMeso(weekAvg) : '기록 없음';
+    document.getElementById('calStatsWeekAvg').textContent = pastWeekCount > 0 ? formatMesoCompact(weekAvg) : '기록 없음';
 
     // 주차별 기록 (최근 주차부터)
     const weekListEl = document.getElementById('calStatsWeekList');
     const weekKeysDesc = weekKeys.slice().sort().reverse();
+    const wkCell = v => v > 0 ? formatMesoCompact(v) : '<span class="wk-zero">-</span>';
     weekListEl.innerHTML = weekKeysDesc.length === 0
       ? '<div class="empty-state">아직 쌓인 기록이 없어요.</div>'
-      : weekKeysDesc.map(k => `
-        <div class="week-total-row">
-          <span class="wt-head"><span class="wt-label">${mapleWeekLabel(k)}</span><span class="wt-range">(${mapleWeekRange(k)})</span></span>
-          <span class="stat time">⏱ ${formatHM(agg.weekTotals[k].time)}</span>
-          <span class="stat money">${COIN_ICON} ${formatMeso(agg.weekTotals[k].money)}</span>
-          <span class="wt-breakdown">
-            <span class="wt-part crystal"><span class="wt-part-name"><i></i>결정석</span><span class="wt-part-val">${formatMeso(agg.weekTotals[k].crystal)}</span></span>
-            <span class="wt-part item"><span class="wt-part-name"><i></i>물욕</span><span class="wt-part-val">${formatMeso(agg.weekTotals[k].item)}</span></span>
-            <span class="wt-part hunt"><span class="wt-part-name"><i></i>재획</span><span class="wt-part-val">${formatMeso(agg.weekTotals[k].hunt)}</span></span>
-          </span>
-        </div>
-      `).join('');
+      : `<div class="wk-row wk-head"><span>주차</span><span>결정석</span><span>물욕</span><span>재획</span><span>시간</span><span>합계</span></div>` +
+        weekKeysDesc.map(k => {
+          const w = agg.weekTotals[k];
+          return `
+        <div class="wk-row">
+          <span class="wk-week"><span class="wk-label">${mapleWeekLabel(k)}</span><span class="wk-range">${mapleWeekRange(k)}</span></span>
+          <span>${wkCell(w.crystal)}</span>
+          <span>${wkCell(w.item)}</span>
+          <span>${wkCell(w.hunt)}</span>
+          <span class="wk-time">${formatHM(w.time)}</span>
+          <span class="wk-total">${formatMesoCompact(w.money)}</span>
+        </div>`;
+        }).join('');
 
     // 최근 8주 추이 (결정석 / 물욕템 각각 별도 집계 기준)
     const chart = document.getElementById('calTrendChart');
