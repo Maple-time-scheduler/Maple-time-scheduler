@@ -354,6 +354,8 @@
   /* 통계 > 결정석·물욕 — 8주 추이(카드 안), 순위 목록(구분선형) */
   #calStatsView .sg-chart-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   #calStatsView .sg-chart { display: flex; align-items: flex-end; justify-content: space-around; gap: 6px; height: 150px; border-bottom: 1px solid var(--border); }
+  #calStatsView .sg-chart .sg-col, #calStatsView .sg-xl span { cursor: pointer; }
+  #calStatsView .sg-chart .sg-col:hover i { filter: brightness(1.12); }
   #calStatsView .sg-chart .sg-col { flex: 1; max-width: 46px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
   #calStatsView .sg-chart .sg-col small { font-size: 9.5px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; }
   #calStatsView .sg-chart .sg-col i { display: block; width: 100%; border-radius: 5px 5px 0 0; min-height: 2px; }
@@ -392,24 +394,58 @@
   #calStatsView .fx-prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); }
   #calStatsView .fx-prices-title { font-size: 11.5px; color: var(--muted); font-weight: 700; margin-right: 2px; }
   #calStatsView .fx-price-note { flex-basis: 100%; font-size: 11px; color: var(--muted); }
-  #calStatsView .fx-row {
-    display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) minmax(0, 1.3fr) minmax(0, 1fr);
-    align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  #calStatsView .fx-toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  /* 계정별 합산 (시세 표 아래) */
+  #calStatsView .fx-acct-title { font-size: 11.5px; color: var(--muted); font-weight: 700; margin: 16px 0 4px; }
+  #calStatsView .fx-acct-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  #calStatsView .fx-acct-row:last-child { border-bottom: none; }
+  #calStatsView .fx-acct-name { flex: 1; min-width: 0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #calStatsView .fx-acct-name small { font-weight: 400; color: var(--muted); font-size: 10.5px; }
+  #calStatsView .fx-acct-part { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; min-width: 58px; justify-content: flex-end; }
+  #calStatsView .fx-acct-part img { width: 15px; height: 15px; object-fit: contain; }
+  #calStatsView .fx-acct-money { width: 70px; text-align: right; font-weight: 800; color: var(--money-grad-1); white-space: nowrap; }
+  #calStatsView .fx-acct-empty { font-size: 11.5px; color: var(--muted); margin-top: 14px; }
+  #calStatsView .fx-acct-empty button { background: none; border: none; padding: 0; color: var(--accent-strong); font-weight: 700; cursor: pointer; font-family: inherit; font-size: inherit; }
+  .acct-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .acct-dot.a0 { background: #FF9F1C; } .acct-dot.a1 { background: #4C9F70; } .acct-dot.a2 { background: #4C7FD6; }
+  /* 캐릭터별 획득 현황 — 6열 카드 (캐릭터 이미지 + 환산 합계) */
+  #calStatsView .fx-char-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 900px) { #calStatsView .fx-char-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { #calStatsView .fx-char-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } }
+  #calStatsView .fx-char-card {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;
+    background: var(--surface); border-radius: 16px; padding: 12px 8px; box-shadow: 0 6px 16px rgba(74,53,32,0.10);
   }
-  #calStatsView .fx-row.no-cube { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) minmax(0, 1fr); }
-  #calStatsView .fx-row:last-child { border-bottom: none; }
-  #calStatsView .fx-row > span:not(:first-child) { text-align: right; white-space: nowrap; }
-  #calStatsView .fx-row.fx-head { font-size: 11px; color: var(--muted); padding: 4px 0 8px; }
-  #calStatsView .fx-row .fx-char { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #calStatsView .fx-row .fx-zero { color: var(--muted); }
-  #calStatsView .fx-row .fx-total { font-weight: 800; color: var(--money-grad-1); }
-  #calStatsView .fx-cubes { display: inline-flex; gap: 6px; justify-content: flex-end; }
-  #calStatsView .fx-cubes span { display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; }
-  #calStatsView .fx-cubes img { width: 14px; height: 14px; object-fit: contain; }
+  [data-theme="dark"] #calStatsView .fx-char-card { box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+  #calStatsView .fx-char-medal { position: absolute; top: 7px; left: 9px; font-size: 15px; }
+  #calStatsView .fx-char-acct { position: absolute; top: 9px; right: 9px; }
+  #calStatsView .fx-char-avatar { width: 64px; height: 64px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0; }
+  #calStatsView .fx-char-avatar img { width: 100%; height: 100%; object-fit: contain; }
+  #calStatsView .fx-char-avatar.nexon-zoom img { transform: scale(3.3); transform-origin: 49% 55%; }
+  #calStatsView .fx-char-name { font-size: 11.5px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #calStatsView .fx-char-money { font-size: 15px; font-weight: 800; color: var(--money-grad-1); }
+  #calStatsView .fx-char-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 6px; font-size: 10.5px; }
+  #calStatsView .fx-char-chips span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+  #calStatsView .fx-char-chips img { width: 14px; height: 14px; object-fit: contain; }
+  #calStatsView .fx-char-chips.sub { color: var(--muted); }
+  /* 계정 그룹 팝업 */
+  .acct-name-list { display: flex; flex-direction: column; gap: 6px; }
+  .acct-name-row { display: flex; align-items: center; gap: 8px; }
+  .acct-name-row input {
+    flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--ink); font-family: inherit; font-size: 12.5px;
+  }
+  .acct-name-row .acct-count { font-size: 11px; color: var(--muted); width: 44px; text-align: right; flex-shrink: 0; }
+  .acct-pick { display: inline-flex; gap: 3px; flex-shrink: 0; }
+  .acct-pick button {
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted); border-radius: 999px;
+    padding: 3px 9px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; max-width: 84px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .acct-pick button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  [data-theme="dark"] .acct-pick button.on { color: #201404; }
   @media (max-width: 600px) {
     #calStatsView .fx-top { grid-template-columns: 1fr; gap: 14px; }
-    #calStatsView .fx-row { font-size: 11.5px; gap: 4px; }
-    #calStatsView .fx-row.fx-head > span { white-space: normal; font-size: 9.5px; line-height: 1.3; }
     #calStatsView .fx-item { gap: 6px; font-size: 12px; }
     #calStatsView .fx-item .sg-bar { display: none; }
     #calStatsView .fx-item-name { flex: 1; width: auto; min-width: 0; }
@@ -417,6 +453,9 @@
     #calStatsView .fx-item-price { width: 58px; }
     #calStatsView .fx-item-money { width: 54px; }
     #calStatsView .fx-hint { flex-basis: 100%; }
+    #calStatsView .fx-acct-row { gap: 6px; font-size: 11.5px; }
+    #calStatsView .fx-acct-part { min-width: 0; }
+    #calStatsView .fx-acct-money { width: 50px; }
   }
   /* 통계 > 개요 — 기간 스위치 + 총 수익 카드 */
   #calStatsView .ov-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -1769,12 +1808,18 @@
             <button type="button" data-period="week" onclick="setFixedPeriod('week')">이번 주</button>
             <button type="button" data-period="cumulative" onclick="setFixedPeriod('cumulative')">누적</button>
           </div>
-          <span class="fx-hint" id="fxHint"></span>
+          <span class="fx-toolbar-right">
+            <span class="fx-hint" id="fxHint"></span>
+            <button type="button" class="hunt-char-manage-btn" onclick="openAccountGroupModal()">⚙ 계정 그룹</button>
+          </span>
         </div>
         <div class="ov-card fx-card">
           <div class="fx-top">
             <div class="ov-left" id="fxLeft"></div>
-            <div class="ov-right" id="fxItems"></div>
+            <div class="ov-right">
+              <div id="fxItems"></div>
+              <div id="fxAccounts"></div>
+            </div>
           </div>
           <div class="fx-prices">
             <span class="fx-prices-title">시세</span>
@@ -2003,6 +2048,23 @@
     <div class="modal-actions" style="flex:none;">
       <button class="modal-cancel-btn" onclick="closeHuntCharManageModal()">닫기</button>
       <button class="modal-save-btn" onclick="saveHuntCharManageModal()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="accountGroupModalOverlay" style="display:none;" onclick="if(event.target===this) closeAccountGroupModal()">
+  <div class="modal-card">
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex:none;">
+      <span>계정 그룹</span>
+      <span id="accountGroupCount" style="font-size:12px; font-weight:700; color:var(--accent-strong);"></span>
+    </div>
+    <div class="modal-hint" style="margin-bottom:10px; flex:none;">최대 3개 계정까지 이름을 정하고, 아래에서 캐릭터마다 계정을 골라 주세요. 고정 리워드가 계정별로 합산돼요.</div>
+    <div class="acct-name-list" id="accountGroupNameList" style="flex:none;"></div>
+    <div class="modal-title" style="margin-top:14px; flex:none;">캐릭터별 계정</div>
+    <div class="modal-boss-list" id="accountGroupCharList" style="flex:1; min-height:48px; height:auto; max-height:none; overflow-y:auto;"></div>
+    <div class="modal-actions" style="flex:none;">
+      <button class="modal-cancel-btn" onclick="closeAccountGroupModal()">닫기</button>
+      <button class="modal-save-btn" onclick="saveAccountGroupModal()">저장</button>
     </div>
   </div>
 </div>
@@ -3572,6 +3634,13 @@
     }
     return { period: 'cumulative', label: '누적 전체', match: () => true, prevMatch: null, highlight: () => false, chartEnd: currentWeekKey() };
   }
+  // 8주 추이 막대를 누르면 그 주의 주간 화면으로 이동
+  function statGroupGoWeek(g, weekKey) {
+    statGroupState[g].period = 'week';
+    statGroupState[g].week = weekKey;
+    closeStatGroupPickers();
+    renderStatGroup(g);
+  }
   function setStatGroupPeriod(g, p) {
     statGroupState[g].period = p;
     closeStatGroupPickers();
@@ -3630,19 +3699,29 @@
     return `${prevLabel} 대비 <span class="${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '▲' : '▼'} ${formatMesoCompact(Math.abs(diff))}${pct}</span>`;
   }
   // 선택한 기간이 끝나는 주까지의 최근 8주 막대그래프 (선택 기간에 해당하는 주를 강조)
-  function statTrendHtml(r, field, color) {
+  function statTrendHtml(g, r, field, color) {
     const catTotals = calCategoryTotals();
     const keys = [];
     for (let i = 7; i >= 0; i--) keys.push(shiftWeekKey(r.chartEnd, -i));
     const values = keys.map(k => (catTotals.byWeek[k] && catTotals.byWeek[k][field]) || 0);
+    if (field === 'crystal' && r.period !== 'week') {
+      // 월간·누적에서는 월간 보스(검은 마법사) 결정석도 클리어한 주에 더해서 보여줍니다 (주간은 제외 기준 유지)
+      Object.keys(state.completionLog || {}).forEach(ds => {
+        const idx = keys.indexOf(statWeekKeyOf(ds));
+        if (idx === -1) return;
+        Object.values(state.completionLog[ds]).forEach(e => {
+          if (e.isBoss && e.theme === 'monthly') values[idx] += (e.money || 0);
+        });
+      });
+    }
     const max = Math.max(...values, 1);
     return `<div class="sg-chart-title">최근 8주 추이</div>
       <div class="sg-chart">` + keys.map((k, i) => `
-        <div class="sg-col ${r.highlight(k) ? 'on' : ''}" title="${mapleWeekLabel(k)} ${formatMeso(values[i])}">
+        <div class="sg-col ${r.highlight(k) ? 'on' : ''}" title="${mapleWeekLabel(k)} ${formatMeso(values[i])} — 눌러서 이 주 보기" onclick="statGroupGoWeek('${g}', '${k}')">
           <small>${formatMesoCompact(values[i])}</small>
           <i style="height:${Math.max(1.5, values[i] / max * 78).toFixed(1)}%; background:${color}"></i>
         </div>`).join('') + `</div>
-      <div class="sg-xl">` + keys.map(k => `<span class="${r.highlight(k) ? 'on' : ''}">${mapleWeekLabel(k).replace('주차', '주')}</span>`).join('') + `</div>`;
+      <div class="sg-xl">` + keys.map(k => `<span class="${r.highlight(k) ? 'on' : ''}" onclick="statGroupGoWeek('${g}', '${k}')">${mapleWeekLabel(k).replace('주차', '주')}</span>`).join('') + `</div>`;
   }
   function statHeroLeftHtml(label, total, deltaHtml, minis) {
     return `<div class="ov-left">
@@ -3709,7 +3788,7 @@
     document.getElementById('sgCard_crystal').innerHTML =
       statHeroLeftHtml('결정석 수익', total, r.prevMatch ? statDeltaHtml(total, prevTotal, r.prevLabel) : '',
         [{ label: '처치한 보스', value: `${kills}회` }, { label: '주 평균', value: statWeekAvg('crystal') }]) +
-      `<div class="ov-right">${statTrendHtml(r, 'crystal', 'var(--money-grad-1)')}</div>`;
+      `<div class="ov-right">${statTrendHtml('crystal', r, 'crystal', 'var(--money-grad-1)')}</div>`;
     const charItems = Object.entries(chars).map(([cid, value]) => ({ icon: statCharIcon(cid), name: statCharName(cid), value }))
       .sort((a, b) => b.value - a.value).slice(0, 10);
     document.getElementById('calCharRankList').innerHTML = statRankRowsHtml(charItems, 'var(--money-grad-1)', '이 기간의 결정석 기록이 없어요.');
@@ -3740,7 +3819,7 @@
       statHeroLeftHtml('물욕 수익', total, r.prevMatch ? statDeltaHtml(total, prevTotal, r.prevLabel) : '',
         [{ label: '판매 건수', value: `${count}건` },
          { label: '최고가 아이템', value: best ? escapeHtml(best.itemName) : '-', style: 'font-size:14px; overflow:hidden; text-overflow:ellipsis;' }]) +
-      `<div class="ov-right">${statTrendHtml(r, 'item', 'var(--rare-color)')}</div>`;
+      `<div class="ov-right">${statTrendHtml('rare', r, 'item', 'var(--rare-color)')}</div>`;
     const charItems = Object.entries(chars).map(([cid, value]) => ({ icon: statCharIcon(cid), name: statCharName(cid), value }))
       .sort((a, b) => b.value - a.value).slice(0, 10);
     document.getElementById('calRareItemCharRankList').innerHTML = statRankRowsHtml(charItems, 'var(--rare-color)', '이 기간에 판매한 물욕템이 없어요.');
@@ -3925,10 +4004,12 @@
           <span class="fx-item-money">${formatMesoCompact(Math.round(money[k] || 0))}</span>
         </div>`;
       }).join('');
+    renderFixedAccountSummary(byChar);
     document.getElementById('fxPriceNote').textContent = `시세를 바꾸면 이번 주(${mapleWeekLabel(curWeek)})부터 적용돼요. 이전 주 기록은 그때 시세로 고정돼요.`;
     renderFixedRewardByCharList(byChar);
   }
 
+  // 캐릭터별 획득 현황 — 6열 카드 (환산 합계 순, 1~3등 메달, 계정 그룹 색 점)
   function renderFixedRewardByCharList(byChar) {
     const el = document.getElementById('calFixedRewardByCharList');
     const withCube = fixedPeriod === 'week';
@@ -3936,27 +4017,132 @@
       const p = byChar[cid];
       const c = state.characters.find(ch => ch.id === cid);
       const moneySum = FIXED_KINDS.reduce((sum, k) => sum + (p.money[k] || 0), 0);
-      return { cid, name: c ? c.name : '(삭제된 캐릭터)', order: characterOrderIndex(cid), p, moneySum };
+      return { cid, c, name: c ? c.name : '(삭제된 캐릭터)', order: characterOrderIndex(cid), p, moneySum };
     }).filter(r => r.moneySum > 0 || FIXED_KINDS.some(k => r.p[k] > 0) || (withCube && (r.p.bronze > 0 || r.p.silver > 0 || r.p.gold > 0)))
       .sort((a, b) => b.moneySum - a.moneySum || a.order - b.order);
     if (rows.length === 0) { el.innerHTML = '<div class="empty-state" style="text-align:center; padding:14px 0;">기록이 없어요.</div>'; return; }
-    const cls = withCube ? 'fx-row' : 'fx-row no-cube';
-    const cell = v => v > 0 ? formatDropCount(v) : '<span class="fx-zero">-</span>';
-    const cubeCell = p => {
-      const parts = [[MEMENTO_BRONZE_ICON_SRC, p.bronze], [MEMENTO_SILVER_ICON_SRC, p.silver], [MEMENTO_GOLD_ICON_SRC, p.gold]]
-        .filter(([, n]) => n > 0).map(([src, n]) => `<span><img src="${src}" alt="">${Math.round(n * 10) / 10}</span>`);
-      return parts.length ? `<span class="fx-cubes">${parts.join('')}</span>` : '<span class="fx-zero">-</span>';
+    const medals = ['🥇', '🥈', '🥉'];
+    const num = n => String(Math.round(n * 10) / 10);
+    el.innerHTML = `<div class="fx-char-grid">` + rows.map((r, i) => {
+      const fx = FIXED_KINDS.filter(k => r.p[k] > 0)
+        .map(k => `<span title="${FIXED_KIND_LABEL[k]}">${fixedKindIcon(k) ? `<img src="${fixedKindIcon(k)}" alt="">` : ''}${num(r.p[k])}</span>`).join('');
+      const cubes = withCube ? [[MEMENTO_BRONZE_ICON_SRC, r.p.bronze, '브론즈'], [MEMENTO_SILVER_ICON_SRC, r.p.silver, '실버'], [MEMENTO_GOLD_ICON_SRC, r.p.gold, '골드']]
+        .filter(([, n]) => n > 0).map(([src, n, label]) => `<span title="메멘토 큐브(${label})"><img src="${src}" alt="">${num(n)}</span>`).join('') : '';
+      const acctIdx = accountGroupIndexOf(r.cid);
+      const acct = acctIdx === -1 ? null : state.accountGroups[acctIdx];
+      return `
+        <div class="fx-char-card" title="${escapeHtml(r.name)}">
+          ${i < 3 ? `<span class="fx-char-medal">${medals[i]}</span>` : ''}
+          ${acct ? `<span class="fx-char-acct" title="${escapeHtml(accountGroupName(acctIdx))}"><i class="acct-dot a${acctIdx}"></i></span>` : ''}
+          ${rankAvatarHtml(r.c ? r.c.image : null, 'fx-char-avatar', r.c ? r.c.imageIsNexon : false)}
+          <span class="fx-char-name">${escapeHtml(r.name)}</span>
+          <span class="fx-char-money">${formatMesoCompact(Math.round(r.moneySum))}</span>
+          <span class="fx-char-chips">${fx || '<span style="color:var(--muted)">에리온·에테 없음</span>'}</span>
+          ${cubes ? `<span class="fx-char-chips sub">${cubes}</span>` : ''}
+        </div>`;
+    }).join('') + `</div>`;
+  }
+
+  // ---- 계정 그룹 (최대 3개) ----
+  const MAX_ACCOUNT_GROUPS = 3;
+  function accountGroupName(idx) {
+    const g = state.accountGroups[idx];
+    return (g && g.name && g.name.trim()) || `계정 ${'ABC'[idx]}`;
+  }
+  function accountGroupIndexOf(cid) {
+    return (state.accountGroups || []).findIndex(g => g && (g.charIds || []).includes(cid));
+  }
+  // 시세 표 아래: 계정마다 에리온·에테 개수와 환산 합계 (지금 고른 기간 기준)
+  function renderFixedAccountSummary(byChar) {
+    const el = document.getElementById('fxAccounts');
+    if (!el) return;
+    const groups = (state.accountGroups || []).map((g, idx) => ({ g, idx })).filter(x => x.g && (x.g.charIds || []).length > 0);
+    if (groups.length === 0) {
+      el.innerHTML = `<div class="fx-acct-empty">캐릭터를 계정별로 묶으면 계정마다 합산해서 보여줘요. <button type="button" onclick="openAccountGroupModal()">계정 그룹 설정</button></div>`;
+      return;
+    }
+    const sumOf = cids => {
+      const t = { erion: 0, eternelUpper: 0, eternelAccessory: 0, money: 0 };
+      cids.forEach(cid => {
+        const p = byChar[cid];
+        if (!p) return;
+        FIXED_KINDS.forEach(k => { t[k] += p[k] || 0; t.money += (p.money && p.money[k]) || 0; });
+      });
+      return t;
     };
-    el.innerHTML = `<div class="${cls} fx-head"><span>캐릭터</span><span>에리온</span><span>에테(상하모견)</span><span>에테(장신망)</span>${withCube ? '<span>메멘토 큐브</span>' : ''}<span>환산 합계</span></div>` +
-      rows.map(r => `
-        <div class="${cls}">
-          <span class="fx-char">${escapeHtml(r.name)}</span>
-          <span>${cell(r.p.erion)}</span>
-          <span>${cell(r.p.eternelUpper)}</span>
-          <span>${cell(r.p.eternelAccessory)}</span>
-          ${withCube ? `<span>${cubeCell(r.p)}</span>` : ''}
-          <span class="fx-total">${formatMesoCompact(Math.round(r.moneySum))}</span>
+    const assigned = new Set();
+    const rows = groups.map(({ g, idx }) => {
+      (g.charIds || []).forEach(cid => assigned.add(cid));
+      return { name: accountGroupName(idx), dot: `<i class="acct-dot a${idx}"></i>`, count: g.charIds.length, t: sumOf(g.charIds) };
+    });
+    const rest = Object.keys(byChar).filter(cid => !assigned.has(cid));
+    const restT = sumOf(rest);
+    if (rest.length > 0 && restT.money > 0) rows.push({ name: '미지정', dot: '<i class="acct-dot" style="background:var(--border)"></i>', count: rest.length, t: restT });
+    const num = n => String(Math.round(n * 10) / 10);
+    el.innerHTML = `<div class="fx-acct-title">계정별 합산</div>` + rows.map(r => `
+      <div class="fx-acct-row">
+        <span class="fx-acct-name">${r.dot}${escapeHtml(r.name)} <small>${r.count}명</small></span>
+        ${FIXED_KINDS.map(k => `<span class="fx-acct-part" title="${FIXED_KIND_LABEL[k]}">${fixedKindIcon(k) ? `<img src="${fixedKindIcon(k)}" alt="">` : ''}${num(r.t[k])}</span>`).join('')}
+        <span class="fx-acct-money">${formatMesoCompact(Math.round(r.t.money))}</span>
+      </div>`).join('');
+  }
+
+  let accountGroupDraft = [];
+  function openAccountGroupModal() {
+    const validIds = new Set(state.characters.map(c => c.id));
+    accountGroupDraft = [0, 1, 2].map(i => {
+      const g = (state.accountGroups || [])[i] || {};
+      return { id: g.id || `acct${i + 1}`, name: g.name || '', charIds: (g.charIds || []).filter(id => validIds.has(id)) };
+    });
+    renderAccountGroupModal();
+    document.getElementById('accountGroupModalOverlay').style.display = 'flex';
+  }
+  function closeAccountGroupModal() {
+    document.getElementById('accountGroupModalOverlay').style.display = 'none';
+  }
+  function setAccountGroupDraftName(idx, value) {
+    accountGroupDraft[idx].name = value;
+    renderAccountGroupModal(true);
+  }
+  function setAccountGroupDraftChar(cid, idx) {
+    accountGroupDraft.forEach(g => { g.charIds = g.charIds.filter(id => id !== cid); });
+    if (idx >= 0) accountGroupDraft[idx].charIds.push(cid);
+    renderAccountGroupModal();
+  }
+  function renderAccountGroupModal(skipNames) {
+    const draftName = i => (accountGroupDraft[i].name || '').trim() || `계정 ${'ABC'[i]}`;
+    const used = accountGroupDraft.filter(g => g.charIds.length > 0).length;
+    document.getElementById('accountGroupCount').textContent = `${used}/${MAX_ACCOUNT_GROUPS}`;
+    if (!skipNames) {
+      document.getElementById('accountGroupNameList').innerHTML = accountGroupDraft.map((g, i) => `
+        <div class="acct-name-row">
+          <i class="acct-dot a${i}"></i>
+          <input type="text" maxlength="12" placeholder="계정 ${'ABC'[i]}" value="${escapeHtml(g.name)}" oninput="setAccountGroupDraftName(${i}, this.value)">
+          <span class="acct-count" id="accountGroupCount_${i}">${g.charIds.length}명</span>
         </div>`).join('');
+    }
+    const listEl = document.getElementById('accountGroupCharList');
+    if (state.characters.length === 0) {
+      listEl.innerHTML = '<div class="modal-boss-empty">등록된 캐릭터가 없어요. 먼저 \'내 캐릭터\'에서 캐릭터를 추가해주세요.</div>';
+      return;
+    }
+    listEl.innerHTML = state.characters.map(c => {
+      const cur = accountGroupDraft.findIndex(g => g.charIds.includes(c.id));
+      return `
+        <div class="modal-boss-row">
+          <span class="modal-boss-row-left" style="gap:8px;"><span>${escapeHtml(c.name)}</span></span>
+          <span class="acct-pick">
+            <button type="button" class="${cur === -1 ? 'on' : ''}" onclick="setAccountGroupDraftChar('${c.id}', -1)">없음</button>
+            ${[0, 1, 2].map(i => `<button type="button" class="${cur === i ? 'on' : ''}" title="${escapeHtml(draftName(i))}" onclick="setAccountGroupDraftChar('${c.id}', ${i})">${escapeHtml(draftName(i))}</button>`).join('')}
+          </span>
+        </div>`;
+    }).join('');
+  }
+  function saveAccountGroupModal() {
+    state.accountGroups = accountGroupDraft.map(g => ({ id: g.id, name: (g.name || '').trim(), charIds: [...g.charIds] }));
+    saveState();
+    closeAccountGroupModal();
+    renderFixedDropStats();
   }
 
   // 보스별 물욕템 판매 수익 · 드롭률 통합 카드 — 위쪽 보스 아이콘(보스·난이도별)을 골라서
@@ -4213,6 +4399,7 @@
     huntLog: [], // 사냥(재획) 기록 — {id, dateStr, characterId, time, meso, shardCount, shardPriceAtEntry, shardMoney, money}. money(=meso+shardMoney)가 주간 진행도/주간 수익에 합산됨
     huntRegisteredCharIds: [], // 재획 기록에 쓸 캐릭터로 등록해둔 캐릭터 id 목록 (최대 5개, 재획 기록 선택은 이 목록 안에서만 가능)
     shardPrice: 7000000, // 조각 1개당 시세(메소) — 언제든 수정 가능, 기록 시점의 값이 각 기록에 그대로 저장(고정)됨. 미입력 기본값 700만
+    accountGroups: [], // 고정 리워드 계정 그룹 (최대 3개) — {id, name, charIds}. 캐릭터는 한 계정에만 속함
     fixedPriceHistory: [], // 고정 리워드 시세 이력 — {weekKey(목요일), erion, eternelUpper, eternelAccessory}. 시세를 바꾸면 그 주부터 적용, 이전 주는 그때 시세로 고정
     erionPrice: 1000000, eternelUpperPrice: 25000000, eternelAccessoryPrice: 1800000000, // 에리온/에테 1개당 참고 시세(메소) — 변동성이 커서 집계에는 안 쓰고, 예상 금액 참고용으로만. 미입력 기본값: 에리온 100만, 에테(상하모견) 0.25억, 에테(장신망) 18억
     characters: [
@@ -4606,6 +4793,7 @@
         state.eternelUpperPrice = state.eternelUpperPrice || 25000000;
         state.eternelAccessoryPrice = state.eternelAccessoryPrice || 1800000000;
         if (!Array.isArray(state.fixedPriceHistory)) state.fixedPriceHistory = [];
+        if (!Array.isArray(state.accountGroups)) state.accountGroups = [];
 
         // 일회성 마이그레이션: 에테(상하모견/장신망) 집계 단위를 '조각 개수'에서 '완성 아이템 개수'(조각 10개=1개)로
         // 변경하면서, 이미 쌓여있던 과거 완료 기록의 에테 수치도 딱 한 번만 1/10로 보정합니다.
